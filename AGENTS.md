@@ -1,3 +1,14 @@
+## Project
+
+BookVerse. Read `README.md` first: it holds the plan, roles, money rules, and the A–F build path (P1–P17).
+
+- Web lives at the repo root: Astro + React + Tailwind + TypeScript. Interactive UI is React `.jsx`/`.tsx` islands with `client:*` directives. Do not use Preact.
+- API lives in `api/`: Node + Express + Zod, its own `package.json`. Validate every request body and env var with Zod.
+- Add libraries only in the step that needs them (TanStack Query, Zustand, Prisma, Redis, BullMQ, Better Auth).
+- Every external service (payment, courier, images, email, SMS) goes behind a provider interface with a mock default, switched by `.env`.
+- Money and points are append-only ledgers. Never update or delete a ledger row.
+- Finish each prompt by running its ACCEPTANCE checks: `npm test`, `npm run build`, `npm run test:api`, `npm run test:e2e`.
+
 ## Development
 
 When starting the dev server, use background mode:
