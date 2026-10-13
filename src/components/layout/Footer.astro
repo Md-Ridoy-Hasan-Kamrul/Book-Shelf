@@ -1,0 +1,40 @@
+---
+const year = new Date().getFullYear();
+
+const links = [
+	{ href: '/#features', label: 'Features' },
+	{ href: '/#how', label: 'How it works' },
+	{ href: 'https://docs.astro.build', label: 'Astro docs', external: true },
+	{ href: 'https://react.dev', label: 'React docs', external: true },
+];
+---
+
+<footer class="border-t border-line bg-paper">
+	<div
+		class="mx-auto flex w-[min(100%-2rem,72rem)] flex-col gap-6 py-10 min-[720px]:flex-row min-[720px]:items-end min-[720px]:justify-between"
+	>
+		<div>
+			<p class="m-0 font-display text-lg font-bold text-ink">Astro React</p>
+			<p class="m-0 mt-1 max-w-sm text-sm text-ink-soft">
+				A small starter: Astro owns the page, React hydrates only the islands.
+			</p>
+		</div>
+		<nav class="flex flex-wrap gap-x-5 gap-y-2" aria-label="Footer">
+			{
+				links.map((link) => (
+					<a
+						href={link.href}
+						class="text-sm font-semibold text-ink no-underline hover:text-sea"
+						target={link.external ? '_blank' : undefined}
+						rel={link.external ? 'noopener noreferrer' : undefined}
+					>
+						{link.label}
+					</a>
+				))
+			}
+		</nav>
+	</div>
+	<p class="m-0 border-t border-line py-4 text-center text-xs text-ink-soft">
+		© {year} Astro React
+	</p>
+</footer>

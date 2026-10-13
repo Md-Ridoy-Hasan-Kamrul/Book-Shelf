@@ -1,0 +1,41 @@
+---
+import '../styles/global.css';
+import '@fontsource-variable/figtree';
+import '@fontsource/syne/700.css';
+import Navbar from '../components/layout/Navbar.jsx';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = 'Astro React',
+	description = 'Static pages with Astro and interactive islands with React.',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<title>{title}</title>
+	</head>
+	<body>
+		<a
+			href="#main"
+			class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-sea focus:px-3 focus:py-2 focus:text-paper"
+		>
+			Skip to content
+		</a>
+		<Navbar client:load />
+		<slot />
+	</body>
+</html>

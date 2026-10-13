@@ -1,0 +1,16 @@
+import { useState } from 'react';
+
+export default function BuyButton({ id }) {
+	const [added, setAdded] = useState(false);
+
+	return (
+		<button
+			type="button"
+			className="inline-flex min-h-11 items-center justify-center rounded-full bg-sea px-5 text-sm font-semibold text-paper transition hover:bg-sea-deep disabled:opacity-70"
+			onClick={() => setAdded(true)}
+			disabled={added}
+		>
+			{added ? 'Added' : 'Buy'} · {id}
+		</button>
+	);
+}
