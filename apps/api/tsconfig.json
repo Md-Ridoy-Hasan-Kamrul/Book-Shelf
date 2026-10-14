@@ -1,17 +1,9 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2023",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "verbatimModuleSyntax": true,
-    "types": ["node"],
-    "rootDir": "src",
-    "outDir": "dist"
+    "noEmit": true,
+    "rootDir": "src"
   },
-  "include": ["src"],
+  "include": ["src", "src/types/**/*.d.ts"],
   "exclude": ["src/**/*.test.ts"]
 }

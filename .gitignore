@@ -15,6 +15,7 @@ pnpm-debug.log*
 # shared build
 packages/shared/dist/
 apps/api/dist/
+apps/api/uploads/
 
 # logs
 npm-debug.log*

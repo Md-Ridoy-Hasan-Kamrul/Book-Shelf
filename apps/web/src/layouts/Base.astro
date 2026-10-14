@@ -1,0 +1,86 @@
+---
+import '../styles/global.css';
+import { getWebEnv } from '../env';
+
+getWebEnv();
+import '@fontsource/hind-siliguri/400.css';
+import '@fontsource/hind-siliguri/600.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+import interLatin400 from '@fontsource/inter/files/inter-latin-400-normal.woff2?url';
+import interLatin600 from '@fontsource/inter/files/inter-latin-600-normal.woff2?url';
+import hindSiliguri400 from '@fontsource/hind-siliguri/files/hind-siliguri-bengali-400-normal.woff2?url';
+import hindSiliguri600 from '@fontsource/hind-siliguri/files/hind-siliguri-bengali-600-normal.woff2?url';
+import Island from '../components/islands/Island.tsx';
+import SiteShell from '../components/islands/SiteShell.tsx';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  jsonLd?: Record<string, unknown>;
+}
+
+const {
+  title = 'BookVerse',
+  description = 'বাংলাদেশের বই মার্কেটপ্লেস ও রিডিং কমিউনিটি — Fresh & Human.',
+  ogImage = '/favicon.svg',
+  jsonLd,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
+const fullTitle = title === 'BookVerse' ? title : `${title} · BookVerse`;
+---
+
+<!doctype html>
+<html lang="bn">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preload" href={interLatin400} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={interLatin600} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={hindSiliguri400} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={hindSiliguri600} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site ?? Astro.url.origin).href} />
+    <meta name="twitter:card" content="summary" />
+    <title>{fullTitle}</title>
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  </head>
+  <body class="bg-cream pb-20 text-ink-900 min-[720px]:pb-0">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-[var(--radius-card)] focus:bg-brand-600 focus:px-3 focus:py-2 focus:text-paper"
+    >
+      Skip to content
+    </a>
+    <Island client:load>
+      <SiteShell />
+    </Island>
+    <slot />
+    <footer class="border-t border-line bg-paper">
+      <div
+        class="mx-auto flex w-[min(100%-2rem,72rem)] flex-col gap-4 py-8 min-[720px]:flex-row min-[720px]:items-end min-[720px]:justify-between"
+      >
+        <div>
+          <p class="m-0 font-display text-lg font-bold text-ink-900">BookVerse</p>
+          <p class="m-0 mt-1 max-w-md text-sm text-ink-500">Local-first · BDT · Bangla + English</p>
+        </div>
+        <nav class="flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold" aria-label="Footer">
+          <a href="/design" class="text-brand-700 no-underline hover:underline">Design</a>
+          <a href="https://docs.astro.build" class="text-ink-700 no-underline hover:text-brand-700"
+            >Astro</a
+          >
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

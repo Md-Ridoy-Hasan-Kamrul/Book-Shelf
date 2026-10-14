@@ -3,35 +3,41 @@ import BuyButton from '../islands/BuyButton.jsx';
 ---
 
 <section id="top" class="py-[clamp(4rem,10vw,7rem)]" aria-labelledby="hero-title">
-	<div class="mx-auto grid w-[min(100%-2rem,72rem)] gap-8 min-[900px]:grid-cols-[1.2fr_0.8fr] min-[900px]:items-center">
-		<div>
-			<p class="mb-3 font-display text-xs font-bold tracking-[0.14em] text-brand-600 uppercase">
-				BookVerse · Astro + React
-			</p>
-			<h1
-				id="hero-title"
-				class="m-0 font-display text-[clamp(2.25rem,6vw,4.25rem)] leading-[1.05] font-bold tracking-tight text-ink-900"
-			>
-				বইয়ের পাতা। ইন্টারঅ্যাক্টিভ দ্বীপ।
-			</h1>
-			<p class="mt-4 max-w-xl text-lg text-ink-700">
-				পেজ Astro-তে, ক্লিক লাগলে React island — Fresh &amp; Human রঙ ও local-first সেটআপ।
-			</p>
-			<div class="mt-7 flex flex-wrap items-center gap-3">
-				<BuyButton id="starter-kit" client:load />
-				<a
-					href="/design"
-					class="inline-flex min-h-11 items-center rounded-full border border-line bg-paper px-5 text-sm font-semibold text-ink-900 no-underline hover:bg-sand"
-				>
-					Design tokens
-				</a>
-			</div>
-		</div>
-		<div class="rounded-[var(--radius-card)] border border-line bg-paper p-6 shadow-[var(--shadow-warm)]">
-			<p class="m-0 font-mono text-xs tracking-wide text-brand-600 uppercase">Page pattern</p>
-			<pre class="mt-3 overflow-x-auto text-sm leading-relaxed text-ink-900"><code>{`import BuyButton from '../components/BuyButton.jsx';
+  <div
+    class="mx-auto grid w-[min(100%-2rem,72rem)] gap-8 min-[900px]:grid-cols-[1.2fr_0.8fr] min-[900px]:items-center"
+  >
+    <div>
+      <p class="mb-3 font-display text-xs font-bold tracking-[0.14em] text-brand-600 uppercase">
+        BookVerse · Astro + React
+      </p>
+      <h1
+        id="hero-title"
+        class="m-0 font-display text-[clamp(2.25rem,6vw,4.25rem)] leading-[1.05] font-bold tracking-tight text-ink-900"
+      >
+        বইয়ের পাতা। ইন্টারঅ্যাক্টিভ দ্বীপ।
+      </h1>
+      <p class="mt-4 max-w-xl text-lg text-ink-700">
+        পেজ Astro-তে, ক্লিক লাগলে React island — Fresh &amp; Human রঙ ও local-first সেটআপ।
+      </p>
+      <div class="mt-7 flex flex-wrap items-center gap-3">
+        <BuyButton id="starter-kit" client:load />
+        <a
+          href="/design"
+          class="inline-flex min-h-11 items-center rounded-full border border-line bg-paper px-5 text-sm font-semibold text-ink-900 no-underline hover:bg-sand"
+        >
+          Design tokens
+        </a>
+      </div>
+    </div>
+    <div
+      data-reveal
+      class="rounded-[var(--radius-card)] border border-line bg-paper p-6 shadow-[var(--shadow-warm)]"
+    >
+      <p class="m-0 font-mono text-xs tracking-wide text-brand-600 uppercase">Page pattern</p>
+      <pre
+        class="mt-3 overflow-x-auto text-sm leading-relaxed text-ink-900"><code>{`import BuyButton from '../components/BuyButton.jsx';
 
 <BuyButton id={product.id} client:load />`}</code></pre>
-		</div>
-	</div>
+    </div>
+  </div>
 </section>

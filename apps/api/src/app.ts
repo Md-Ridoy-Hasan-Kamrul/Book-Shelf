@@ -1,48 +1,91 @@
+import { errorEnvelope } from '@bookverse/shared';
 import cors from 'cors';
 import express, { type ErrorRequestHandler } from 'express';
 import helmet from 'helmet';
+import { pinoHttp } from 'pino-http';
 import { ZodError } from 'zod';
-import type { Env } from './env.js';
-import { healthRouter } from './routes/health.js';
+import type { ApiEnv } from '@bookverse/shared';
+import { toNodeHandler } from 'better-auth/node';
+import { createAuth } from './auth/createAuth.js';
+import { AppError } from './lib/appError.js';
+import type { Logger } from './lib/logger.js';
+import { requestIdMiddleware } from './middleware/requestId.js';
+import { createEmailProvider } from './providers/email/index.js';
+import { createProviderRegistry } from './providers/index.js';
+import { createSmsProvider } from './providers/sms/index.js';
+import { createAuthRateLimitMiddleware, createFollowRouter } from './routes/follow.js';
+import { createHealthRouter } from './routes/health.js';
+import { createMeRouter } from './routes/me.js';
+import { createPhoneOtpRouter } from './routes/phoneOtp.js';
+import { createBooksRouter } from './routes/books.js';
+import { createPostsRouter } from './routes/posts.js';
+import { createRoleApplicationRouter } from './routes/roleApplications.js';
+import { createSearchRouter } from './routes/search.js';
+import { createSellerRouter } from './routes/seller.js';
+import { createUploadsRouter } from './routes/uploads.js';
+import { createUsersRouter } from './routes/users.js';
+import { createWishlistRouter } from './routes/wishlist.js';
+import { createStorageProvider } from './providers/storage/index.js';
+import { createSearchService } from './services/search/pgSearchService.js';
 
-export function createApp(env: Env) {
-	const app = express();
+export function createApp(env: ApiEnv, logger: Logger) {
+  const app = express();
+  const providers = createProviderRegistry(env);
+  const email = createEmailProvider(env);
+  const sms = createSmsProvider(env, logger);
+  const storage = createStorageProvider(env);
+  const search = createSearchService(env);
+  const auth = createAuth(env, email);
 
-	app.disable('x-powered-by');
-	app.use(helmet());
-	app.use(cors({ origin: env.WEB_ORIGIN, credentials: true }));
-	app.use(express.json({ limit: '1mb' }));
+  app.disable('x-powered-by');
+  app.set('providers', providers);
+  app.set('auth', auth);
 
-	app.use('/health', healthRouter);
+  app.use(requestIdMiddleware);
+  app.use(
+    pinoHttp({
+      logger,
+      genReqId: (_req, res) => String(res.locals.requestId ?? 'unknown'),
+    }),
+  );
+  app.use(helmet());
+  app.use(cors({ origin: env.WEB_ORIGIN, credentials: true }));
 
-	app.use((_req, res) => {
-		res.status(404).json({
-			success: false,
-			code: 'NOT_FOUND',
-			message: 'Not found',
-			errors: [],
-		});
-	});
+  app.use('/api/auth', createAuthRateLimitMiddleware(env));
+  app.all('/api/auth/*splat', toNodeHandler(auth));
 
-	const onError: ErrorRequestHandler = (err, _req, res, _next) => {
-		if (err instanceof ZodError) {
-			res.status(400).json({
-				success: false,
-				code: 'VALIDATION_ERROR',
-				message: 'Invalid request',
-				errors: err.issues,
-			});
-			return;
-		}
-		console.error(err);
-		res.status(500).json({
-			success: false,
-			code: 'INTERNAL_ERROR',
-			message: 'Internal server error',
-			errors: [],
-		});
-	};
-	app.use(onError);
+  app.use(express.json({ limit: '1mb' }));
 
-	return app;
+  app.use('/health', createHealthRouter(env));
+  app.use('/me', createMeRouter(auth));
+  app.use('/users', createFollowRouter(auth, env));
+  app.use('/users', createUsersRouter(auth));
+  app.use('/role-applications', createRoleApplicationRouter(auth));
+  app.use('/phone', createPhoneOtpRouter(auth, env, sms));
+  app.use('/posts', createPostsRouter(auth, env));
+  app.use('/books', createBooksRouter(env, storage));
+  app.use('/search', createSearchRouter(env, search));
+  app.use('/seller', createSellerRouter(auth, env, storage));
+  app.use('/wishlist', createWishlistRouter(auth));
+  app.use('/uploads', createUploadsRouter(storage));
+
+  app.use((_req, res) => {
+    res.status(404).json(errorEnvelope('NOT_FOUND', 'Not found'));
+  });
+
+  const onError: ErrorRequestHandler = (err, _req, res, _next) => {
+    if (err instanceof AppError) {
+      res.status(err.statusCode).json(errorEnvelope(err.code, err.message, err.errors));
+      return;
+    }
+    if (err instanceof ZodError) {
+      res.status(400).json(errorEnvelope('VALIDATION_ERROR', 'Invalid request', err.issues));
+      return;
+    }
+    logger.error({ err }, 'Unhandled error');
+    res.status(500).json(errorEnvelope('INTERNAL_ERROR', 'Internal server error'));
+  };
+  app.use(onError);
+
+  return app;
 }

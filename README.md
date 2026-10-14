@@ -1,49 +1,54 @@
 # BookVerse
 
-বাংলাদেশের জন্য বই কেনাবেচা ও সোশ্যাল রিডিং — **local-first**, ০ টাকা। Full plan: `AGENTS.md`, progress: `PROJECT_FLOW.md`.
+Local-first social-commerce for books in Bangladesh. Rules: `AGENTS.md`. Progress: `PROJECT_FLOW.md`.
 
-## Stack (P1)
+## P1 stack
 
-| Layer | Tools |
-| --- | --- |
-| Web | Astro SSR (`@astrojs/node`) + React + Tailwind + TypeScript |
-| State | TanStack Query (`src/lib/queryClient.ts`), Zustand (`src/stores/`) |
-| API | Node + Express + Zod + Helmet |
-| Shared | `packages/shared` — Zod schemas |
-| Local infra | Docker: Postgres, Redis, Mailpit |
+| Layer  | Location                                                        |
+| ------ | --------------------------------------------------------------- |
+| Web    | `apps/web` — Astro SSR (`@astrojs/node`) + **React** + Tailwind |
+| API    | `apps/api` — Express + Zod + Pino + provider registry           |
+| Shared | `packages/shared` — env + HTTP envelopes (Zod), **tsup** build  |
 
-## Structure
+## Prerequisites
 
-```text
-apps/web/          Astro + React (/, /design)
-apps/api/          Express API (/health)
-packages/shared/   Shared Zod types
-docker-compose.yml
+- Node `>=22.12.0`, pnpm 10, Docker (Postgres, Redis, Mailpit)
+
+## Setup
+
+```bash
+cp .env.example .env
+pnpm install
+docker compose up -d
+pnpm db:migrate
+pnpm db:seed
+pnpm dev
 ```
+
+| URL                          | Service                                                      |
+| ---------------------------- | ------------------------------------------------------------ |
+| http://localhost:4321        | Web                                                          |
+| http://localhost:4321/design | Design tokens                                                |
+| http://localhost:4000/health | API health (Postgres + Redis when `HEALTH_SKIP_INFRA=false`) |
+| http://localhost:8025        | Mailpit UI                                                   |
 
 ## Commands
 
-| Command | Action |
-| --- | --- |
-| `pnpm install` | Install all workspaces |
-| `pnpm dev` | Web `:4321` + API `:4000` |
-| `pnpm docker:up` | Postgres, Redis, Mailpit |
-| `pnpm build` | shared → web → api |
-| `pnpm test` | Vitest (web + api) |
-| `pnpm test:e2e` | Playwright (web) |
+| Command              | Action                                              |
+| -------------------- | --------------------------------------------------- |
+| `pnpm dev`           | Web + API                                           |
+| `pnpm build`         | shared → web → api                                  |
+| `pnpm lint`          | ESLint (all packages)                               |
+| `pnpm typecheck`     | TypeScript                                          |
+| `pnpm test`          | Vitest                                              |
+| `pnpm test:e2e`      | Playwright                                          |
+| `pnpm db:validate`   | `prisma validate`                                   |
+| `pnpm db:migrate`    | Apply migrations (Postgres)                         |
+| `pnpm db:seed`       | Dev seed (200 books, settings, commission rules)    |
+| `pnpm db:seed:bench` | Bulk seed (~100k books) for search benchmark        |
+| `pnpm bench:search`  | Search p50/p95 report (needs bench seed + Postgres) |
+| `pnpm db:explain`    | EXPLAIN checks (trigram + verified-buyer index)     |
+| `pnpm db:studio`     | Prisma Studio                                       |
+| `pnpm sim:ipn`       | Stub (P5+)                                          |
 
-Copy `.env.example` → `apps/api/.env` when you wire Prisma (P3).
-
-## Design
-
-Fresh & Human palette: **`/design`** on the dev server.
-
-Island pattern:
-
-```astro
----
-import BuyButton from '../components/BuyButton.jsx';
----
-
-<BuyButton id={product.id} client:load />
-```
+Both apps import `@bookverse/shared`. Web validates `PUBLIC_*` via `src/env.ts`; API validates full env at startup.

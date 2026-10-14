@@ -10,52 +10,67 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Vitest
+  quality:
+    name: Lint, typecheck, test
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: bookverse
+          POSTGRES_PASSWORD: bookverse
+          POSTGRES_DB: bookverse
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U bookverse -d bookverse"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 10
       - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
       - run: pnpm test
-
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
+        env:
+          DATABASE_URL: postgresql://bookverse:bookverse@localhost:5432/bookverse
+          DIRECT_URL: postgresql://bookverse:bookverse@localhost:5432/bookverse
+          REDIS_URL: redis://localhost:6379
+          HEALTH_SKIP_INFRA: 'true'
+      - run: pnpm db:validate
+        env:
+          DATABASE_URL: postgresql://bookverse:bookverse@localhost:5432/bookverse
+          DIRECT_URL: postgresql://bookverse:bookverse@localhost:5432/bookverse
+      - run: pnpm db:migrate
+        env:
+          DATABASE_URL: postgresql://bookverse:bookverse@localhost:5432/bookverse
+          DIRECT_URL: postgresql://bookverse:bookverse@localhost:5432/bookverse
+      - run: pnpm db:seed
+        env:
+          DATABASE_URL: postgresql://bookverse:bookverse@localhost:5432/bookverse
+          DIRECT_URL: postgresql://bookverse:bookverse@localhost:5432/bookverse
+      - run: pnpm db:explain
+        env:
+          DATABASE_URL: postgresql://bookverse:bookverse@localhost:5432/bookverse
+          DIRECT_URL: postgresql://bookverse:bookverse@localhost:5432/bookverse
       - run: pnpm build
-
-  api:
-    name: API
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @bookverse/shared build
-      - run: pnpm --filter @bookverse/api typecheck
-      - run: pnpm --filter @bookverse/api test
 
   e2e:
     name: Playwright
@@ -64,7 +79,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 10
       - uses: actions/setup-node@v5
         with:
           node-version: 22

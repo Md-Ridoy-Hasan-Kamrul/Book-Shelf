@@ -1,0 +1,31 @@
+---
+import Base from '../../layouts/Base.astro';
+import { fetchBooks } from '../../lib/catalogApi';
+
+const slug = Astro.params.slug;
+if (!slug) return Astro.redirect('/search');
+const data = await fetchBooks({ publisher: slug, limit: '24' });
+---
+
+<Base title={`Publisher · ${slug}`}>
+  <main id="main" class="py-10">
+    <div class="mx-auto w-[min(100%-2rem,72rem)]">
+      <h1 class="m-0 font-display text-3xl font-bold text-ink-900">{slug}</h1>
+      <ul class="mt-8 grid list-none gap-4 p-0 min-[720px]:grid-cols-3">
+        {
+          data.items.map((b) => (
+            <li>
+              <a
+                href={`/books/${b.slug}`}
+                class="block rounded-[var(--radius-card)] border border-line bg-paper p-4 no-underline"
+              >
+                <h2 class="m-0 font-display text-lg font-bold text-ink-900">{b.titleBn}</h2>
+                <p class="m-0 text-sm text-ink-500">{b.author}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </main>
+</Base>

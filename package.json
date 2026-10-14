@@ -8,13 +8,53 @@
   },
   "packageManager": "pnpm@10.17.1",
   "scripts": {
+    "prepare": "husky",
     "dev": "pnpm --filter @bookverse/shared build && pnpm run --parallel dev:web dev:api",
     "dev:web": "pnpm --filter @bookverse/web dev",
     "dev:api": "pnpm --filter @bookverse/api dev",
     "build": "pnpm --filter @bookverse/shared build && pnpm --filter @bookverse/web build && pnpm --filter @bookverse/api build",
-    "test": "pnpm --filter @bookverse/shared build && pnpm --filter @bookverse/web test && pnpm --filter @bookverse/api test",
+    "lint": "eslint apps/api/src apps/web/src packages/shared/src",
+    "typecheck": "pnpm --filter @bookverse/shared build && pnpm -r typecheck",
+    "test": "pnpm --filter @bookverse/shared build && pnpm -r test",
     "test:e2e": "pnpm --filter @bookverse/web test:e2e",
     "docker:up": "docker compose up -d",
-    "docker:down": "docker compose down"
+    "docker:down": "docker compose down",
+    "db:validate": "pnpm --filter @bookverse/api db:validate",
+    "db:migrate": "pnpm --filter @bookverse/api db:migrate",
+    "db:seed": "pnpm --filter @bookverse/api db:seed",
+    "db:explain": "pnpm --filter @bookverse/api db:explain",
+    "db:seed:bench": "pnpm --filter @bookverse/api db:seed:bench",
+    "bench:search": "pnpm --filter @bookverse/api bench:search",
+    "db:studio": "pnpm --filter @bookverse/api db:studio",
+    "backup": "node scripts/stub.mjs backup",
+    "reconcile": "node scripts/stub.mjs reconcile",
+    "sim:ipn": "node scripts/stub.mjs sim:ipn",
+    "sim:courier": "node scripts/stub.mjs sim:courier"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,tsx,jsx,astro,css,json,md}": "prettier --write"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.4",
+    "prettier": "^3.6.2",
+    "prettier-plugin-astro": "^0.14.1",
+    "typescript-eslint": "^8.46.0"
+  },
+  "allowScripts": {
+    "esbuild": true,
+    "prisma": true,
+    "@prisma/client": true,
+    "@prisma/engines": true
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "prisma",
+      "@prisma/client",
+      "@prisma/engines"
+    ]
   }
 }

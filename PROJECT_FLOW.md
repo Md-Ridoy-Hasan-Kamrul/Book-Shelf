@@ -4,23 +4,18 @@ Check off after each prompt’s ACCEPTANCE passes.
 
 ## A · Setup (P1–2)
 
-- [x] P1 — pnpm monorepo (`apps/web`, `apps/api`, `packages/shared`)
-- [x] P1 — docker-compose: Postgres, Redis, Mailpit
-- [x] P1 — Web: Astro SSR (`@astrojs/node`) + React + Tailwind strict
-- [x] P1 — Fresh & Human tokens + `/design` page
-- [x] P1 — TanStack Query client + Zustand (navbar state)
-- [x] P1 — API envelope on `/health`, Helmet, Zod env
-- [x] P2 — Fresh & Human palette v2, mood tokens, `/design` + WCAG table + reader voices
+- [x] P1 — Monorepo, Docker, ESLint/Prettier/Husky, shared tsup, API health (db+redis), providers, CI
+- [x] P2 — Base.astro shell, UI kit, `/design` guide, stores, apiClient
 
 ## B · Data + Auth (P3–4)
 
-- [ ] Prisma schema + migrate
-- [ ] Better Auth + roles
-- [ ] Follow policies
+- [x] P3 — Prisma schema, migrate (pg_trgm + FTS), seed, money helpers
+- [x] P4 — Better Auth, GET /me, RBAC, follow policy, auth pages
 
 ## C · Commerce (P5–9)
 
-- [ ] Catalog → checkout → escrow → delivery → payout (local)
+- [x] P5 — Catalog API, pg SearchService, book pages, local uploads, bench script
+- [ ] Checkout → escrow → delivery → payout (local)
 
 ## D · Retention (P10–12)
 

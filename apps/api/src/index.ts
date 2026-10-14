@@ -1,9 +1,11 @@
+import { loadApiEnv } from './env.js';
 import { createApp } from './app.js';
-import { loadEnv } from './env.js';
+import { createLogger } from './lib/logger.js';
 
-const env = loadEnv();
-const app = createApp(env);
+const env = loadApiEnv();
+const logger = createLogger(env);
+const app = createApp(env, logger);
 
 app.listen(env.PORT, () => {
-	console.log(`BookVerse API running at http://localhost:${env.PORT}`);
+  logger.info({ port: env.PORT, providers: app.get('providers') }, 'BookVerse API listening');
 });

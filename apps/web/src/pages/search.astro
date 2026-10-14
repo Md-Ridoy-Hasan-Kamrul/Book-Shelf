@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import SearchSuggest from '../components/islands/SearchSuggest.tsx';
+import CatalogFilters from '../components/islands/CatalogFilters.tsx';
+import { searchBooks } from '../lib/catalogApi';
+
+const q = Astro.url.searchParams.get('q') ?? '';
+const results = q ? await searchBooks(q) : { items: [], nextCursor: null };
+---
+
+<Base title={q ? `Search: ${q}` : 'Search'}>
+  <main id="main" class="py-10">
+    <div class="mx-auto w-[min(100%-2rem,72rem)]">
+      <h1 class="m-0 font-display text-3xl font-bold text-ink-900">Search</h1>
+      <div class="mt-6">
+        <SearchSuggest client:load initialQ={q} />
+      </div>
+      <div class="mt-6">
+        <CatalogFilters client:load />
+      </div>
+      {
+        q && (
+          <>
+            <p class="mt-8 text-sm text-ink-500">
+              {results.items.length} results for “{q}”
+            </p>
+            <ul class="mt-4 grid list-none gap-4 p-0 min-[720px]:grid-cols-3">
+              {results.items.map((b) => (
+                <li>
+                  <a
+                    href={`/books/${b.slug}`}
+                    class="block rounded-[var(--radius-card)] border border-line bg-paper p-4 no-underline hover:bg-sand"
+                  >
+                    <h2 class="m-0 font-display text-lg font-bold text-ink-900">{b.titleBn}</h2>
+                    <p class="m-0 mt-1 text-sm text-ink-500">{b.author}</p>
+                    {b.minPrice && (
+                      <p class="mt-2 text-sm font-semibold text-ink-900">৳{b.minPrice}</p>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+    </div>
+  </main>
+</Base>
