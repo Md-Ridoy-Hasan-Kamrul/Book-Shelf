@@ -15,8 +15,7 @@ Do NOT add Cloudflare, Vercel or Render adapters now. Use `@astrojs/node`. Futur
 ## FIXED STACK (do not substitute without asking)
 
 - Monorepo (pnpm workspaces): `apps/web`, `apps/api`, `packages/shared`
-- `apps/web`: Astro (SSR, `@astrojs/node`) + React + Tailwind CSS + TypeScript strict
-- TanStack Query + Zustand + GSAP (only small, purposeful animation)
+- `apps/web`: Astro (SSR, `@astrojs/node`) + React + Tailwind CSS + TypeScript strict + TanStack Query + Zustand + GSAP (only small, purposeful animation)
 - `apps/api`: Node + Express + TypeScript strict + Zod + Prisma + PostgreSQL + Redis + BullMQ
 - Auth: Better Auth (DB sessions, role field). Phone OTP via SmsProvider (console in local mode).
 - Storage: StorageProvider (local disk now, R2 later). Email: EmailProvider (SMTP->Mailpit now).
@@ -50,8 +49,9 @@ Do NOT add Cloudflare, Vercel or Render adapters now. Use `@astrojs/node`. Futur
 4. Write tests (money, auth, policy and webhook logic are mandatory).
 5. Run lint + typecheck + tests and fix failures.
 6. Report: what is done, what is NOT done, how I can verify it manually, deviations from the spec and why.
+7. Update `PROJECT_FLOW.md` checkbox suggestions and README/docs if commands or env keys changed.
 
-Update `PROJECT_FLOW.md` checkbox suggestions and README/docs if commands or env keys changed. Stop after the task. Do not start the next prompt on your own. Never silently skip a requirement.
+Stop after the task. Do not start the next prompt on your own. Never silently skip a requirement.
 
 ## DESIGN TOKENS - "Fresh & Human" palette v2
 
@@ -59,11 +59,10 @@ Only via Tailwind theme, never raw hex in components.
 
 - paper `#FFFFFF` | cream `#FBF7F0` (default page bg) | sand `#F3EDE2` | line `#EAE3D6`
 - ink-900 `#1F2A37` | ink-700 `#374151` | ink-500 `#5B6472` | ink-300 `#9AA3B0` (decor only)
-- brand-600 `#2563EB` (hover/links brand-700 `#1D4ED8`)
-- leaf-600 `#16A34A`, leaf-700 `#15803D` (text/buttons), leaf-50 `#F0FDF4`
+- brand-600 `#2563EB` (hover/links brand-700 `#1D4ED8`) | brand-100 `#DBEAFE`
+- leaf-600 `#16A34A`, leaf-700 `#15803D` (text/buttons), leaf-50 `#F0FDF4`, leaf-100 `#DCFCE7`
 - cta-500 `#F97316` (ink-900 text on it; white text only on cta-700 `#C2410C`)
 - sun-100 `#FEF3C7`, sun-200 `#FDE68A` (offers) / sun-800 `#92400E`
-- brand-100 `#DBEAFE`, leaf-100 `#DCFCE7` (soft backgrounds)
 - rose-600 `#E11D48` (like only) | urgent-600 `#DC2626` (flash sale, out of stock, errors only) | premium-600 `#7C3AED`
 
 Mood chips (bg/text):
