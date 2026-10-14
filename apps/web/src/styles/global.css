@@ -15,16 +15,39 @@
 	--color-ink-300: #9aa3b0;
 	--color-brand-600: #2563eb;
 	--color-brand-700: #1d4ed8;
+	--color-brand-100: #dbeafe;
 	--color-leaf-600: #16a34a;
 	--color-leaf-700: #15803d;
+	--color-leaf-100: #dcfce7;
 	--color-leaf-50: #f0fdf4;
 	--color-cta-500: #f97316;
 	--color-cta-700: #c2410c;
 	--color-sun-100: #fef3c7;
+	--color-sun-200: #fde68a;
 	--color-sun-800: #92400e;
 	--color-rose-600: #e11d48;
 	--color-urgent-600: #dc2626;
 	--color-premium-600: #7c3aed;
+	--color-mood-happy-bg: #fef3c7;
+	--color-mood-happy-text: #92400e;
+	--color-mood-calm-bg: #dcfce7;
+	--color-mood-calm-text: #166534;
+	--color-mood-sad-bg: #dbeafe;
+	--color-mood-sad-text: #1e3a8a;
+	--color-mood-motivated-bg: #ffedd5;
+	--color-mood-motivated-text: #9a3412;
+	--color-mood-curious-bg: #ccfbf1;
+	--color-mood-curious-text: #115e59;
+	--color-mood-romantic-bg: #ffe4e6;
+	--color-mood-romantic-text: #9f1239;
+	--color-mood-lonely-bg: #ede9fe;
+	--color-mood-lonely-text: #5b21b6;
+	--color-mood-stressed-bg: #e0f2fe;
+	--color-mood-stressed-text: #075985;
+	--color-mood-adventurous-bg: #ecfccb;
+	--color-mood-adventurous-text: #3f6212;
+	--color-mood-focused-bg: #e2e8f0;
+	--color-mood-focused-text: #1e293b;
 }
 
 @layer base {

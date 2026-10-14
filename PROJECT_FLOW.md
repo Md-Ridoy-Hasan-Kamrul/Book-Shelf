@@ -10,7 +10,7 @@ Check off after each prompt’s ACCEPTANCE passes.
 - [x] P1 — Fresh & Human tokens + `/design` page
 - [x] P1 — TanStack Query client + Zustand (navbar state)
 - [x] P1 — API envelope on `/health`, Helmet, Zod env
-- [ ] P2 — (next prompt)
+- [x] P2 — Fresh & Human palette v2, mood tokens, `/design` + WCAG table + reader voices
 
 ## B · Data + Auth (P3–4)
 

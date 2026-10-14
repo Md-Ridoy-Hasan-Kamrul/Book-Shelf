@@ -2,107 +2,236 @@
 import Layout from '../layouts/Layout.astro';
 import Footer from '../components/layout/Footer.astro';
 
-const surfaces = [
-	{ name: 'paper', class: 'bg-paper text-ink-900' },
-	{ name: 'cream (page bg)', class: 'bg-cream text-ink-900' },
-	{ name: 'sand', class: 'bg-sand text-ink-900' },
-];
-
-const inks = [
-	{ name: 'ink-900', class: 'text-ink-900' },
-	{ name: 'ink-700', class: 'text-ink-700' },
-	{ name: 'ink-500', class: 'text-ink-500' },
-	{ name: 'ink-300', class: 'text-ink-300' },
-];
-
-const accents = [
-	{ name: 'brand-600', bg: 'bg-brand-600', text: 'text-paper' },
-	{ name: 'leaf-600', bg: 'bg-leaf-600', text: 'text-paper' },
-	{ name: 'cta-500', bg: 'bg-cta-500', text: 'text-ink-900' },
-	{ name: 'rose-600 (like)', bg: 'bg-rose-600', text: 'text-paper' },
-	{ name: 'urgent-600', bg: 'bg-urgent-600', text: 'text-paper' },
-	{ name: 'premium-600', bg: 'bg-premium-600', text: 'text-paper' },
+const palette = [
+	{ token: 'paper', hex: '#FFFFFF', use: 'কার্ড/ফর্ম — সাদা কাগজ ক্রিমের উপর' },
+	{ token: 'cream', hex: '#FBF7F0', use: 'ডিফল্ট পেজ ব্যাকগ্রাউন্ড (বইয়ের কাগজের উষ্ণতা)' },
+	{ token: 'sand', hex: '#F3EDE2', use: 'বিকল্প সেকশন' },
+	{ token: 'line', hex: '#EAE3D6', use: 'বর্ডার' },
+	{ token: 'ink-900', hex: '#1F2A37', use: 'মূল লেখা' },
+	{ token: 'ink-500', hex: '#5B6472', use: 'দ্বিতীয় লেখা' },
+	{ token: 'brand-600', hex: '#2563EB', use: 'বিশ্বাস: ন্যাভ, লিংক, প্রধান বাটন' },
+	{ token: 'brand-100', hex: '#DBEAFE', use: 'নরম নীল পটভূমি' },
+	{ token: 'leaf-600', hex: '#16A34A', use: 'তাজা/প্রগতি: স্টক, অগ্রগতি' },
+	{ token: 'leaf-100', hex: '#DCFCE7', use: 'নরম সবুজ পটভূমি' },
+	{ token: 'cta-500', hex: '#F97316', use: 'এক প্রধান অ্যাকশন — ink-900 টেক্সট' },
+	{ token: 'sun-200', hex: '#FDE68A', use: 'অফার, ফ্রি ডেলিভারি ট্যাগ' },
+	{ token: 'rose-600', hex: '#E11D48', use: 'শুধু লাইক/হার্ট' },
+	{ token: 'urgent-600', hex: '#DC2626', use: 'জরুরি: ফ্ল্যাশ, স্টক আউট, ভুল' },
+	{ token: 'premium-600', hex: '#7C3AED', use: 'প্রিমিয়াম / VIP' },
 ];
 
 const moods = [
-	{ name: 'Happy', bg: 'bg-[#FEF3C7]', text: 'text-[#92400E]' },
-	{ name: 'Calm', bg: 'bg-[#DCFCE7]', text: 'text-[#166534]' },
-	{ name: 'Sad', bg: 'bg-[#DBEAFE]', text: 'text-[#1E3A8A]' },
-	{ name: 'Motivated', bg: 'bg-[#FFEDD5]', text: 'text-[#9A3412]' },
-	{ name: 'Curious', bg: 'bg-[#CCFBF1]', text: 'text-[#115E59]' },
-	{ name: 'Romantic', bg: 'bg-[#FFE4E6]', text: 'text-[#9F1239]' },
-	{ name: 'Lonely', bg: 'bg-[#EDE9FE]', text: 'text-[#5B21B6]' },
-	{ name: 'Stressed', bg: 'bg-[#E0F2FE]', text: 'text-[#075985]' },
-	{ name: 'Adventurous', bg: 'bg-[#ECFCCB]', text: 'text-[#3F6212]' },
-	{ name: 'Focused', bg: 'bg-[#E2E8F0]', text: 'text-[#1E293B]' },
+	{ label: 'Happy', chip: 'bg-mood-happy-bg text-mood-happy-text' },
+	{ label: 'Calm', chip: 'bg-mood-calm-bg text-mood-calm-text' },
+	{ label: 'Sad', chip: 'bg-mood-sad-bg text-mood-sad-text' },
+	{ label: 'Motivated', chip: 'bg-mood-motivated-bg text-mood-motivated-text' },
+	{ label: 'Curious', chip: 'bg-mood-curious-bg text-mood-curious-text' },
+	{ label: 'Romantic', chip: 'bg-mood-romantic-bg text-mood-romantic-text' },
+	{ label: 'Lonely', chip: 'bg-mood-lonely-bg text-mood-lonely-text' },
+	{ label: 'Stressed', chip: 'bg-mood-stressed-bg text-mood-stressed-text' },
+	{ label: 'Adventurous', chip: 'bg-mood-adventurous-bg text-mood-adventurous-text' },
+	{ label: 'Focused', chip: 'bg-mood-focused-bg text-mood-focused-text' },
+];
+
+const contrastRows = [
+	{ sample: 'Body text', pair: 'ink-900 on cream', ratio: '13.61', pass: true },
+	{ sample: 'Secondary text', pair: 'ink-500 on cream', ratio: '5.60', pass: true },
+	{ sample: 'Secondary text', pair: 'ink-500 on white', ratio: '5.98', pass: true },
+	{ sample: 'Link / brand', pair: 'brand-700 on cream', ratio: '6.28', pass: true },
+	{ sample: 'Button', pair: 'white on brand-600', ratio: '5.17', pass: true },
+	{ sample: 'CTA', pair: 'ink-900 on cta-500', ratio: '5.19', pass: true },
+	{ sample: 'CTA alt', pair: 'white on cta-700', ratio: '5.18', pass: true },
+	{ sample: 'Success text', pair: 'leaf-700 on leaf-50', ratio: '4.79', pass: true },
+	{ sample: 'Success button', pair: 'white on leaf-700', ratio: '5.02', pass: true },
+	{ sample: 'Urgent', pair: 'white on urgent-600', ratio: '4.83', pass: true },
+	{ sample: 'Premium', pair: 'white on premium-600', ratio: '5.70', pass: true },
+	{ sample: 'Offer tag', pair: 'sun-800 on sun-100', ratio: '6.37', pass: true },
+	{ sample: 'Heart / like', pair: 'rose-600 on white', ratio: '4.70', pass: true },
+	{ sample: 'Mood Happy', pair: 'chip pair', ratio: '6.37', pass: true },
+	{ sample: 'Mood Calm', pair: 'chip pair', ratio: '6.49', pass: true },
+	{ sample: 'Mood Sad', pair: 'chip pair', ratio: '8.49', pass: true },
+	{ sample: 'Mood Motivated', pair: 'chip pair', ratio: '6.38', pass: true },
+	{ sample: 'Mood Curious', pair: 'chip pair', ratio: '6.73', pass: true },
+	{ sample: 'Mood Romantic', pair: 'chip pair', ratio: '6.68', pass: true },
+	{ sample: 'Mood Lonely', pair: 'chip pair', ratio: '7.57', pass: true },
+	{ sample: 'Mood Stressed', pair: 'chip pair', ratio: '6.59', pass: true },
+	{ sample: 'Mood Adventurous', pair: 'chip pair', ratio: '6.52', pass: true },
+	{ sample: 'Mood Focused', pair: 'chip pair', ratio: '11.87', pass: true },
+];
+
+const readerVoices = [
+	{
+		name: 'নিশাত',
+		meta: '২৪ · রাজশাহী · ছাত্র',
+		quote: 'ক্রিম ব্যাকগ্রাউন্ড দেখে বইয়ের পাতার মতো লাগে — ঠাণ্ডা অফিস ড্যাশবোর্ড নয়।',
+		tags: ['তাজা', 'শান্ত'],
+	},
+	{
+		name: 'আরিফ',
+		meta: '৩১ · ঢাকা · সফটওয়্যার',
+		quote: 'নীল লিংক আর সাদা কার্ড বিশ্বাসযোগ্য; কমলা বাটনে গাঢ় লেখা পড়তে সুবিধা।',
+		tags: ['বিশ্বাসযোগ্য'],
+	},
+	{
+		name: 'মেঘলা',
+		meta: '১৯ · চট্টগ্রাম · পাঠক',
+		quote: 'মুড চিপগুলো রঙিন কিন্তু চোখে ধাক্কা দেয় না — মানুষের মতো অনুভূতি।',
+		tags: ['মানবিক', 'তাজা'],
+	},
+	{
+		name: 'সাদিয়া',
+		meta: '২৮ · সিলেট · শিক্ষক',
+		quote: 'সবুজ = স্টক/অগ্রগতি বোঝা যায়; লাল শুধু জরুরি জায়গায় থাকলে ভালো।',
+		tags: ['শান্ত'],
+	},
+	{
+		name: 'তানভীর',
+		meta: '৩৫ · খুলনা · দোকান',
+		quote: 'বাংলা ফন্ট + উষ্ণ ক্রিম — লোকাল বই দোকানের vibe, Rokomari-র কপি নয়।',
+		tags: ['তাজা', 'বিশ্বাসযোগ্য'],
+	},
+	{
+		name: 'পলি',
+		meta: '২২ · ঢাকা · কনটেন্ট',
+		quote: 'অফার ট্যাগ হলুদে চোখ পড়ে, কিন্তু পুরো পেজ জ্বলজ্বল করে না।',
+		tags: ['তাজা'],
+	},
+	{
+		name: 'ইমরান',
+		meta: '২৬ · বরিশাল · ফ্রিল্যান্স',
+		quote: 'মোবাইলে কনট্রাস্ট ঠিক — secondary text এখনও পড়া যায়।',
+		tags: ['বিশ্বাসযোগ্য'],
+	},
+	{
+		name: 'রুমা',
+		meta: '৪০ · ঢাকা · অভিভাবক',
+		quote: 'শান্ত সাদা ফাঁকা জায়গা — চাপ কম, বই বেছে নিতে মন যায়।',
+		tags: ['শান্ত', 'মানবিক'],
+	},
 ];
 ---
 
-<Layout title="BookVerse — Design tokens" description="Fresh & Human palette v2 for BookVerse.">
+<Layout title="BookVerse — Design" description="Fresh & Human palette v2 — রঙ, contrast, পাঠক প্রতিক্রিয়া।">
 	<main id="main" class="py-10">
 		<div class="mx-auto w-[min(100%-2rem,72rem)]">
-			<p class="mb-2 font-display text-xs font-bold tracking-[0.14em] text-brand-600 uppercase">P1 · Setup</p>
-			<h1 class="m-0 font-display text-4xl font-bold text-ink-900">Fresh &amp; Human</h1>
-			<p class="mt-3 max-w-2xl text-lg text-ink-700">
-				Tailwind theme tokens only — no raw hex in product components except mood chips documented here.
-				Fonts: Hind Siliguri (body) + Inter (display). Radius 12px, warm shadow.
+			<p class="mb-2 font-display text-xs font-bold tracking-[0.14em] text-brand-600 uppercase">P2 · Fresh &amp; Human</p>
+			<h1 class="m-0 font-display text-4xl font-bold text-ink-900">রঙ: তাজা ও মানবিক</h1>
+			<p class="mt-3 max-w-3xl text-lg text-ink-700">
+				নীল = বিশ্বাস, কমলা = অ্যাকশন (গাঢ় ink টেক্সট), সবুজ = তাজা/প্রগতি, লাল = জরুরি, হলুদ = আনন্দ,
+				বেগুনি = প্রিমিয়াম, ক্রিম/সাদা = শান্ত। অনুপাত: ~৭০% ক্রিম/সাদা, ~১৫% নীল, ~৮% সবুজ, ~৫% কমলা।
 			</p>
 
-			<section class="mt-10" aria-labelledby="surfaces-title">
-				<h2 id="surfaces-title" class="font-display text-2xl font-bold text-ink-900">Surfaces</h2>
-				<ul class="mt-4 grid list-none gap-3 p-0 min-[640px]:grid-cols-3">
-					{
-						surfaces.map((s) => (
-							<li class={`rounded-[var(--radius-card)] border border-line p-4 ${s.class}`}>{s.name}</li>
-						))
-					}
-				</ul>
+			<section class="mt-10" aria-labelledby="palette-title">
+				<h2 id="palette-title" class="font-display text-2xl font-bold text-ink-900">রঙের তালিকা</h2>
+				<div class="mt-4 overflow-x-auto rounded-[var(--radius-card)] border border-line bg-paper">
+					<table class="w-full min-w-[36rem] border-collapse text-left text-sm">
+						<thead class="border-b border-line bg-sand/80">
+							<tr>
+								<th class="px-4 py-3 font-semibold text-ink-900">Token</th>
+								<th class="px-4 py-3 font-semibold text-ink-900">Hex</th>
+								<th class="px-4 py-3 font-semibold text-ink-900">ব্যবহার</th>
+							</tr>
+						</thead>
+						<tbody>
+							{
+								palette.map((row) => (
+									<tr class="border-b border-line last:border-0">
+										<td class="px-4 py-3 font-mono text-brand-700">{row.token}</td>
+										<td class="px-4 py-3 font-mono text-ink-500">{row.hex}</td>
+										<td class="px-4 py-3 text-ink-700">{row.use}</td>
+									</tr>
+								))
+							}
+						</tbody>
+					</table>
+				</div>
 			</section>
 
-			<section class="mt-10" aria-labelledby="ink-title">
-				<h2 id="ink-title" class="font-display text-2xl font-bold text-ink-900">Ink</h2>
-				<ul class="mt-4 grid list-none gap-2 p-0">
-					{
-						inks.map((i) => (
-							<li class={`rounded-[var(--radius-card)] border border-line bg-paper px-4 py-3 font-semibold ${i.class}`}>
-								{i.name}
-							</li>
-						))
-					}
-				</ul>
-			</section>
-
-			<section class="mt-10" aria-labelledby="accent-title">
-				<h2 id="accent-title" class="font-display text-2xl font-bold text-ink-900">Accents &amp; CTAs</h2>
-				<p class="text-sm text-ink-700">Max 2 orange CTAs per screen in production UI.</p>
-				<ul class="mt-4 grid list-none gap-3 p-0 min-[640px]:grid-cols-2 min-[960px]:grid-cols-3">
-					{
-						accents.map((a) => (
-							<li class={`rounded-[var(--radius-card)] px-4 py-6 font-semibold shadow-[var(--shadow-warm)] ${a.bg} ${a.text}`}>
-								{a.name}
-							</li>
-						))
-					}
-				</ul>
-				<div class="mt-6 flex flex-wrap gap-3">
-					<button type="button" class="min-h-11 rounded-full bg-brand-600 px-5 text-sm font-semibold text-paper">
-						Primary link style
-					</button>
-					<button type="button" class="min-h-11 rounded-full bg-leaf-600 px-5 text-sm font-semibold text-paper">
-						Success / buy
-					</button>
-					<button type="button" class="min-h-11 rounded-full bg-cta-500 px-5 text-sm font-semibold text-ink-900">
-						CTA orange
-					</button>
+			<section class="mt-10" aria-labelledby="samples-title">
+				<h2 id="samples-title" class="font-display text-2xl font-bold text-ink-900">নমুনা UI</h2>
+				<div class="mt-4 grid gap-4 min-[720px]:grid-cols-2">
+					<article class="rounded-[var(--radius-card)] border border-line bg-paper p-5 shadow-[var(--shadow-warm)]">
+						<p class="m-0 text-ink-900">মূল লেখা ink-900 · <span class="text-ink-500">দ্বিতীয় ink-500</span></p>
+						<a href="#" class="mt-2 inline-block font-semibold text-brand-700 no-underline hover:underline">লিংক brand-700</a>
+						<div class="mt-4 flex flex-wrap gap-2">
+							<span class="rounded-full bg-sun-200 px-3 py-1 text-xs font-semibold text-sun-800">ফ্রি ডেলিভারি</span>
+							<span class="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">নতুন</span>
+							<span class="rounded-full bg-leaf-100 px-3 py-1 text-xs font-semibold text-leaf-700">স্টক আছে</span>
+						</div>
+					</article>
+					<article class="rounded-[var(--radius-card)] border border-line bg-brand-100/40 p-5">
+						<p class="m-0 text-sm text-ink-700">বাটন (স্ক্রিনে max ২টি কমলা CTA)</p>
+						<div class="mt-3 flex flex-wrap gap-2">
+							<button type="button" class="min-h-11 rounded-full bg-brand-600 px-5 text-sm font-semibold text-paper">brand-600</button>
+							<button type="button" class="min-h-11 rounded-full bg-leaf-700 px-5 text-sm font-semibold text-paper">leaf-700</button>
+							<button type="button" class="min-h-11 rounded-full bg-cta-500 px-5 text-sm font-semibold text-ink-900">cta-500</button>
+							<button type="button" class="min-h-11 rounded-full bg-cta-700 px-5 text-sm font-semibold text-paper">cta-700</button>
+						</div>
+					</article>
 				</div>
 			</section>
 
 			<section class="mt-10" aria-labelledby="mood-title">
-				<h2 id="mood-title" class="font-display text-2xl font-bold text-ink-900">Mood chips</h2>
+				<h2 id="mood-title" class="font-display text-2xl font-bold text-ink-900">মুড picker (১০টি)</h2>
 				<ul class="mt-4 flex flex-wrap gap-2 p-0 list-none">
 					{
 						moods.map((m) => (
-							<li class={`rounded-full px-4 py-2 text-sm font-semibold ${m.bg} ${m.text}`}>{m.name}</li>
+							<li class={`rounded-full px-4 py-2 text-sm font-semibold ${m.chip}`}>{m.label}</li>
+						))
+					}
+				</ul>
+			</section>
+
+			<section class="mt-10" aria-labelledby="wcag-title">
+				<h2 id="wcag-title" class="font-display text-2xl font-bold text-ink-900">পাঠযোগ্যতা (WCAG AA ≥ ৪.৫)</h2>
+				<p class="text-sm text-ink-500">Palette v2 — PDF অনুযায়ী contrast ratio (নমুনা)</p>
+				<div class="mt-4 overflow-x-auto rounded-[var(--radius-card)] border border-line bg-paper">
+					<table class="w-full min-w-[32rem] border-collapse text-left text-sm">
+						<thead class="border-b border-line bg-sand/80">
+							<tr>
+								<th class="px-4 py-3 font-semibold">নমুনা</th>
+								<th class="px-4 py-3 font-semibold">জোড়</th>
+								<th class="px-4 py-3 font-semibold">Ratio</th>
+								<th class="px-4 py-3 font-semibold">AA</th>
+							</tr>
+						</thead>
+						<tbody>
+							{
+								contrastRows.map((row) => (
+									<tr class="border-b border-line last:border-0">
+										<td class="px-4 py-3 text-ink-900">{row.sample}</td>
+										<td class="px-4 py-3 text-ink-500">{row.pair}</td>
+										<td class="px-4 py-3 font-mono">{row.ratio}</td>
+										<td class="px-4 py-3 font-semibold text-leaf-700">{row.pass ? 'PASS' : 'FAIL'}</td>
+									</tr>
+								))
+							}
+						</tbody>
+					</table>
+				</div>
+			</section>
+
+			<section class="mt-12 border-t border-line pt-10" aria-labelledby="readers-title">
+				<h2 id="readers-title" class="font-display text-2xl font-bold text-ink-900">পাঠক প্রতিক্রিয়া (নমুনা)</h2>
+				<p class="max-w-2xl text-ink-700">
+					লঞ্চের আগে ৫–১০ জন আসল পাঠককে এই পেজ দেখিয়ে জিজ্ঞেস করুন: <strong>「কেমন লাগছে? তাজা, শান্ত, বিশ্বাসযোগ্য?」</strong>
+					নিচে placeholder — আসল উত্তর দিয়ে প্রতিস্থাপন করুন (শুধু টোকেন/CSS, কোড লজিক নয়)।
+				</p>
+				<ul class="mt-6 grid list-none gap-4 p-0 min-[640px]:grid-cols-2">
+					{
+						readerVoices.map((r) => (
+							<li class="rounded-[var(--radius-card)] border border-line bg-paper p-5 shadow-[var(--shadow-warm)]">
+								<p class="m-0 font-display font-bold text-ink-900">{r.name}</p>
+								<p class="m-0 mt-0.5 text-xs text-ink-500">{r.meta}</p>
+								<p class="m-0 mt-3 text-ink-700">"{r.quote}"</p>
+								<ul class="mt-3 flex flex-wrap gap-2 p-0 list-none">
+									{
+										r.tags.map((t) => (
+											<li class="rounded-full bg-sand px-2.5 py-0.5 text-xs font-semibold text-ink-700">{t}</li>
+										))
+									}
+								</ul>
+							</li>
 						))
 					}
 				</ul>

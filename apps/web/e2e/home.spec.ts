@@ -24,6 +24,7 @@ test.describe('Home page', () => {
 		await page.goto('/');
 		await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Design' }).click();
 		await expect(page).toHaveURL(/\/design$/);
-		await expect(page.getByRole('heading', { name: /Fresh & Human/i })).toBeVisible();
+		await expect(page.getByRole('heading', { name: /তাজা ও মানবিক/i })).toBeVisible();
+		await expect(page.getByRole('heading', { name: /WCAG AA/i })).toBeVisible();
 	});
 });

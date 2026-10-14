@@ -62,7 +62,8 @@ Only via Tailwind theme, never raw hex in components.
 - brand-600 `#2563EB` (hover/links brand-700 `#1D4ED8`)
 - leaf-600 `#16A34A`, leaf-700 `#15803D` (text/buttons), leaf-50 `#F0FDF4`
 - cta-500 `#F97316` (ink-900 text on it; white text only on cta-700 `#C2410C`)
-- sun-100 `#FEF3C7` / sun-800 `#92400E`
+- sun-100 `#FEF3C7`, sun-200 `#FDE68A` (offers) / sun-800 `#92400E`
+- brand-100 `#DBEAFE`, leaf-100 `#DCFCE7` (soft backgrounds)
 - rose-600 `#E11D48` (like only) | urgent-600 `#DC2626` (flash sale, out of stock, errors only) | premium-600 `#7C3AED`
 
 Mood chips (bg/text):

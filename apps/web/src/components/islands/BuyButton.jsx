@@ -6,7 +6,7 @@ export default function BuyButton({ id }) {
 	return (
 		<button
 			type="button"
-			className="inline-flex min-h-11 items-center justify-center rounded-full bg-leaf-600 px-5 text-sm font-semibold text-paper transition hover:bg-leaf-700 disabled:opacity-70"
+			className="inline-flex min-h-11 items-center justify-center rounded-full bg-leaf-700 px-5 text-sm font-semibold text-paper transition hover:bg-leaf-600 disabled:opacity-70"
 			onClick={() => setAdded(true)}
 			disabled={added}
 		>
