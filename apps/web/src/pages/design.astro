@@ -1,0 +1,113 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Footer from '../components/layout/Footer.astro';
+
+const surfaces = [
+	{ name: 'paper', class: 'bg-paper text-ink-900' },
+	{ name: 'cream (page bg)', class: 'bg-cream text-ink-900' },
+	{ name: 'sand', class: 'bg-sand text-ink-900' },
+];
+
+const inks = [
+	{ name: 'ink-900', class: 'text-ink-900' },
+	{ name: 'ink-700', class: 'text-ink-700' },
+	{ name: 'ink-500', class: 'text-ink-500' },
+	{ name: 'ink-300', class: 'text-ink-300' },
+];
+
+const accents = [
+	{ name: 'brand-600', bg: 'bg-brand-600', text: 'text-paper' },
+	{ name: 'leaf-600', bg: 'bg-leaf-600', text: 'text-paper' },
+	{ name: 'cta-500', bg: 'bg-cta-500', text: 'text-ink-900' },
+	{ name: 'rose-600 (like)', bg: 'bg-rose-600', text: 'text-paper' },
+	{ name: 'urgent-600', bg: 'bg-urgent-600', text: 'text-paper' },
+	{ name: 'premium-600', bg: 'bg-premium-600', text: 'text-paper' },
+];
+
+const moods = [
+	{ name: 'Happy', bg: 'bg-[#FEF3C7]', text: 'text-[#92400E]' },
+	{ name: 'Calm', bg: 'bg-[#DCFCE7]', text: 'text-[#166534]' },
+	{ name: 'Sad', bg: 'bg-[#DBEAFE]', text: 'text-[#1E3A8A]' },
+	{ name: 'Motivated', bg: 'bg-[#FFEDD5]', text: 'text-[#9A3412]' },
+	{ name: 'Curious', bg: 'bg-[#CCFBF1]', text: 'text-[#115E59]' },
+	{ name: 'Romantic', bg: 'bg-[#FFE4E6]', text: 'text-[#9F1239]' },
+	{ name: 'Lonely', bg: 'bg-[#EDE9FE]', text: 'text-[#5B21B6]' },
+	{ name: 'Stressed', bg: 'bg-[#E0F2FE]', text: 'text-[#075985]' },
+	{ name: 'Adventurous', bg: 'bg-[#ECFCCB]', text: 'text-[#3F6212]' },
+	{ name: 'Focused', bg: 'bg-[#E2E8F0]', text: 'text-[#1E293B]' },
+];
+---
+
+<Layout title="BookVerse — Design tokens" description="Fresh & Human palette v2 for BookVerse.">
+	<main id="main" class="py-10">
+		<div class="mx-auto w-[min(100%-2rem,72rem)]">
+			<p class="mb-2 font-display text-xs font-bold tracking-[0.14em] text-brand-600 uppercase">P1 · Setup</p>
+			<h1 class="m-0 font-display text-4xl font-bold text-ink-900">Fresh &amp; Human</h1>
+			<p class="mt-3 max-w-2xl text-lg text-ink-700">
+				Tailwind theme tokens only — no raw hex in product components except mood chips documented here.
+				Fonts: Hind Siliguri (body) + Inter (display). Radius 12px, warm shadow.
+			</p>
+
+			<section class="mt-10" aria-labelledby="surfaces-title">
+				<h2 id="surfaces-title" class="font-display text-2xl font-bold text-ink-900">Surfaces</h2>
+				<ul class="mt-4 grid list-none gap-3 p-0 min-[640px]:grid-cols-3">
+					{
+						surfaces.map((s) => (
+							<li class={`rounded-[var(--radius-card)] border border-line p-4 ${s.class}`}>{s.name}</li>
+						))
+					}
+				</ul>
+			</section>
+
+			<section class="mt-10" aria-labelledby="ink-title">
+				<h2 id="ink-title" class="font-display text-2xl font-bold text-ink-900">Ink</h2>
+				<ul class="mt-4 grid list-none gap-2 p-0">
+					{
+						inks.map((i) => (
+							<li class={`rounded-[var(--radius-card)] border border-line bg-paper px-4 py-3 font-semibold ${i.class}`}>
+								{i.name}
+							</li>
+						))
+					}
+				</ul>
+			</section>
+
+			<section class="mt-10" aria-labelledby="accent-title">
+				<h2 id="accent-title" class="font-display text-2xl font-bold text-ink-900">Accents &amp; CTAs</h2>
+				<p class="text-sm text-ink-700">Max 2 orange CTAs per screen in production UI.</p>
+				<ul class="mt-4 grid list-none gap-3 p-0 min-[640px]:grid-cols-2 min-[960px]:grid-cols-3">
+					{
+						accents.map((a) => (
+							<li class={`rounded-[var(--radius-card)] px-4 py-6 font-semibold shadow-[var(--shadow-warm)] ${a.bg} ${a.text}`}>
+								{a.name}
+							</li>
+						))
+					}
+				</ul>
+				<div class="mt-6 flex flex-wrap gap-3">
+					<button type="button" class="min-h-11 rounded-full bg-brand-600 px-5 text-sm font-semibold text-paper">
+						Primary link style
+					</button>
+					<button type="button" class="min-h-11 rounded-full bg-leaf-600 px-5 text-sm font-semibold text-paper">
+						Success / buy
+					</button>
+					<button type="button" class="min-h-11 rounded-full bg-cta-500 px-5 text-sm font-semibold text-ink-900">
+						CTA orange
+					</button>
+				</div>
+			</section>
+
+			<section class="mt-10" aria-labelledby="mood-title">
+				<h2 id="mood-title" class="font-display text-2xl font-bold text-ink-900">Mood chips</h2>
+				<ul class="mt-4 flex flex-wrap gap-2 p-0 list-none">
+					{
+						moods.map((m) => (
+							<li class={`rounded-full px-4 py-2 text-sm font-semibold ${m.bg} ${m.text}`}>{m.name}</li>
+						))
+					}
+				</ul>
+			</section>
+		</div>
+	</main>
+	<Footer />
+</Layout>
