@@ -15,6 +15,7 @@ export const SYSTEM_SETTINGS: Record<string, unknown> = {
   payment_fee_bps: 150,
   payout_min_bdt: '500.00',
   claim_window_hours: 72,
+  rto_cost_bdt: '80.00',
 };
 
 export const DELIVERY_FEE_RULES = [
@@ -46,8 +47,10 @@ export const ORDER_STATUS_TRANSITIONS: Array<{ from: string; to: string; note?: 
   { from: 'PENDING_PAYMENT', to: 'CANCELLED', note: 'Unpaid timeout or buyer cancel' },
   { from: 'PAID', to: 'PROCESSING', note: 'Seller accepted' },
   { from: 'PAID', to: 'CANCELLED', note: 'Refund before processing' },
-  { from: 'PROCESSING', to: 'SHIPPED', note: 'Handed to courier' },
+  { from: 'PROCESSING', to: 'PACKED', note: 'Seller packed order' },
   { from: 'PROCESSING', to: 'CANCELLED', note: 'Cancel before ship' },
+  { from: 'PACKED', to: 'SHIPPED', note: 'Courier consignment created' },
+  { from: 'PACKED', to: 'CANCELLED', note: 'Cancel before handoff' },
   { from: 'SHIPPED', to: 'DELIVERED', note: 'Delivery confirmed' },
   { from: 'SHIPPED', to: 'CANCELLED', note: 'Return in transit (rare)' },
   { from: 'DELIVERED', to: 'REFUNDED', note: 'Post-delivery claim approved' },
@@ -55,6 +58,25 @@ export const ORDER_STATUS_TRANSITIONS: Array<{ from: string; to: string; note?: 
   { from: 'DELIVERED', to: 'DISPUTED', note: 'Buyer claim opened' },
   { from: 'DISPUTED', to: 'REFUNDED', note: 'Claim approved' },
   { from: 'DISPUTED', to: 'DELIVERED', note: 'Claim rejected' },
+];
+
+/** Mock courier status → internal action (P8). */
+export const COURIER_STATUS_MAPPINGS: Array<{
+  provider: string;
+  courierStatus: string;
+  internalAction: string;
+  note?: string;
+}> = [
+  {
+    provider: 'mock',
+    courierStatus: 'CREATED',
+    internalAction: 'TRACKING_ONLY',
+    note: 'Label created',
+  },
+  { provider: 'mock', courierStatus: 'IN_TRANSIT', internalAction: 'SHIPPED' },
+  { provider: 'mock', courierStatus: 'DELIVERED', internalAction: 'DELIVERED' },
+  { provider: 'mock', courierStatus: 'RETURNED', internalAction: 'RETURNED' },
+  { provider: 'mock', courierStatus: 'COD_REMIT', internalAction: 'COD_REMIT' },
 ];
 
 /** Appendix D — CommissionRule seed rows (bps). */

@@ -96,6 +96,20 @@ export const orderDetailSchema = z.object({
       createdAt: z.string(),
     }),
   ),
+  tracking: z
+    .object({
+      consignmentId: z.string(),
+      trackingCode: z.string().nullable(),
+      courierStatus: z.string(),
+      timeline: z.array(
+        z.object({
+          status: z.string(),
+          message: z.string().nullable(),
+          at: z.string(),
+        }),
+      ),
+    })
+    .nullable(),
   createdAt: z.string(),
 });
 

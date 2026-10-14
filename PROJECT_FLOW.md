@@ -17,7 +17,8 @@ Check off after each prompt’s ACCEPTANCE passes.
 - [x] P5 — Catalog API, pg SearchService, book pages, local uploads, bench script
 - [x] P6 — Cart quote, COD checkout, orders, BullMQ reservation release
 - [x] P7 — Mock/SSLCommerz payments, IPN, ledger, escrow, claims, payouts, reconcile
-- [ ] Delivery courier remit (P8) → full payout rails
+- [x] P8 — Mock courier, PACKED→shipment job, webhooks, poll fallback, sim:courier, tracking UI
+- [ ] Delivery courier remit → full payout rails (live Steadfast/Pathao)
 
 ## D · Retention (P10–12)
 

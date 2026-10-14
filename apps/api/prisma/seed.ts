@@ -11,6 +11,7 @@ import {
   GENRES,
   MOOD_TAGS,
   ORDER_STATUS_TRANSITIONS,
+  COURIER_STATUS_MAPPINGS,
   SEED_COUPONS,
   SYSTEM_SETTINGS,
 } from './seed-data.js';
@@ -66,6 +67,10 @@ async function clearDatabase() {
     'Checkout',
     'Coupon',
     'DeliveryFeeRule',
+    'ShipmentEvent',
+    'Shipment',
+    'CourierWebhookEvent',
+    'CourierStatusMapping',
     'OrderStatusTransition',
     'Address',
     'Listing',
@@ -136,6 +141,10 @@ async function main() {
         note: t.note,
       },
     });
+  }
+
+  for (const m of COURIER_STATUS_MAPPINGS) {
+    await prisma.courierStatusMapping.create({ data: m });
   }
 
   const genreRecords = await Promise.all(GENRES.map((g) => prisma.genre.create({ data: g })));

@@ -35,6 +35,28 @@ Astro.response.headers.set('Cache-Control', 'private, no-store');
         }
       </ul>
     </section>
+    {
+      order.tracking ? (
+        <section class="mt-6">
+          <h2 class="text-lg font-bold">Delivery tracking</h2>
+          <p class="text-sm text-ink-500">
+            {order.tracking.trackingCode
+              ? `Tracking ${order.tracking.trackingCode}`
+              : order.tracking.consignmentId}{' '}
+            · {order.tracking.courierStatus}
+          </p>
+          <ol class="mt-2 space-y-2 border-l-2 border-brand-100 pl-4 text-sm">
+            {order.tracking.timeline.map((e) => (
+              <li>
+                <strong>{e.status}</strong>
+                {e.message ? ` — ${e.message}` : ''}
+                <div class="text-ink-500">{e.at}</div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null
+    }
     <section class="mt-6">
       <h2 class="text-lg font-bold">Status history</h2>
       <ol class="mt-2 space-y-2 border-l-2 border-line pl-4 text-sm">

@@ -10,13 +10,15 @@ import { resolveClaim } from '../services/money/claimService.js';
 import { runWeeklyPayoutBatch } from '../services/money/payoutService.js';
 import { reconcileOrdersVsLedger } from '../services/money/reconcileService.js';
 import { confirmCodRemit } from '../services/money/codRemitService.js';
+import { createCourierProvider } from '../providers/courier/index.js';
+import { retryShipmentCreate } from '../services/courier/shipmentService.js';
 
 const resolveSchema = z.object({
   decision: z.enum(['APPROVE', 'REJECT']),
   note: z.string().min(1).max(2000),
 });
 
-export function createAdminMoneyRouter(auth: BookVerseAuth, _env: ApiEnv) {
+export function createAdminMoneyRouter(auth: BookVerseAuth, env: ApiEnv) {
   const router = Router();
 
   router.post('/payouts/run', requireAuth(auth), requireRole('ADMIN'), async (_req, res, next) => {
@@ -47,6 +49,21 @@ export function createAdminMoneyRouter(auth: BookVerseAuth, _env: ApiEnv) {
         const body = resolveSchema.parse(req.body);
         await resolveClaim(admin.id, paramId(req.params.orderId), body.decision, body.note);
         res.json(successEnvelope({ resolved: true }));
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.post(
+    '/orders/:orderId/shipment-retry',
+    requireAuth(auth),
+    requireRole('ADMIN'),
+    async (req, res, next) => {
+      try {
+        const courier = createCourierProvider(env);
+        await retryShipmentCreate(env, courier, paramId(req.params.orderId));
+        res.json(successEnvelope({ retried: true }));
       } catch (err) {
         next(err);
       }

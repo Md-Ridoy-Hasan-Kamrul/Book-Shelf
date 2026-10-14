@@ -46,6 +46,7 @@ enum OrderStatus {
   PENDING_PAYMENT
   PAID
   PROCESSING
+  PACKED
   SHIPPED
   DELIVERED
   DISPUTED
@@ -539,6 +540,7 @@ model Order {
   claim         Claim?
   ledgerEntries LedgerEntry[]
   paymentEvents PaymentEvent[]
+  shipment        Shipment?
 
   @@index([buyerId, createdAt, id])
   @@index([sellerId, createdAt, id])
@@ -621,6 +623,62 @@ model Claim {
   resolution String?     @db.Text
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+}
+
+model Shipment {
+  id             String    @id @default(cuid())
+  orderId        String    @unique
+  order          Order     @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  provider       String
+  consignmentId  String    @unique
+  trackingCode   String?
+  codAmount      Decimal   @db.Decimal(12, 2)
+  courierStatus  String    @default("pending")
+  lastWebhookAt  DateTime?
+  pollAfter      DateTime?
+  failureCount   Int       @default(0)
+  lastError      String?   @db.Text
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  events ShipmentEvent[]
+
+  @@index([pollAfter])
+  @@index([courierStatus])
+}
+
+model ShipmentEvent {
+  id              String   @id @default(cuid())
+  shipmentId      String
+  shipment        Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  providerEventId String?
+  status          String
+  message         String?  @db.Text
+  raw             Json
+  createdAt       DateTime @default(now())
+
+  @@unique([shipmentId, providerEventId])
+  @@index([shipmentId, createdAt])
+}
+
+model CourierWebhookEvent {
+  id        String   @id @default(cuid())
+  provider  String
+  eventId   String
+  payload   Json
+  createdAt DateTime @default(now())
+
+  @@unique([provider, eventId])
+}
+
+model CourierStatusMapping {
+  id            String @id @default(cuid())
+  provider      String
+  courierStatus String
+  internalAction String
+  note          String?
+
+  @@unique([provider, courierStatus])
 }
 
 model PaymentEvent {

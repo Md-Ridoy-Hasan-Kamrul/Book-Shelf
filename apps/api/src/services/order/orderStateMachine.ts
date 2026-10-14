@@ -43,5 +43,10 @@ export async function transitionOrderStatus(
 }
 
 export function canCancelBeforeShip(status: OrderStatus): boolean {
-  return status === 'PENDING_PAYMENT' || status === 'PAID' || status === 'PROCESSING';
+  return (
+    status === 'PENDING_PAYMENT' ||
+    status === 'PAID' ||
+    status === 'PROCESSING' ||
+    status === 'PACKED'
+  );
 }

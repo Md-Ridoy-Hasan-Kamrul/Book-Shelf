@@ -48,6 +48,9 @@ export async function getOrderForBuyer(userId: string, orderId: string) {
       seller: { select: { displayName: true, name: true } },
       lineItems: true,
       statusHistory: { orderBy: { createdAt: 'asc' } },
+      shipment: {
+        include: { events: { orderBy: { createdAt: 'asc' } } },
+      },
     },
   });
   if (!order) {
@@ -77,6 +80,18 @@ export async function getOrderForBuyer(userId: string, orderId: string) {
       note: h.note,
       createdAt: h.createdAt.toISOString(),
     })),
+    tracking: order.shipment
+      ? {
+          consignmentId: order.shipment.consignmentId,
+          trackingCode: order.shipment.trackingCode,
+          courierStatus: order.shipment.courierStatus,
+          timeline: order.shipment.events.map((e) => ({
+            status: e.status,
+            message: e.message,
+            at: e.createdAt.toISOString(),
+          })),
+        }
+      : null,
     createdAt: order.createdAt.toISOString(),
   };
 }

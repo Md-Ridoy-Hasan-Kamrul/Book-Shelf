@@ -20,6 +20,7 @@ import {
   updateListingStock,
   uploadBookCover,
 } from '../services/sellerCatalogService.js';
+import { markOrderPacked } from '../services/courier/shipmentService.js';
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 6 * 1024 * 1024 } });
 
@@ -111,6 +112,16 @@ export function createSellerRouter(auth: BookVerseAuth, env: ApiEnv, storage: St
       }
     },
   );
+
+  router.post('/orders/:id/pack', requireAuth(auth), async (req, res, next) => {
+    try {
+      const user = (req as AuthedRequest).user;
+      await markOrderPacked(user.id, paramId(req.params.id), env);
+      res.json(successEnvelope({ packed: true }));
+    } catch (err) {
+      next(err);
+    }
+  });
 
   router.post(
     '/admin/look-inside/:bookId/approve',

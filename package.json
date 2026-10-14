@@ -29,7 +29,7 @@
     "backup": "node scripts/stub.mjs backup",
     "sim:ipn": "node scripts/sim-ipn.mjs",
     "reconcile": "pnpm --filter @bookverse/api reconcile",
-    "sim:courier": "node scripts/stub.mjs sim:courier"
+    "sim:courier": "node scripts/sim-courier.mjs"
   },
   "lint-staged": {
     "*.{js,mjs,cjs,ts,tsx,jsx,astro,css,json,md}": "prettier --write"

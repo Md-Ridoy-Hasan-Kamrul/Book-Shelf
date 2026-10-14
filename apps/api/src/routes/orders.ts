@@ -24,6 +24,7 @@ const adminStatusSchema = z.object({
     'PENDING_PAYMENT',
     'PAID',
     'PROCESSING',
+    'PACKED',
     'SHIPPED',
     'DELIVERED',
     'CANCELLED',

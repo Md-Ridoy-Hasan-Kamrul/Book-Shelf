@@ -30,6 +30,7 @@ import { createOrdersRouter } from './routes/orders.js';
 import { createAddressesRouter } from './routes/addresses.js';
 import { createPaymentsRouter } from './routes/payments.js';
 import { createPaymentWebhooksRouter } from './routes/webhooksPayment.js';
+import { createCourierWebhooksRouter } from './routes/webhooksCourier.js';
 import { createAdminMoneyRouter } from './routes/adminMoney.js';
 import { createPaymentProvider } from './providers/payment/index.js';
 import { createStorageProvider } from './providers/storage/index.js';
@@ -65,6 +66,12 @@ export function createApp(env: ApiEnv, logger: Logger) {
     '/webhooks/payment',
     express.urlencoded({ extended: false, limit: '256kb' }),
     createPaymentWebhooksRouter(env, logger),
+  );
+
+  app.use(
+    '/webhooks/courier',
+    express.json({ limit: '256kb' }),
+    createCourierWebhooksRouter(env, logger),
   );
 
   app.use(express.json({ limit: '1mb' }));
