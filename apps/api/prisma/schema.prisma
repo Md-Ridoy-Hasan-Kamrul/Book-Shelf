@@ -48,6 +48,7 @@ enum OrderStatus {
   PROCESSING
   SHIPPED
   DELIVERED
+  DISPUTED
   CANCELLED
   REFUNDED
 }
@@ -89,6 +90,8 @@ enum LedgerEntryKind {
   COMMISSION
   REFUND
   PAYOUT
+  PAYMENT_FEE
+  RTO_COST
   ADJUSTMENT
   ESCROW_HOLD
   ESCROW_RELEASE
@@ -114,6 +117,18 @@ enum ClaimStatus {
   APPROVED
   REJECTED
   REFUNDED
+}
+
+enum PayoutStatus {
+  PENDING
+  PAID
+}
+
+enum PaymentIntentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  EXPIRED
 }
 
 enum RoleApplicationType {
@@ -237,6 +252,7 @@ model User {
   vendorProfile        VendorProfile?
   roleApplications     RoleApplication[]
   ledgerEntries        LedgerEntry[]
+  payouts              Payout[]
   pointLedger          PointLedger[]
   orderStatusChanges   OrderStatusHistory[]  @relation("OrderStatusActor")
   adminAuditLogs       AdminAuditLog[]       @relation("AdminAuditActor")
@@ -457,9 +473,25 @@ model Checkout {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
-  orders Order[]
+  orders         Order[]
+  paymentIntent  PaymentIntent?
 
   @@index([buyerId, createdAt, id])
+}
+
+model PaymentIntent {
+  id         String              @id @default(cuid())
+  checkoutId String              @unique
+  checkout   Checkout            @relation(fields: [checkoutId], references: [id], onDelete: Restrict)
+  tranId     String              @unique
+  amount     Decimal             @db.Decimal(12, 2)
+  currency   String              @default("BDT")
+  provider   String
+  status     PaymentIntentStatus @default(PENDING)
+  sessionKey String?
+  gatewayUrl String?             @db.Text
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
 }
 
 model Address {
@@ -498,6 +530,7 @@ model Order {
   total           Decimal       @db.Decimal(12, 2)
   shippingAddressId String?
   shippingAddress Address?      @relation(fields: [shippingAddressId], references: [id], onDelete: SetNull)
+  deliveredAt     DateTime?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
@@ -610,15 +643,34 @@ model LedgerEntry {
   ownerType      LedgerOwnerType
   orderId        String?
   order          Order?            @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  orderLineItemId String?
   amount         Decimal           @db.Decimal(12, 2)
   kind           LedgerEntryKind
   status         LedgerEntryStatus @default(PENDING)
   idempotencyKey String            @unique
   availableAt    DateTime?
+  payoutId       String?
+  payout         Payout?           @relation(fields: [payoutId], references: [id], onDelete: SetNull)
   createdAt      DateTime          @default(now())
 
   @@index([ownerId, status])
   @@index([orderId])
+  @@index([status, availableAt])
+}
+
+model Payout {
+  id        String       @id @default(cuid())
+  ownerId   String
+  owner     User         @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  amount    Decimal      @db.Decimal(12, 2)
+  status    PayoutStatus @default(PENDING)
+  reference String?
+  createdAt DateTime     @default(now())
+  paidAt    DateTime?
+
+  ledgerEntries LedgerEntry[]
+
+  @@index([ownerId, status])
 }
 
 model PointLedger {

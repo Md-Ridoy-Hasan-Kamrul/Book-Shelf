@@ -3,6 +3,7 @@ import { useCartStore } from '../../stores/cart';
 import {
   createAddress,
   fetchAddresses,
+  initiatePayment,
   postCheckout,
   postCheckoutQuote,
 } from '../../lib/checkoutApi';
@@ -109,6 +110,12 @@ export default function CheckoutForm() {
         },
         key,
       );
+      if (paymentMethod === 'ONLINE') {
+        const pay = await initiatePayment(result.checkoutId);
+        clear();
+        window.location.href = pay.gatewayUrl;
+        return;
+      }
       clear();
       setSuccessOrderId(result.orders[0]?.id ?? null);
     } catch (err) {
@@ -207,9 +214,13 @@ export default function CheckoutForm() {
             />
             Cash on delivery (COD)
           </label>
-          <label className="mt-2 flex items-center gap-2 opacity-60">
-            <input type="radio" disabled checked={paymentMethod === 'ONLINE'} />
-            Online (P7)
+          <label className="mt-2 flex items-center gap-2">
+            <input
+              type="radio"
+              checked={paymentMethod === 'ONLINE'}
+              onChange={() => setPaymentMethod('ONLINE')}
+            />
+            Online (mock / SSLCommerz sandbox)
           </label>
         </div>
 

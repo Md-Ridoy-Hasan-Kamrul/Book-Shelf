@@ -12,6 +12,9 @@ export const SYSTEM_SETTINGS: Record<string, unknown> = {
   cod_trust_score_min: 50,
   cod_new_user_max_bdt: '2000.00',
   checkout_reservation_minutes: 15,
+  payment_fee_bps: 150,
+  payout_min_bdt: '500.00',
+  claim_window_hours: 72,
 };
 
 export const DELIVERY_FEE_RULES = [
@@ -49,6 +52,9 @@ export const ORDER_STATUS_TRANSITIONS: Array<{ from: string; to: string; note?: 
   { from: 'SHIPPED', to: 'CANCELLED', note: 'Return in transit (rare)' },
   { from: 'DELIVERED', to: 'REFUNDED', note: 'Post-delivery claim approved' },
   { from: 'PENDING_PAYMENT', to: 'PROCESSING', note: 'COD confirmed at checkout' },
+  { from: 'DELIVERED', to: 'DISPUTED', note: 'Buyer claim opened' },
+  { from: 'DISPUTED', to: 'REFUNDED', note: 'Claim approved' },
+  { from: 'DISPUTED', to: 'DELIVERED', note: 'Claim rejected' },
 ];
 
 /** Appendix D — CommissionRule seed rows (bps). */

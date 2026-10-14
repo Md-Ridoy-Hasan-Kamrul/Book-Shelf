@@ -67,6 +67,17 @@ export async function postCheckoutQuote(body: {
   return apiSuccessEnvelopeSchema(checkoutQuoteSchema).parse(json).data;
 }
 
+export async function initiatePayment(checkoutId: string) {
+  const res = await authedFetch('/payments/initiate', {
+    method: 'POST',
+    body: JSON.stringify({ checkoutId }),
+  });
+  const json: unknown = await res.json();
+  if (!res.ok) throw new Error('Payment initiation failed');
+  const schema = z.object({ tranId: z.string(), gatewayUrl: z.string() });
+  return apiSuccessEnvelopeSchema(schema).parse(json).data;
+}
+
 export async function postCheckout(
   body: {
     items: Array<{ listingId: string; qty: number }>;

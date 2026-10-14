@@ -1,5 +1,5 @@
 import type { OrderStatus } from '@prisma/client';
-import type { MeUser } from '@bookverse/shared';
+import type { ApiEnv, MeUser } from '@bookverse/shared';
 import { AppError } from '../../lib/appError.js';
 import { prisma } from '../../lib/prisma.js';
 import { releaseListingReservation } from '../checkout/stockReservationService.js';
@@ -110,6 +110,7 @@ export async function cancelOrderByBuyer(user: MeUser, orderId: string) {
 }
 
 export async function adminTransitionOrder(
+  env: ApiEnv,
   adminId: string,
   orderId: string,
   to: OrderStatus,
@@ -127,5 +128,9 @@ export async function adminTransitionOrder(
       actorId: adminId,
       note,
     });
+    if (to === 'DELIVERED') {
+      const { onOrderDelivered } = await import('../money/escrowService.js');
+      await onOrderDelivered(tx, orderId, env);
+    }
   });
 }

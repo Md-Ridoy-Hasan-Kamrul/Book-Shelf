@@ -1,6 +1,7 @@
 import { successEnvelope } from '@bookverse/shared';
 import { Router } from 'express';
 import { z } from 'zod';
+import type { ApiEnv } from '@bookverse/shared';
 import type { BookVerseAuth } from '../auth/createAuth.js';
 import { paramId } from '../lib/params.js';
 import { requireAuth, type AuthedRequest } from '../middleware/requireAuth.js';
@@ -11,6 +12,7 @@ import {
   getOrderForBuyer,
   listOrdersForBuyer,
 } from '../services/order/orderService.js';
+import { openOrderClaim } from '../services/money/claimService.js';
 
 const listQuerySchema = z.object({
   cursor: z.string().optional(),
@@ -26,11 +28,17 @@ const adminStatusSchema = z.object({
     'DELIVERED',
     'CANCELLED',
     'REFUNDED',
+    'DISPUTED',
   ]),
   note: z.string().max(500).optional(),
 });
 
-export function createOrdersRouter(auth: BookVerseAuth) {
+const claimSchema = z.object({
+  reason: z.string().min(10).max(2000),
+  images: z.array(z.string().url()).max(5).default([]),
+});
+
+export function createOrdersRouter(auth: BookVerseAuth, env: ApiEnv) {
   const router = Router();
 
   router.get('/', requireAuth(auth), async (req, res, next) => {
@@ -54,6 +62,17 @@ export function createOrdersRouter(auth: BookVerseAuth) {
     }
   });
 
+  router.post('/:id/claim', requireAuth(auth), async (req, res, next) => {
+    try {
+      const user = (req as AuthedRequest).user;
+      const body = claimSchema.parse(req.body);
+      await openOrderClaim(user, paramId(req.params.id), body.reason, body.images, env);
+      res.status(201).json(successEnvelope({ opened: true }));
+    } catch (err) {
+      next(err);
+    }
+  });
+
   router.post('/:id/cancel', requireAuth(auth), async (req, res, next) => {
     try {
       const user = (req as AuthedRequest).user;
@@ -72,7 +91,7 @@ export function createOrdersRouter(auth: BookVerseAuth) {
       try {
         const admin = (req as AuthedRequest).user;
         const body = adminStatusSchema.parse(req.body);
-        await adminTransitionOrder(admin.id, paramId(req.params.id), body.status, body.note);
+        await adminTransitionOrder(env, admin.id, paramId(req.params.id), body.status, body.note);
         res.json(successEnvelope({ updated: true }));
       } catch (err) {
         next(err);

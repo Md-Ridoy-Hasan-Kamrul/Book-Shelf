@@ -28,6 +28,10 @@ import { createWishlistRouter } from './routes/wishlist.js';
 import { createCheckoutRouter } from './routes/checkout.js';
 import { createOrdersRouter } from './routes/orders.js';
 import { createAddressesRouter } from './routes/addresses.js';
+import { createPaymentsRouter } from './routes/payments.js';
+import { createPaymentWebhooksRouter } from './routes/webhooksPayment.js';
+import { createAdminMoneyRouter } from './routes/adminMoney.js';
+import { createPaymentProvider } from './providers/payment/index.js';
 import { createStorageProvider } from './providers/storage/index.js';
 import { createSearchService } from './services/search/pgSearchService.js';
 
@@ -57,6 +61,12 @@ export function createApp(env: ApiEnv, logger: Logger) {
   app.use('/api/auth', createAuthRateLimitMiddleware(env));
   app.all('/api/auth/*splat', toNodeHandler(auth));
 
+  app.use(
+    '/webhooks/payment',
+    express.urlencoded({ extended: false, limit: '256kb' }),
+    createPaymentWebhooksRouter(env, logger),
+  );
+
   app.use(express.json({ limit: '1mb' }));
 
   app.use('/health', createHealthRouter(env));
@@ -71,8 +81,11 @@ export function createApp(env: ApiEnv, logger: Logger) {
   app.use('/seller', createSellerRouter(auth, env, storage));
   app.use('/wishlist', createWishlistRouter(auth));
   app.use('/checkout', createCheckoutRouter(auth, env));
-  app.use('/orders', createOrdersRouter(auth));
+  app.use('/orders', createOrdersRouter(auth, env));
   app.use('/addresses', createAddressesRouter(auth));
+  app.use('/payments', createPaymentsRouter(auth, env));
+  app.use('/admin/money', createAdminMoneyRouter(auth, env));
+  app.set('payment', createPaymentProvider(env));
   app.use('/uploads', createUploadsRouter(storage));
 
   app.use((_req, res) => {

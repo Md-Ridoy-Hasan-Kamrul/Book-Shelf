@@ -1,6 +1,7 @@
 import { PostType, PrismaClient, SellerType, UserRole } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 import { fromPaisa, splitCommission, toPaisa } from '@bookverse/shared';
+import { createSaleLedgerForOrder } from '../src/services/money/ledgerService.js';
 import {
   AUTHORS,
   BANGLA_TITLES,
@@ -60,6 +61,8 @@ async function clearDatabase() {
     'OrderStatusHistory',
     'OrderLineItem',
     'Order',
+    'Payout',
+    'PaymentIntent',
     'Checkout',
     'Coupon',
     'DeliveryFeeRule',
@@ -359,6 +362,10 @@ async function main() {
       },
     });
 
+    await prisma.$transaction(async (tx) => {
+      await createSaleLedgerForOrder(tx, order.id);
+    });
+
     await prisma.review.create({
       data: {
         userId: buyer.id,
@@ -406,6 +413,12 @@ async function main() {
       },
     });
   }
+
+  await prisma.systemSetting.upsert({
+    where: { key: 'platform_ledger_user_id' },
+    create: { key: 'platform_ledger_user_id', value: adminId, updatedBy: 'seed' },
+    update: { value: adminId, updatedBy: 'seed' },
+  });
 
   await prisma.adminAuditLog.create({
     data: {

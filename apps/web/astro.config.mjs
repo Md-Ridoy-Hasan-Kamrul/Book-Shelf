@@ -33,6 +33,8 @@ export default defineConfig({
         '/checkout': { target: 'http://127.0.0.1:4000', changeOrigin: true },
         '/orders': { target: 'http://127.0.0.1:4000', changeOrigin: true },
         '/addresses': { target: 'http://127.0.0.1:4000', changeOrigin: true },
+        '/payments': { target: 'http://127.0.0.1:4000', changeOrigin: true },
+        '/admin/money': { target: 'http://127.0.0.1:4000', changeOrigin: true },
       },
     },
   },

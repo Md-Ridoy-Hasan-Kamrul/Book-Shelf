@@ -27,8 +27,8 @@
     "bench:search": "pnpm --filter @bookverse/api bench:search",
     "db:studio": "pnpm --filter @bookverse/api db:studio",
     "backup": "node scripts/stub.mjs backup",
-    "reconcile": "node scripts/stub.mjs reconcile",
-    "sim:ipn": "node scripts/stub.mjs sim:ipn",
+    "sim:ipn": "node scripts/sim-ipn.mjs",
+    "reconcile": "pnpm --filter @bookverse/api reconcile",
     "sim:courier": "node scripts/stub.mjs sim:courier"
   },
   "lint-staged": {

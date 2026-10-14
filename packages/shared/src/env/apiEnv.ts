@@ -22,7 +22,7 @@ export const ApiEnvSchema = z.object({
   STORAGE_PROVIDER: providerEnum('STORAGE_PROVIDER', ['local']),
   EMAIL_PROVIDER: providerEnum('EMAIL_PROVIDER', ['smtp']),
   SMS_PROVIDER: providerEnum('SMS_PROVIDER', ['console']),
-  PAYMENT_PROVIDER: providerEnum('PAYMENT_PROVIDER', ['mock']),
+  PAYMENT_PROVIDER: providerEnum('PAYMENT_PROVIDER', ['mock', 'sslcommerz']),
   COURIER_PROVIDER: providerEnum('COURIER_PROVIDER', ['mock']),
   LLM_PROVIDER: providerEnum('LLM_PROVIDER', ['off']),
   SEARCH_PROVIDER: providerEnum('SEARCH_PROVIDER', ['pg']),
