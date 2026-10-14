@@ -10,7 +10,11 @@ export async function runWeeklyPayoutBatch(
 
   const rows = await prisma.ledgerEntry.groupBy({
     by: ['ownerId'],
-    where: { status: 'AVAILABLE', kind: { in: ['SALE', 'COMMISSION', 'PAYMENT_FEE', 'REFUND'] } },
+    where: {
+      status: 'AVAILABLE',
+      payoutId: null,
+      kind: { in: ['SALE', 'COMMISSION', 'PAYMENT_FEE', 'REFUND'] },
+    },
     _sum: { amount: true },
   });
 
@@ -21,7 +25,7 @@ export async function runWeeklyPayoutBatch(
 
     await prisma.$transaction(async (tx) => {
       const entries = await tx.ledgerEntry.findMany({
-        where: { ownerId: row.ownerId, status: 'AVAILABLE' },
+        where: { ownerId: row.ownerId, status: 'AVAILABLE', payoutId: null },
       });
       const total = entries.reduce((s, e) => s + toPaisa(e.amount.toString()), 0n);
       if (total < minPaisa) return;
@@ -38,14 +42,10 @@ export async function runWeeklyPayoutBatch(
       for (const e of entries) {
         await tx.ledgerEntry.update({
           where: { id: e.id },
-          data: { status: 'PAID', payoutId: payout.id },
+          data: { payoutId: payout.id },
         });
       }
 
-      await tx.payout.update({
-        where: { id: payout.id },
-        data: { status: 'PAID', paidAt: new Date() },
-      });
       created += 1;
     });
   }

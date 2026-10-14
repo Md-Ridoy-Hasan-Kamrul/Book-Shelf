@@ -32,6 +32,8 @@ import { createPaymentsRouter } from './routes/payments.js';
 import { createPaymentWebhooksRouter } from './routes/webhooksPayment.js';
 import { createCourierWebhooksRouter } from './routes/webhooksCourier.js';
 import { createAdminMoneyRouter } from './routes/adminMoney.js';
+import { createSellerDashboardRouter } from './routes/sellerDashboard.js';
+import { createAdminDashboardRouter } from './routes/adminDashboard.js';
 import { createPaymentProvider } from './providers/payment/index.js';
 import { createStorageProvider } from './providers/storage/index.js';
 import { createSearchService } from './services/search/pgSearchService.js';
@@ -86,6 +88,8 @@ export function createApp(env: ApiEnv, logger: Logger) {
   app.use('/books', createBooksRouter(env, storage));
   app.use('/search', createSearchRouter(env, search));
   app.use('/seller', createSellerRouter(auth, env, storage));
+  app.use('/seller/dashboard', createSellerDashboardRouter(auth, env));
+  app.use('/admin/dashboard', createAdminDashboardRouter(auth));
   app.use('/wishlist', createWishlistRouter(auth));
   app.use('/checkout', createCheckoutRouter(auth, env));
   app.use('/orders', createOrdersRouter(auth, env));

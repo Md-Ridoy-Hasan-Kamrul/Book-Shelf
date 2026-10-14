@@ -1,0 +1,18 @@
+---
+import Base from '../../layouts/Base.astro';
+import AdminDashboard from '../../components/islands/AdminDashboard.tsx';
+import { fetchMe } from '../../lib/session';
+
+const me = await fetchMe(Astro.request.headers.get('cookie') ?? '');
+if (!me) return Astro.redirect('/login?next=/admin/dashboard');
+if (me.role !== 'ADMIN') return Astro.redirect('/');
+---
+
+<Base title="Admin dashboard" description="Platform operations and KPIs">
+  <main id="main" class="mx-auto w-[min(100%-2rem,48rem)] py-8">
+    <h1 class="font-display text-2xl font-bold text-ink-900">Admin dashboard</h1>
+    <div class="mt-6">
+      <AdminDashboard client:load />
+    </div>
+  </main>
+</Base>

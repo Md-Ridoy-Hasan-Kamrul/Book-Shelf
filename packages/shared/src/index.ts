@@ -42,6 +42,16 @@ export {
   addressCreateSchema,
 } from './checkout/schemas.js';
 export {
+  dashboardListQuerySchema,
+  sellerOrdersQuerySchema,
+  adminRoleAppsQuerySchema,
+  sellerOverviewSchema,
+  adminKpiSchema,
+  commissionRuleUpdateSchema,
+  systemSettingUpdateSchema,
+  sellerVerifySchema,
+} from './dashboard/schemas.js';
+export {
   booksListQuerySchema,
   searchQuerySchema,
   searchSuggestQuerySchema,

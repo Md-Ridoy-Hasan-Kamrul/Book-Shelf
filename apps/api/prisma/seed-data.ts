@@ -16,6 +16,7 @@ export const SYSTEM_SETTINGS: Record<string, unknown> = {
   payout_min_bdt: '500.00',
   claim_window_hours: 72,
   rto_cost_bdt: '80.00',
+  margin_guard_min_bps: 500,
 };
 
 export const DELIVERY_FEE_RULES = [

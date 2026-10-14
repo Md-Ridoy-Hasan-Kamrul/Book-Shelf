@@ -1,6 +1,6 @@
 import { defineMiddleware } from 'astro:middleware';
 
-const PRIVATE_PREFIXES = ['/verify-phone', '/account'];
+const PRIVATE_PREFIXES = ['/verify-phone', '/account', '/seller/dashboard', '/admin/dashboard'];
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const path = context.url.pathname;
