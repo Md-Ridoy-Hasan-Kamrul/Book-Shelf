@@ -5,7 +5,10 @@ export type AppErrorCode =
   | 'UNAUTHORIZED'
   | 'FORBIDDEN'
   | 'RATE_LIMITED'
-  | 'CONFLICT';
+  | 'CONFLICT'
+  | 'COD_UNAVAILABLE'
+  | 'INSUFFICIENT_STOCK'
+  | 'INVALID_TRANSITION';
 
 export class AppError extends Error {
   readonly code: AppErrorCode;

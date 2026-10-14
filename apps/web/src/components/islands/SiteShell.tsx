@@ -1,19 +1,19 @@
+import { useState } from 'react';
 import { useCartStore } from '../../stores/cart';
-import { useUiStore } from '../../stores/ui';
 import { ToastStack } from '../ui/Toast';
+import CartDrawer from './CartDrawer';
 
 const bottomLinks = [
   { href: '/', label: 'Home' },
   { href: '/#features', label: 'Discover' },
   { href: '/#how', label: 'Community' },
-  { href: '/#top', label: 'Cart' },
+  { href: '/checkout', label: 'Cart' },
   { href: '/design', label: 'Profile' },
 ];
 
 export default function SiteShell() {
   const count = useCartStore((s) => s.count());
-  const addDemo = useCartStore((s) => s.addDemo);
-  const pushToast = useUiStore((s) => s.pushToast);
+  const [cartOpen, setCartOpen] = useState(false);
 
   return (
     <>
@@ -44,10 +44,7 @@ export default function SiteShell() {
             <button
               type="button"
               className="relative rounded-full border border-line bg-cream px-3 py-2 text-sm font-semibold"
-              onClick={() => {
-                addDemo();
-                pushToast('কার্টে যোগ হয়েছে', 'success');
-              }}
+              onClick={() => setCartOpen(true)}
             >
               Cart
               <span className="ml-1 inline-flex min-w-5 justify-center rounded-full bg-brand-600 px-1.5 text-xs text-paper">
@@ -74,6 +71,7 @@ export default function SiteShell() {
           ))}
         </ul>
       </nav>
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
       <ToastStack />
     </>
   );

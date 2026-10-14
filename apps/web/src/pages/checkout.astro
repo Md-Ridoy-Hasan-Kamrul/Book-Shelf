@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import Island from '../components/islands/Island.tsx';
+import CheckoutForm from '../components/islands/CheckoutForm.tsx';
+
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+---
+
+<Base title="Checkout" description="Complete your BookVerse order.">
+  <main id="main" class="mx-auto w-[min(100%-2rem,48rem)] py-8">
+    <h1 class="font-display text-2xl font-bold text-ink-900">Checkout</h1>
+    <Island client:load>
+      <CheckoutForm />
+    </Island>
+  </main>
+</Base>

@@ -9,7 +9,47 @@ export const SYSTEM_SETTINGS: Record<string, unknown> = {
   max_cart_items: 20,
   point_redemption_cap_bps: 2000,
   review_min_chars: 20,
+  cod_trust_score_min: 50,
+  cod_new_user_max_bdt: '2000.00',
+  checkout_reservation_minutes: 15,
 };
+
+export const DELIVERY_FEE_RULES = [
+  { district: 'Dhaka', baseFee: '60.00', perItemFee: '15.00', perKgFee: '0.00' },
+  { district: 'Chattogram', baseFee: '80.00', perItemFee: '20.00', perKgFee: '0.00' },
+  { district: 'Default', baseFee: '120.00', perItemFee: '25.00', perKgFee: '5.00' },
+];
+
+export const SEED_COUPONS = [
+  {
+    code: 'WELCOME10',
+    discountType: 'PERCENT' as const,
+    value: '10.00',
+    minSubtotal: '300.00',
+    maxDiscount: '200.00',
+  },
+  {
+    code: 'FLAT50',
+    discountType: 'FIXED' as const,
+    value: '50.00',
+    minSubtotal: '500.00',
+    maxDiscount: null,
+  },
+];
+
+/** Allowed order status transitions (Appendix C). */
+export const ORDER_STATUS_TRANSITIONS: Array<{ from: string; to: string; note?: string }> = [
+  { from: 'PENDING_PAYMENT', to: 'PAID', note: 'Online payment captured' },
+  { from: 'PENDING_PAYMENT', to: 'CANCELLED', note: 'Unpaid timeout or buyer cancel' },
+  { from: 'PAID', to: 'PROCESSING', note: 'Seller accepted' },
+  { from: 'PAID', to: 'CANCELLED', note: 'Refund before processing' },
+  { from: 'PROCESSING', to: 'SHIPPED', note: 'Handed to courier' },
+  { from: 'PROCESSING', to: 'CANCELLED', note: 'Cancel before ship' },
+  { from: 'SHIPPED', to: 'DELIVERED', note: 'Delivery confirmed' },
+  { from: 'SHIPPED', to: 'CANCELLED', note: 'Return in transit (rare)' },
+  { from: 'DELIVERED', to: 'REFUNDED', note: 'Post-delivery claim approved' },
+  { from: 'PENDING_PAYMENT', to: 'PROCESSING', note: 'COD confirmed at checkout' },
+];
 
 /** Appendix D — CommissionRule seed rows (bps). */
 export const COMMISSION_RULES = [

@@ -1,0 +1,37 @@
+---
+import Base from '../../layouts/Base.astro';
+import { fetchOrders } from '../../lib/checkoutApi';
+
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+
+const data = await fetchOrders();
+if (data === null) {
+  return Astro.redirect('/login?redirect=/orders');
+}
+---
+
+<Base title="Your orders" description="BookVerse order history.">
+  <main id="main" class="mx-auto w-[min(100%-2rem,48rem)] py-8">
+    <h1 class="font-display text-2xl font-bold text-ink-900">Orders</h1>
+    {
+      data.items.length === 0 ? (
+        <p class="text-ink-500">এখনও কোনো অর্ডার নেই।</p>
+      ) : (
+        <ul class="mt-4 list-none space-y-3 p-0">
+          {data.items.map((o) => (
+            <li>
+              <a
+                href={`/orders/${o.id}`}
+                class="block rounded-[var(--radius-card)] border border-line bg-paper p-4 no-underline hover:bg-sand"
+              >
+                <span class="font-semibold text-ink-900">{o.sellerName}</span>
+                <span class="ml-2 text-sm text-ink-500">{o.status}</span>
+                <span class="float-right font-bold text-ink-900">৳{o.total}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </main>
+</Base>

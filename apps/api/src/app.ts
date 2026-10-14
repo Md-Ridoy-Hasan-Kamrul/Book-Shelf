@@ -25,6 +25,9 @@ import { createSellerRouter } from './routes/seller.js';
 import { createUploadsRouter } from './routes/uploads.js';
 import { createUsersRouter } from './routes/users.js';
 import { createWishlistRouter } from './routes/wishlist.js';
+import { createCheckoutRouter } from './routes/checkout.js';
+import { createOrdersRouter } from './routes/orders.js';
+import { createAddressesRouter } from './routes/addresses.js';
 import { createStorageProvider } from './providers/storage/index.js';
 import { createSearchService } from './services/search/pgSearchService.js';
 
@@ -67,6 +70,9 @@ export function createApp(env: ApiEnv, logger: Logger) {
   app.use('/search', createSearchRouter(env, search));
   app.use('/seller', createSellerRouter(auth, env, storage));
   app.use('/wishlist', createWishlistRouter(auth));
+  app.use('/checkout', createCheckoutRouter(auth, env));
+  app.use('/orders', createOrdersRouter(auth));
+  app.use('/addresses', createAddressesRouter(auth));
   app.use('/uploads', createUploadsRouter(storage));
 
   app.use((_req, res) => {

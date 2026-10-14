@@ -1,12 +1,16 @@
 import { PostType, PrismaClient, SellerType, UserRole } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
+import { fromPaisa, splitCommission, toPaisa } from '@bookverse/shared';
 import {
   AUTHORS,
   BANGLA_TITLES,
   COMMISSION_RULES,
+  DELIVERY_FEE_RULES,
   ENGLISH_TITLES,
   GENRES,
   MOOD_TAGS,
+  ORDER_STATUS_TRANSITIONS,
+  SEED_COUPONS,
   SYSTEM_SETTINGS,
 } from './seed-data.js';
 
@@ -56,6 +60,10 @@ async function clearDatabase() {
     'OrderStatusHistory',
     'OrderLineItem',
     'Order',
+    'Checkout',
+    'Coupon',
+    'DeliveryFeeRule',
+    'OrderStatusTransition',
     'Address',
     'Listing',
     'RoleApplication',
@@ -96,6 +104,33 @@ async function main() {
         bps: rule.bps,
         priority: rule.priority,
         active: true,
+      },
+    });
+  }
+
+  for (const row of DELIVERY_FEE_RULES) {
+    await prisma.deliveryFeeRule.create({ data: row });
+  }
+
+  for (const c of SEED_COUPONS) {
+    await prisma.coupon.create({
+      data: {
+        code: c.code,
+        discountType: c.discountType,
+        value: c.value,
+        minSubtotal: c.minSubtotal ?? undefined,
+        maxDiscount: c.maxDiscount ?? undefined,
+        active: true,
+      },
+    });
+  }
+
+  for (const t of ORDER_STATUS_TRANSITIONS) {
+    await prisma.orderStatusTransition.create({
+      data: {
+        fromStatus: t.from as import('@prisma/client').OrderStatus,
+        toStatus: t.to as import('@prisma/client').OrderStatus,
+        note: t.note,
       },
     });
   }
@@ -196,10 +231,25 @@ async function main() {
           emailVerified: i % 3 === 0,
           role: UserRole.USER,
           phone: i < 20 ? `0170000${String(i).padStart(4, '0')}` : undefined,
+          phoneVerified: i === 0,
+          trustScore: 100,
         },
       });
     }),
   );
+
+  await prisma.address.create({
+    data: {
+      userId: regularUsers[0].id,
+      label: 'Home',
+      phone: '01700000000',
+      division: 'Dhaka',
+      district: 'Dhaka',
+      area: 'Dhanmondi',
+      line1: 'House 12, Road 5',
+      isDefault: true,
+    },
+  });
 
   const books = [];
   for (let i = 0; i < 200; i++) {
@@ -251,18 +301,32 @@ async function main() {
         sellerType: seller.sellerType,
         vendorId: seller.vendorId,
         price: priceBdt(i),
-        stock: 5 + (i % 40),
+        stock: i === 199 ? 1 : 5 + (i % 40),
         status: 'ACTIVE',
       },
     });
   }
 
   const buyer = regularUsers[0];
+  const buyerAddress = await prisma.address.findFirst({ where: { userId: buyer.id } });
   const listing = await prisma.listing.findFirst({ where: { bookId: books[0].id } });
-  if (listing) {
-    const order = await prisma.order.create({
+  if (listing && buyerAddress) {
+    const linePaisa = toPaisa(listing.price.toString());
+    const { sellerPaisa, commissionPaisa } = splitCommission(linePaisa, 800);
+    const checkout = await prisma.checkout.create({
       data: {
         buyerId: buyer.id,
+        paymentMethod: 'COD',
+        status: 'COMPLETED',
+        shippingAddressId: buyerAddress.id,
+        idempotencyKey: `seed-order-${buyer.id}`,
+      },
+    });
+    const order = await prisma.order.create({
+      data: {
+        checkoutId: checkout.id,
+        buyerId: buyer.id,
+        sellerId: listing.sellerId,
         status: 'DELIVERED',
         paymentMethod: 'COD',
         paymentStatus: 'CAPTURED',
@@ -270,7 +334,7 @@ async function main() {
         shippingFee: '60.00',
         discount: '0.00',
         total: (Number(listing.price) + 60).toFixed(2),
-        idempotencyKey: `seed-order-${buyer.id}`,
+        shippingAddressId: buyerAddress.id,
         lineItems: {
           create: {
             listingId: listing.id,
@@ -279,10 +343,18 @@ async function main() {
             unitPrice: listing.price,
             qty: 1,
             lineTotal: listing.price,
+            sellerId: listing.sellerId,
+            commissionBps: 800,
+            commissionAmount: fromPaisa(commissionPaisa),
+            sellerAmount: fromPaisa(sellerPaisa),
           },
         },
         statusHistory: {
-          create: { status: 'DELIVERED', note: 'Seed delivered order', actorId: adminId },
+          create: [
+            { status: 'PENDING_PAYMENT', note: 'Seed' },
+            { status: 'PROCESSING', note: 'COD' },
+            { status: 'DELIVERED', note: 'Seed delivered order', actorId: adminId },
+          ],
         },
       },
     });

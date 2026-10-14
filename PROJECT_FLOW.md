@@ -15,7 +15,8 @@ Check off after each prompt’s ACCEPTANCE passes.
 ## C · Commerce (P5–9)
 
 - [x] P5 — Catalog API, pg SearchService, book pages, local uploads, bench script
-- [ ] Checkout → escrow → delivery → payout (local)
+- [x] P6 — Cart quote, COD checkout, orders, BullMQ reservation release
+- [ ] Escrow → delivery → payout (local)
 
 ## D · Retention (P10–12)
 

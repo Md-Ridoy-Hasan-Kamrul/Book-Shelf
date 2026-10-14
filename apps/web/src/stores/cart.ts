@@ -1,13 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-type CartItem = { id: string; title: string; qty: number };
+export type CartItem = { listingId: string; title: string; qty: number };
 
 type CartState = {
   items: CartItem[];
   count: () => number;
-  add: (id: string, title?: string) => void;
-  addDemo: () => void;
+  add: (listingId: string, title: string, qty?: number) => void;
+  setQty: (listingId: string, qty: number) => void;
+  remove: (listingId: string) => void;
   clear: () => void;
 };
 
@@ -16,19 +17,29 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       items: [],
       count: () => get().items.reduce((sum, i) => sum + i.qty, 0),
-      add: (id, title = id) =>
+      add: (listingId, title, qty = 1) =>
         set((s) => {
-          const existing = s.items.find((i) => i.id === id);
+          const existing = s.items.find((i) => i.listingId === listingId);
           if (existing) {
             return {
-              items: s.items.map((i) => (i.id === id ? { ...i, qty: i.qty + 1 } : i)),
+              items: s.items.map((i) =>
+                i.listingId === listingId ? { ...i, qty: i.qty + qty } : i,
+              ),
             };
           }
-          return { items: [...s.items, { id, title, qty: 1 }] };
+          return { items: [...s.items, { listingId, title, qty }] };
         }),
-      addDemo: () => get().add('demo-book', 'Demo Book'),
+      setQty: (listingId, qty) =>
+        set((s) => ({
+          items:
+            qty <= 0
+              ? s.items.filter((i) => i.listingId !== listingId)
+              : s.items.map((i) => (i.listingId === listingId ? { ...i, qty } : i)),
+        })),
+      remove: (listingId) =>
+        set((s) => ({ items: s.items.filter((i) => i.listingId !== listingId) })),
       clear: () => set({ items: [] }),
     }),
-    { name: 'bookverse-cart' },
+    { name: 'bookverse-cart-v2' },
   ),
 );

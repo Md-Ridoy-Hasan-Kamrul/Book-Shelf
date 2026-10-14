@@ -1,0 +1,53 @@
+---
+import Base from '../../layouts/Base.astro';
+import { fetchOrder } from '../../lib/checkoutApi';
+
+const { id } = Astro.params;
+if (!id) return Astro.redirect('/orders');
+
+const order = await fetchOrder(id);
+if (!order) return Astro.redirect('/orders');
+
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+---
+
+<Base title={`Order ${order.id.slice(0, 8)}`} description="Order details">
+  <main id="main" class="mx-auto w-[min(100%-2rem,48rem)] py-8">
+    <p>
+      <a href="/orders" class="text-sm font-semibold text-brand-700">← Orders</a>
+    </p>
+    <h1 class="font-display text-2xl font-bold text-ink-900">{order.sellerName}</h1>
+    <p class="text-ink-500">
+      {order.status} · {order.paymentMethod} · ৳{order.total}
+    </p>
+    <section class="mt-6">
+      <h2 class="text-lg font-bold">Items</h2>
+      <ul class="list-none space-y-2 p-0">
+        {
+          order.lineItems.map((li) => (
+            <li class="flex justify-between border-b border-line py-2 text-sm">
+              <span>
+                {li.title} × {li.qty}
+              </span>
+              <span class="font-semibold">৳{li.lineTotal}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+    <section class="mt-6">
+      <h2 class="text-lg font-bold">Status history</h2>
+      <ol class="mt-2 space-y-2 border-l-2 border-line pl-4 text-sm">
+        {
+          order.statusHistory.map((h) => (
+            <li>
+              <strong>{h.status}</strong>
+              {h.note ? ` — ${h.note}` : ''}
+              <div class="text-ink-500">{h.createdAt}</div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+  </main>
+</Base>

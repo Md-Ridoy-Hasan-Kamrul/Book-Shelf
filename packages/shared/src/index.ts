@@ -32,6 +32,16 @@ export {
 export { meUserSchema, meResponseSchema, type MeUser } from './auth/me.js';
 export { normalizeSearchQuery } from './catalog/normalizeQuery.js';
 export {
+  cartLineSchema,
+  checkoutQuoteBodySchema,
+  checkoutBodySchema,
+  checkoutQuoteSchema,
+  checkoutResultSchema,
+  orderSummarySchema,
+  orderDetailSchema,
+  addressCreateSchema,
+} from './checkout/schemas.js';
+export {
   booksListQuerySchema,
   searchQuerySchema,
   searchSuggestQuerySchema,
