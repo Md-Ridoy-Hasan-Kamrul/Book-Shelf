@@ -23,6 +23,17 @@ export const SYSTEM_SETTINGS: Record<string, unknown> = {
   claim_window_hours: 72,
   rto_cost_bdt: '80.00',
   margin_guard_min_bps: 500,
+  recommend_weights: {
+    genre: 3,
+    author: 4,
+    publisher: 2,
+    wishlist: 3,
+    purchase: 5,
+    shelf: 4,
+    follow: 2,
+    popularity: 1.5,
+    freshness: 1,
+  },
 };
 
 export const DELIVERY_FEE_RULES = [

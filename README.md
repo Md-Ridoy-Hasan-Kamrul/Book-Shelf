@@ -37,6 +37,7 @@ pnpm dev
 | ---------------------------- | ------------------------------------------------------------ |
 | http://localhost:4321        | Web                                                          |
 | http://localhost:4321/design | Design tokens                                                |
+| http://localhost:4321/mood   | Mood discovery results (chip → DB `moodTags`)                |
 | http://localhost:4000/health | API health (Postgres + Redis when `HEALTH_SKIP_INFRA=false`) |
 | http://localhost:8025        | Mailpit UI                                                   |
 
@@ -54,3 +55,9 @@ pnpm dev
 | `pnpm db:seed`     | Dev seed                  |
 | `pnpm sim:courier` | Courier webhook simulator |
 | `pnpm bench:feed`  | Feed latency bench        |
+
+## P14 mood / recommend (local-first)
+
+- Mood chips + `/discover/mood` query `Book.moodTags` (no LLM). Copy: _these books may match your mood_.
+- Rule-based `/discover/recommend` (weights in `SystemSetting.recommend_weights`), 10‑minute Redis cache, in-stock only.
+- Optional free-text classify: `FEATURE_MOOD_LLM=true` + `LLM_PROVIDER=mock` (default `off` uses rule fallback when enabled).

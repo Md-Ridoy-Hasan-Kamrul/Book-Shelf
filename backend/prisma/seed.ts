@@ -55,6 +55,7 @@ async function clearDatabase() {
     'Campaign',
     'ReadingGoal',
     'BookshelfItem',
+    'MoodLog',
     'WishlistItem',
     'Review',
     'UserBadge',
