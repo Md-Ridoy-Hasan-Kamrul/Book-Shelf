@@ -42,6 +42,8 @@ import { createAdminDashboardRouter } from './routes/adminDashboard.js';
 import { createPaymentProvider } from './providers/payment/index.js';
 import { createStorageProvider } from './providers/storage/index.js';
 import { createSearchService } from './services/search/pgSearchService.js';
+import { createLlmProvider } from './providers/llm/index.js';
+import { createDiscoverRouter } from './routes/discover.js';
 
 export function createApp(env: ApiEnv, logger: Logger) {
   const app = express();
@@ -50,6 +52,7 @@ export function createApp(env: ApiEnv, logger: Logger) {
   const sms = createSmsProvider(env, logger);
   const storage = createStorageProvider(env);
   const search = createSearchService(env);
+  const llm = createLlmProvider(env);
   const auth = createAuth(env, email);
 
   app.disable('x-powered-by');
@@ -101,6 +104,7 @@ export function createApp(env: ApiEnv, logger: Logger) {
   app.use('/bookshelf', createBookshelfRouter(auth, env));
   app.use('/isbn', createIsbnRouter(env));
   app.use('/used-listings', createUsedListingsRouter(auth, env, storage));
+  app.use('/discover', createDiscoverRouter(auth, env, storage, llm));
   app.use('/checkout', createCheckoutRouter(auth, env));
   app.use('/orders', createOrdersRouter(auth, env));
   app.use('/orders', createSellerRatingRouter(auth, env));

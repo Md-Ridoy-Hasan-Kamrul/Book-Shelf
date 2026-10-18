@@ -92,3 +92,18 @@ export {
   sellerRatingCreateSchema,
   isbnParamSchema,
 } from './used/schemas.js';
+export {
+  moodEnumSchema,
+  moodSortSchema,
+  moodDiscoverQuerySchema,
+  moodLogBodySchema,
+  moodClassifyBodySchema,
+  llmMoodClassifyResultSchema,
+  discoverBookCardSchema,
+  moodDiscoverResultSchema,
+  recommendSectionSchema,
+  recommendResultSchema,
+  moodClassifyResultSchema,
+  discoverConfigSchema,
+  type MoodEnum,
+} from './discover/schemas.js';

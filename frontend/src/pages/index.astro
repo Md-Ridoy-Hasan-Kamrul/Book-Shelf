@@ -4,12 +4,20 @@ import Hero from '../components/sections/Hero.astro';
 import Features from '../components/sections/Features.astro';
 import HowItWorks from '../components/sections/HowItWorks.astro';
 import ScrollReveal from '../components/islands/ScrollReveal.tsx';
+import MoodPicker from '../components/islands/MoodPicker.tsx';
+import RecommendRail from '../components/islands/RecommendRail.tsx';
 ---
 
 <Base title="BookVerse — Home">
   <ScrollReveal client:load />
   <main id="main">
     <Hero />
+    <section class="py-10" aria-label="Mood discovery">
+      <div class="mx-auto grid w-[min(100%-2rem,72rem)] gap-8">
+        <MoodPicker client:load />
+        <RecommendRail client:load />
+      </div>
+    </section>
     <Features />
     <HowItWorks />
   </main>

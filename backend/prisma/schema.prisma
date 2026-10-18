@@ -292,6 +292,7 @@ model User {
   moderationLogs       ModerationLog[]       @relation("ModerationActor")
   lookInsideSubmitted  BookLookInside[]      @relation("LookInsideSubmitter")
   lookInsideApproved   BookLookInside[]      @relation("LookInsideApprover")
+  moodLogs             MoodLog[]
 
   @@index([role])
   @@index([createdAt, id])
@@ -433,6 +434,17 @@ model Book {
   @@index([publisherId])
   @@index([writerId])
   @@index([createdAt, id])
+}
+
+model MoodLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mood      String
+  source    String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt, id])
 }
 
 model Listing {
