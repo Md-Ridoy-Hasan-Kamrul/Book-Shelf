@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import PointsHistory from '../components/islands/PointsHistory.tsx';
+---
+
+<Base title="Points" description="Point ledger history">
+  <main id="main" class="mx-auto w-[min(100%-2rem,40rem)] py-8">
+    <h1 class="font-display text-2xl font-bold text-ink-900">Points</h1>
+    <p class="mb-6 text-sm text-ink-500">
+      <a href="/bookshelf" class="font-semibold text-brand-700 underline">← Bookshelf</a>
+    </p>
+    <PointsHistory client:load />
+  </main>
+</Base>

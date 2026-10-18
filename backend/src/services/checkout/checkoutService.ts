@@ -84,6 +84,23 @@ export async function performCheckout(
       },
     });
 
+    let pointsDiscountPaisa = 0n;
+    if (body.pointsToRedeem && body.pointsToRedeem > 0) {
+      const quoteTotalPaisa =
+        built.subtotalPaisa +
+        [...shippingBySeller.values()].reduce((a, b) => a + b, 0n) -
+        built.discountTotalPaisa;
+      const { redeemPointsForCheckout } = await import('../points/redeemPoints.js');
+      const redeemed = await redeemPointsForCheckout(
+        tx,
+        user.id,
+        createdCheckout.id,
+        body.pointsToRedeem,
+        quoteTotalPaisa,
+      );
+      pointsDiscountPaisa = redeemed.discountPaisa;
+    }
+
     const orders = [];
     for (const [sellerId, groupLines] of sellerGroups) {
       const groupSubtotal = groupLines.reduce((s, l) => s + l.lineTotalPaisa, 0n);
@@ -92,8 +109,13 @@ export async function performCheckout(
         built.subtotalPaisa,
         built.discountTotalPaisa,
       );
+      const groupPointDiscount = allocateDiscount(
+        groupSubtotal,
+        built.subtotalPaisa,
+        pointsDiscountPaisa,
+      );
       const groupShipping = shippingBySeller.get(sellerId) ?? 0n;
-      const groupTotal = groupSubtotal + groupShipping - groupDiscount;
+      const groupTotal = groupSubtotal + groupShipping - groupDiscount - groupPointDiscount;
 
       for (const line of groupLines) {
         await reserveListingStock(tx, line.listingId, line.qty);
@@ -109,8 +131,8 @@ export async function performCheckout(
           paymentStatus: body.paymentMethod === 'COD' ? 'PENDING' : 'PENDING',
           subtotal: fromPaisa(groupSubtotal),
           shippingFee: fromPaisa(groupShipping),
-          discount: fromPaisa(groupDiscount),
-          total: fromPaisa(groupTotal),
+          discount: fromPaisa(groupDiscount + groupPointDiscount),
+          total: fromPaisa(groupTotal < 0n ? 0n : groupTotal),
           shippingAddressId: address.id,
         },
       });

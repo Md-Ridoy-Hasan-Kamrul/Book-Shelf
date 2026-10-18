@@ -32,7 +32,8 @@
     "sim:ipn": "node scripts/sim-ipn.mjs",
     "reconcile": "pnpm --filter @bookverse/api reconcile",
     "sim:courier": "node scripts/sim-courier.mjs",
-    "bench:feed": "node scripts/bench-feed.mjs"
+    "bench:feed": "node scripts/bench-feed.mjs",
+    "verify:points": "pnpm --filter @bookverse/api verify:points"
   },
   "lint-staged": {
     "*.{js,mjs,cjs,ts,tsx,jsx,astro,css,json,md}": "prettier --write"

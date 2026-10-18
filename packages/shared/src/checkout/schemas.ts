@@ -13,6 +13,7 @@ export const checkoutQuoteBodySchema = z.object({
 
 export const checkoutBodySchema = checkoutQuoteBodySchema.extend({
   paymentMethod: z.enum(['COD', 'ONLINE']),
+  pointsToRedeem: z.coerce.number().int().min(0).max(1_000_000).optional(),
 });
 
 export const quoteLineSchema = z.object({

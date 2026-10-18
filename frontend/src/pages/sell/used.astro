@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/Base.astro';
+import UsedListingForm from '../../components/islands/UsedListingForm.tsx';
+
+const isbn = Astro.url.searchParams.get('isbn') ?? '';
+---
+
+<Base title="Sell used book" description="List a used book for sale">
+  <main id="main" class="mx-auto w-[min(100%-2rem,32rem)] py-8">
+    <h1 class="font-display text-2xl font-bold text-ink-900">Sell used book</h1>
+    <p class="mb-6 text-sm text-ink-500">
+      Verified account required. First listing goes to admin moderation. Commission 10%.
+    </p>
+    <UsedListingForm client:load initialIsbn={isbn} />
+  </main>
+</Base>

@@ -127,6 +127,8 @@ export async function applyInternalAction(
           note: 'Courier delivered',
         });
         await onOrderDelivered(tx, orderId, env);
+        const { awardPointsForDeliveredOrder } = await import('../points/purchasePoints.js');
+        await awardPointsForDeliveredOrder(orderId, tx);
       }
     });
     return;

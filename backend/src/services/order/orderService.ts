@@ -146,6 +146,8 @@ export async function adminTransitionOrder(
     if (to === 'DELIVERED') {
       const { onOrderDelivered } = await import('../money/escrowService.js');
       await onOrderDelivered(tx, orderId, env);
+      const { awardPointsForDeliveredOrder } = await import('../points/purchasePoints.js');
+      await awardPointsForDeliveredOrder(orderId, tx);
     }
   });
 }

@@ -8,8 +8,9 @@ const bottomLinks = [
   { href: '/', label: 'Home' },
   { href: '/#features', label: 'Discover' },
   { href: '/feed', label: 'Community' },
+  { href: '/bookshelf', label: 'Shelf' },
+  { href: '/used', label: 'Used' },
   { href: '/checkout', label: 'Cart' },
-  { href: '/design', label: 'Profile' },
 ];
 
 export default function SiteShell() {

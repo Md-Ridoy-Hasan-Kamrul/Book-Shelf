@@ -28,8 +28,9 @@ export async function createReview(userId: string, bookId: string, input: Create
 
   const verified = await userHasVerifiedPurchase(userId, bookId);
 
+  let review;
   try {
-    return await prisma.review.create({
+    review = await prisma.review.create({
       data: {
         userId,
         bookId,
@@ -43,6 +44,18 @@ export async function createReview(userId: string, bookId: string, input: Create
   } catch {
     throw new AppError('CONFLICT', 'You already reviewed this book', 409);
   }
+
+  // First review only (idempotent via reason+refId = userId)
+  const prior = await prisma.review.count({ where: { userId } });
+  if (prior === 1 && input.body.length >= minChars) {
+    const { awardPoints } = await import('../points/awardPoints.js');
+    const { pointsForFirstReview } = await import('../points/pointRules.js');
+    await awardPoints(userId, 'FIRST_REVIEW', userId, await pointsForFirstReview(), {
+      note: 'First book review',
+    });
+  }
+
+  return review;
 }
 
 export async function listBookReviews(bookId: string, cursor?: string, limit = 20) {
@@ -97,6 +110,31 @@ export async function markReviewHelpful(userId: string, reviewId: string) {
     });
   } catch {
     throw new AppError('CONFLICT', 'Already marked helpful', 409);
+  }
+
+  // Points to review author (not voter); daily cap; no points for likes/comments spam
+  if (review.userId !== userId) {
+    const { awardPoints } = await import('../points/awardPoints.js');
+    const { pointsForHelpfulVote, helpfulVoteDailyCap } = await import('../points/pointRules.js');
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const todayEarned = await prisma.pointLedger.aggregate({
+      where: {
+        userId: review.userId,
+        reason: 'HELPFUL_VOTE',
+        createdAt: { gte: startOfDay },
+        delta: { gt: 0 },
+      },
+      _sum: { delta: true },
+    });
+    const cap = await helpfulVoteDailyCap();
+    const earned = todayEarned._sum.delta ?? 0;
+    const per = await pointsForHelpfulVote();
+    if (earned + per <= cap) {
+      await awardPoints(review.userId, 'HELPFUL_VOTE', `${reviewId}:${userId}`, per, {
+        note: 'Helpful vote on review',
+      });
+    }
   }
 }
 

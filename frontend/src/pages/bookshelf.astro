@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+import BookshelfBoard from '../components/islands/BookshelfBoard.tsx';
+---
+
+<Base title="My bookshelf" description="Reading shelf and yearly goal">
+  <main id="main" class="mx-auto w-[min(100%-2rem,72rem)] py-8">
+    <div class="mb-6 flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h1 class="font-display text-2xl font-bold text-ink-900">Bookshelf</h1>
+        <p class="text-sm text-ink-500">Want · Reading · Read · Paused</p>
+      </div>
+      <a href="/points" class="text-sm font-semibold text-brand-700 underline">Points history</a>
+    </div>
+    <BookshelfBoard client:load />
+  </main>
+</Base>

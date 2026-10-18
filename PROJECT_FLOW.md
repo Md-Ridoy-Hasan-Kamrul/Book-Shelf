@@ -21,6 +21,8 @@ Check off after each prompt’s ACCEPTANCE passes.
 - [x] P9 — Seller & admin dashboards (paginated APIs, audit log, IDOR tests, mobile UI)
 - [x] P10 — Reviews, wishlist alerts, notifications, separate worker process
 - [x] P11 — Social feed, reactions, comments, moderation, trending cache job
+- [x] P12 — Bookshelf, reading goals, awardPoints/PointLedger, badges, points UI
+- [x] P13 — Used-book marketplace, ISBN lookup/scanner, near-me, seller ratings
 - [ ] Delivery courier remit → full payout rails (live Steadfast/Pathao)
 
 ## D · Retention (P10–12)

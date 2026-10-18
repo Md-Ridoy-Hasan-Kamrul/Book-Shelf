@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-export const listingConditionSchema = z.enum(['NEW', 'LIKE_NEW', 'GOOD', 'FAIR']);
+export const listingConditionSchema = z.enum(['NEW', 'LIKE_NEW', 'GOOD', 'FAIR', 'READABLE']);
+export const usedConditionSchema = z.enum(['LIKE_NEW', 'GOOD', 'FAIR', 'READABLE']);
+export const listingFulfillmentSchema = z.enum(['SHIPPING', 'PICKUP', 'BOTH']);
 export const catalogTypeSchema = z.enum(['NEW', 'USED']);
 export const bookSortSchema = z.enum(['newest', 'price_asc', 'price_desc', 'title']);
 

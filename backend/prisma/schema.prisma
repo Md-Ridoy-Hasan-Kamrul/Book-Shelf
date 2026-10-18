@@ -33,13 +33,21 @@ enum ListingCondition {
   LIKE_NEW
   GOOD
   FAIR
+  READABLE
 }
 
 enum ListingStatus {
   DRAFT
+  PENDING_MODERATION
   ACTIVE
   SOLD_OUT
   REMOVED
+}
+
+enum ListingFulfillment {
+  SHIPPING
+  PICKUP
+  BOTH
 }
 
 enum OrderStatus {
@@ -174,6 +182,7 @@ enum ReportTargetType {
   COMMENT
   USER
   REVIEW
+  LISTING
 }
 
 enum ReportStatus {
@@ -185,9 +194,17 @@ enum ReportStatus {
 
 enum BookshelfStatus {
   WANT_TO_READ
-  READING
-  FINISHED
-  DNF
+  CURRENTLY_READING
+  READ
+  PAUSED
+}
+
+enum BadgeType {
+  BOOKWORM
+  TOP_REVIEWER
+  GENRE_EXPLORER
+  EARLY_READER
+  COMMUNITY_STAR
 }
 
 enum ClubMemberRole {
@@ -265,6 +282,9 @@ model User {
   ledgerEntries        LedgerEntry[]
   payouts              Payout[]
   pointLedger          PointLedger[]
+  badges               UserBadge[]
+  sellerRatingsGiven   SellerRating[]        @relation("SellerRatingBuyer")
+  sellerRatingsReceived SellerRating[]       @relation("SellerRatingSeller")
   orderStatusChanges   OrderStatusHistory[]  @relation("OrderStatusActor")
   adminAuditLogs       AdminAuditLog[]       @relation("AdminAuditActor")
   campaigns            Campaign[]            @relation("CampaignOwner")
@@ -416,27 +436,71 @@ model Book {
 }
 
 model Listing {
-  id          String           @id @default(cuid())
-  bookId      String
-  book        Book             @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  sellerId    String
-  seller      User             @relation("ListingSeller", fields: [sellerId], references: [id], onDelete: Restrict)
-  sellerType  SellerType
-  vendorId    String?
-  vendor      VendorProfile?   @relation(fields: [vendorId], references: [id], onDelete: SetNull)
-  price       Decimal          @db.Decimal(12, 2)
-  stock       Int              @default(0)
-  reservedQty Int              @default(0)
-  condition   ListingCondition @default(NEW)
-  status      ListingStatus    @default(ACTIVE)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id           String             @id @default(cuid())
+  bookId       String
+  book         Book               @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  sellerId     String
+  seller       User               @relation("ListingSeller", fields: [sellerId], references: [id], onDelete: Restrict)
+  sellerType   SellerType
+  vendorId     String?
+  vendor       VendorProfile?     @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+  price        Decimal            @db.Decimal(12, 2)
+  stock        Int                @default(0)
+  reservedQty  Int                @default(0)
+  condition    ListingCondition   @default(NEW)
+  status       ListingStatus      @default(ACTIVE)
+  isUsed       Boolean            @default(false)
+  photoKeys    String[]           @default([])
+  description  String?            @db.Text
+  district     String?
+  area         String?
+  fulfillment  ListingFulfillment @default(SHIPPING)
+  moderatedAt  DateTime?
+  moderatedById String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
 
   orderLineItems OrderLineItem[]
+  sellerRatings  SellerRating[]
 
   @@index([bookId, status])
   @@index([sellerId])
   @@index([createdAt, id])
+  @@index([isUsed, district, status])
+}
+
+model IsbnCache {
+  id          String   @id @default(cuid())
+  isbn        String   @unique
+  title       String
+  titleBn     String?
+  authors     String[] @default([])
+  description String?  @db.Text
+  coverUrl    String?
+  pageCount   Int?
+  publishedYear Int?
+  language    String?
+  source      String
+  raw         Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SellerRating {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  listingId String?
+  listing   Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  buyerId   String
+  buyer     User     @relation("SellerRatingBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  sellerId  String
+  seller    User     @relation("SellerRatingSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  rating    Int
+  body      String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([sellerId, createdAt])
 }
 
 model BookLookInside {
@@ -553,6 +617,7 @@ model Order {
   ledgerEntries LedgerEntry[]
   paymentEvents PaymentEvent[]
   shipment        Shipment?
+  sellerRating    SellerRating?
 
   @@index([buyerId, createdAt, id])
   @@index([sellerId, createdAt, id])
@@ -749,11 +814,25 @@ model PointLedger {
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   delta          Int
   kind           PointLedgerKind
+  reason         String
+  refId          String
   idempotencyKey String          @unique
   note           String?
   createdAt      DateTime        @default(now())
 
+  @@unique([userId, reason, refId])
   @@index([userId, createdAt])
+}
+
+model UserBadge {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      BadgeType
+  awardedAt DateTime  @default(now())
+
+  @@unique([userId, type])
+  @@index([type])
 }
 
 // ─── Social / reading ────────────────────────────────────────────────────────
@@ -790,16 +869,18 @@ model WishlistItem {
 }
 
 model BookshelfItem {
-  id        String          @id @default(cuid())
-  userId    String
-  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bookId    String
-  book      Book            @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  status    BookshelfStatus @default(WANT_TO_READ)
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+  id           String          @id @default(cuid())
+  userId       String
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId       String
+  book         Book            @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  status       BookshelfStatus @default(WANT_TO_READ)
+  pageProgress Int             @default(0)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
 
   @@unique([userId, bookId])
+  @@index([userId, status])
 }
 
 model ReadingGoal {

@@ -46,6 +46,12 @@ export {
   reportCreateSchema,
 } from './retention/schemas.js';
 export {
+  bookshelfStatusSchema,
+  bookshelfUpsertSchema,
+  readingGoalUpdateSchema,
+  pointHistoryQuerySchema,
+} from './points/schemas.js';
+export {
   cartLineSchema,
   checkoutQuoteBodySchema,
   checkoutBodySchema,
@@ -76,4 +82,13 @@ export {
   updateListingStockSchema,
   listingUpdateSchema,
   lookInsideSubmitSchema,
+  listingConditionSchema,
+  usedConditionSchema,
+  listingFulfillmentSchema,
 } from './catalog/schemas.js';
+export {
+  usedListingCreateSchema,
+  usedNearMeQuerySchema,
+  sellerRatingCreateSchema,
+  isbnParamSchema,
+} from './used/schemas.js';

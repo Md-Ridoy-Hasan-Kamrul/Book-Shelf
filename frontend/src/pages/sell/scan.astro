@@ -1,0 +1,15 @@
+---
+import Base from '../../layouts/Base.astro';
+import IsbnScanner from '../../components/islands/IsbnScanner.tsx';
+---
+
+<Base title="Scan ISBN" description="Scan a barcode to list a used book">
+  <main id="main" class="mx-auto w-[min(100%-2rem,28rem)] py-8">
+    <h1 class="font-display text-2xl font-bold text-ink-900">ISBN scanner</h1>
+    <p class="mb-4 text-sm text-ink-500">Camera loads only on this page. Or type ISBN manually.</p>
+    <IsbnScanner client:only="react" />
+    <p class="mt-4 text-sm">
+      <a href="/sell/used" class="font-semibold text-brand-700 underline">Manual listing</a>
+    </p>
+  </main>
+</Base>

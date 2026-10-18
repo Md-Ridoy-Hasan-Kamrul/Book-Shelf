@@ -24,6 +24,12 @@ import {
   scheduleTrendingRebuild,
   closeFeedQueue,
 } from './jobs/feedQueue.js';
+import {
+  getBadgeQueue,
+  startBadgeWorker,
+  scheduleNightlyBadges,
+  closeBadgeQueue,
+} from './jobs/badgeQueue.js';
 
 const env = loadApiEnv();
 const logger = createLogger(env);
@@ -38,6 +44,7 @@ getMoneyQueue(env);
 getCourierQueue(env);
 getNotificationQueue(env);
 getFeedQueue(env);
+getBadgeQueue(env);
 
 startCheckoutWorker(env, logger);
 startMoneyWorker(env, logger);
@@ -47,11 +54,14 @@ void scheduleCourierPoll(env);
 startNotificationWorker(env, logger);
 startFeedWorker(env, logger);
 void scheduleTrendingRebuild(env);
+startBadgeWorker(env, logger);
+void scheduleNightlyBadges(env);
 
 logger.info('BookVerse worker process started (BullMQ)');
 
 async function shutdown(signal: string) {
   logger.info({ signal }, 'Worker graceful shutdown');
+  await closeBadgeQueue();
   await closeFeedQueue();
   await closeNotificationQueue();
   await closeCourierQueue();
