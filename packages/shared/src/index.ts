@@ -32,6 +32,20 @@ export {
 export { meUserSchema, meResponseSchema, type MeUser } from './auth/me.js';
 export { normalizeSearchQuery } from './catalog/normalizeQuery.js';
 export {
+  postCreateSchema,
+  postUpdateSchema,
+  commentCreateSchema,
+  reactionSchema,
+  feedQuerySchema,
+  moderationActionSchema,
+  postTypeSchema,
+} from './social/schemas.js';
+export {
+  reviewCreateSchema,
+  reviewListQuerySchema,
+  reportCreateSchema,
+} from './retention/schemas.js';
+export {
   cartLineSchema,
   checkoutQuoteBodySchema,
   checkoutBodySchema,
@@ -60,5 +74,6 @@ export {
   searchSuggestSchema,
   createBookListingSchema,
   updateListingStockSchema,
+  listingUpdateSchema,
   lookInsideSubmitSchema,
 } from './catalog/schemas.js';

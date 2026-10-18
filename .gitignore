@@ -7,15 +7,17 @@ dist/
 # dependencies
 node_modules/
 package-lock.json
-apps/*/package-lock.json
+frontend/package-lock.json
+backend/package-lock.json
 
 # pnpm
 pnpm-debug.log*
 
 # shared build
 packages/shared/dist/
-apps/api/dist/
-apps/api/uploads/
+frontend/dist/
+backend/dist/
+backend/uploads/
 
 # logs
 npm-debug.log*

@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import SocialFeed from '../components/islands/SocialFeed.tsx';
+import PostComposer from '../components/islands/PostComposer.tsx';
+---
+
+<Base title="Community feed" description="BookVerse reading community">
+  <main id="main" class="mx-auto w-[min(100%-2rem,40rem)] py-8">
+    <h1 class="font-display text-2xl font-bold text-ink-900">Community</h1>
+    <p class="text-sm text-ink-500">Following · Trending · Mixed (local)</p>
+    <div class="mt-6 space-y-6">
+      <PostComposer client:load />
+      <SocialFeed client:load />
+    </div>
+  </main>
+</Base>

@@ -9,11 +9,13 @@
   "packageManager": "pnpm@10.17.1",
   "scripts": {
     "prepare": "husky",
-    "dev": "pnpm --filter @bookverse/shared build && pnpm run --parallel dev:web dev:api",
+    "dev": "pnpm --filter @bookverse/shared build && pnpm run --parallel dev:web dev:api dev:worker",
     "dev:web": "pnpm --filter @bookverse/web dev",
     "dev:api": "pnpm --filter @bookverse/api dev",
+    "dev:backend": "pnpm --filter @bookverse/api dev",
+    "dev:worker": "pnpm --filter @bookverse/api worker",
     "build": "pnpm --filter @bookverse/shared build && pnpm --filter @bookverse/web build && pnpm --filter @bookverse/api build",
-    "lint": "eslint apps/api/src apps/web/src packages/shared/src",
+    "lint": "eslint frontend/src backend/src packages/shared/src",
     "typecheck": "pnpm --filter @bookverse/shared build && pnpm -r typecheck",
     "test": "pnpm --filter @bookverse/shared build && pnpm -r test",
     "test:e2e": "pnpm --filter @bookverse/web test:e2e",
@@ -29,7 +31,8 @@
     "backup": "node scripts/stub.mjs backup",
     "sim:ipn": "node scripts/sim-ipn.mjs",
     "reconcile": "pnpm --filter @bookverse/api reconcile",
-    "sim:courier": "node scripts/sim-courier.mjs"
+    "sim:courier": "node scripts/sim-courier.mjs",
+    "bench:feed": "node scripts/bench-feed.mjs"
   },
   "lint-staged": {
     "*.{js,mjs,cjs,ts,tsx,jsx,astro,css,json,md}": "prettier --write"

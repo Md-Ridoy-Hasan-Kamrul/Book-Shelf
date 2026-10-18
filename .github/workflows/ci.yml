@@ -86,7 +86,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install chromium --with-deps
-        working-directory: apps/web
-      - run: pnpm --filter @bookverse/web test:e2e
+        working-directory: frontend
+      - run: pnpm test:e2e
         env:
           CI: true

@@ -19,6 +19,8 @@ Check off after each prompt’s ACCEPTANCE passes.
 - [x] P7 — Mock/SSLCommerz payments, IPN, ledger, escrow, claims, payouts, reconcile
 - [x] P8 — Mock courier, PACKED→shipment job, webhooks, poll fallback, sim:courier, tracking UI
 - [x] P9 — Seller & admin dashboards (paginated APIs, audit log, IDOR tests, mobile UI)
+- [x] P10 — Reviews, wishlist alerts, notifications, separate worker process
+- [x] P11 — Social feed, reactions, comments, moderation, trending cache job
 - [ ] Delivery courier remit → full payout rails (live Steadfast/Pathao)
 
 ## D · Retention (P10–12)

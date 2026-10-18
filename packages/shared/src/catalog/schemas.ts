@@ -98,6 +98,14 @@ export const updateListingStockSchema = z.object({
   stock: z.coerce.number().int().nonnegative(),
 });
 
+export const listingUpdateSchema = z.object({
+  stock: z.coerce.number().int().nonnegative().optional(),
+  price: z
+    .string()
+    .regex(/^\d+(\.\d{2})?$/)
+    .optional(),
+});
+
 export const lookInsideSubmitSchema = z.object({
   copyrightConfirmed: z.literal(true),
 });

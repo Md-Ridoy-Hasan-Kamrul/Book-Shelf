@@ -1,0 +1,1051 @@
+// BookVerse — Appendix A core + P3 extensions (Better Auth merged User)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  USER
+  WRITER
+  PUBLISHER
+  VENDOR
+  ADMIN
+  MODERATOR
+}
+
+enum SellerType {
+  PUBLISHER
+  WRITER
+  VENDOR
+  USER
+}
+
+enum ListingCondition {
+  NEW
+  LIKE_NEW
+  GOOD
+  FAIR
+}
+
+enum ListingStatus {
+  DRAFT
+  ACTIVE
+  SOLD_OUT
+  REMOVED
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  PROCESSING
+  PACKED
+  SHIPPED
+  DELIVERED
+  DISPUTED
+  CANCELLED
+  REFUNDED
+}
+
+enum CheckoutStatus {
+  PENDING
+  COMPLETED
+  EXPIRED
+  CANCELLED
+}
+
+enum CouponDiscountType {
+  PERCENT
+  FIXED
+}
+
+enum PaymentMethod {
+  COD
+  ONLINE
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  FAILED
+  REFUNDED
+}
+
+enum LedgerOwnerType {
+  PLATFORM
+  USER
+  PUBLISHER
+  VENDOR
+}
+
+enum LedgerEntryKind {
+  SALE
+  COMMISSION
+  REFUND
+  PAYOUT
+  PAYMENT_FEE
+  RTO_COST
+  ADJUSTMENT
+  ESCROW_HOLD
+  ESCROW_RELEASE
+}
+
+enum LedgerEntryStatus {
+  PENDING
+  AVAILABLE
+  PAID
+  VOID
+}
+
+enum PointLedgerKind {
+  EARN
+  REDEEM
+  ADJUSTMENT
+  EXPIRE
+}
+
+enum ClaimStatus {
+  OPEN
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  REFUNDED
+}
+
+enum PayoutStatus {
+  PENDING
+  PAID
+}
+
+enum PaymentIntentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
+enum RoleApplicationType {
+  WRITER
+  PUBLISHER
+  VENDOR
+}
+
+enum RoleApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PostType {
+  STATUS
+  QUOTE
+  PHOTO
+  POLL
+  TEXT
+  IMAGE
+  REVIEW_SHARE
+  READING_UPDATE
+  QUESTION
+  ANNOUNCEMENT
+  SPONSORED
+}
+
+enum ReactionKind {
+  LIKE
+  DISLIKE
+}
+
+enum ReactionTargetType {
+  POST
+  COMMENT
+  REVIEW
+}
+
+enum ReportTargetType {
+  POST
+  COMMENT
+  USER
+  REVIEW
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+enum BookshelfStatus {
+  WANT_TO_READ
+  READING
+  FINISHED
+  DNF
+}
+
+enum ClubMemberRole {
+  OWNER
+  MODERATOR
+  MEMBER
+}
+
+enum LookInsideStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  SMS
+  PUSH
+}
+
+// ─── Auth (Better Auth) + User ───────────────────────────────────────────────
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  role          UserRole  @default(USER)
+  phone         String?   @unique
+  phoneVerified Boolean   @default(false)
+  displayName   String?
+  bio           String?   @db.Text
+  pointsBalance Int       @default(0)
+  trustScore    Int       @default(100)
+  rtoCount      Int       @default(0)
+  bannedAt      DateTime?
+  suspendedUntil DateTime?
+  moderationWarnings Int @default(0)
+  deletedAt     DateTime?
+
+  sessions      Session[]
+  accounts      Account[]
+
+  addresses            Address[]
+  orders               Order[]               @relation("OrderBuyer")
+  ordersAsSeller       Order[]               @relation("OrderSeller")
+  checkouts            Checkout[]
+  listings             Listing[]             @relation("ListingSeller")
+  reviews              Review[]
+  wishlist             WishlistItem[]
+  bookshelf            BookshelfItem[]
+  readingGoals         ReadingGoal[]
+  posts                Post[]
+  comments             Comment[]
+  reactions            Reaction[]
+  reportsFiled         Report[]              @relation("ReportReporter")
+  blocksInitiated      Block[]               @relation("BlockBlocker")
+  blocksReceived       Block[]               @relation("BlockBlocked")
+  followers            Follow[]              @relation("FollowFollowing")
+  following            Follow[]              @relation("FollowFollower")
+  reprintRequests      ReprintRequest[]
+  clubsOwned           BookClub[]            @relation("ClubOwner")
+  clubMemberships      ClubMember[]
+  notifications        Notification[]
+  notificationPrefs    NotificationPreference[]
+  writerProfile        WriterProfile?
+  publisherProfile     PublisherProfile?
+  vendorProfile        VendorProfile?
+  roleApplications     RoleApplication[]
+  ledgerEntries        LedgerEntry[]
+  payouts              Payout[]
+  pointLedger          PointLedger[]
+  orderStatusChanges   OrderStatusHistory[]  @relation("OrderStatusActor")
+  adminAuditLogs       AdminAuditLog[]       @relation("AdminAuditActor")
+  campaigns            Campaign[]            @relation("CampaignOwner")
+  savedPosts           SavedPost[]
+  moderationLogs       ModerationLog[]       @relation("ModerationActor")
+  lookInsideSubmitted  BookLookInside[]      @relation("LookInsideSubmitter")
+  lookInsideApproved   BookLookInside[]      @relation("LookInsideApprover")
+
+  @@index([role])
+  @@index([createdAt, id])
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+
+  @@index([identifier])
+}
+
+// ─── Catalog ─────────────────────────────────────────────────────────────────
+
+model Genre {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  nameBn    String
+  createdAt DateTime @default(now())
+
+  books Book[]
+}
+
+model PublisherProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessName String
+  slug         String   @unique
+  verified     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  books Book[]
+}
+
+model WriterProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  penName   String
+  bio       String?  @db.Text
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  books Book[]
+}
+
+model VendorProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shopName  String
+  slug      String   @unique
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  listings Listing[]
+}
+
+model Book {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  isbn          String?  @unique
+  title         String
+  titleBn       String
+  author        String
+  authorBn      String?
+  description   String   @db.Text
+  descriptionBn String?  @db.Text
+  coverKey      String?
+  pageCount     Int?
+  language      String   @default("bn")
+  publishedYear Int?
+  moodTags      String[]
+
+  genreId     String
+  genre       Genre            @relation(fields: [genreId], references: [id], onDelete: Restrict)
+  publisherId String?
+  publisher   PublisherProfile? @relation(fields: [publisherId], references: [id], onDelete: SetNull)
+  writerId    String?
+  writer      WriterProfile?    @relation(fields: [writerId], references: [id], onDelete: SetNull)
+
+  searchVector Unsupported("tsvector")?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  listings        Listing[]
+  orderLineItems  OrderLineItem[]
+  reviews         Review[]
+  wishlist        WishlistItem[]
+  bookshelf       BookshelfItem[]
+  posts           Post[]
+  reprintRequests ReprintRequest[]
+  lookInside      BookLookInside?
+
+  @@index([genreId])
+  @@index([publisherId])
+  @@index([writerId])
+  @@index([createdAt, id])
+}
+
+model Listing {
+  id          String           @id @default(cuid())
+  bookId      String
+  book        Book             @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  sellerId    String
+  seller      User             @relation("ListingSeller", fields: [sellerId], references: [id], onDelete: Restrict)
+  sellerType  SellerType
+  vendorId    String?
+  vendor      VendorProfile?   @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+  price       Decimal          @db.Decimal(12, 2)
+  stock       Int              @default(0)
+  reservedQty Int              @default(0)
+  condition   ListingCondition @default(NEW)
+  status      ListingStatus    @default(ACTIVE)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  orderLineItems OrderLineItem[]
+
+  @@index([bookId, status])
+  @@index([sellerId])
+  @@index([createdAt, id])
+}
+
+model BookLookInside {
+  id                 String           @id @default(cuid())
+  bookId             String           @unique
+  book               Book             @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  pageKeys           String[]
+  copyrightConfirmed Boolean
+  status             LookInsideStatus @default(PENDING)
+  submittedById      String
+  submittedBy        User             @relation("LookInsideSubmitter", fields: [submittedById], references: [id], onDelete: Restrict)
+  approvedById       String?
+  approvedBy           User?            @relation("LookInsideApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@index([status])
+}
+
+model RoleApplication {
+  id        String                @id @default(cuid())
+  userId    String
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      RoleApplicationType
+  status    RoleApplicationStatus @default(PENDING)
+  note      String?               @db.Text
+  documents String[]              @default([])
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+
+  @@index([userId, type])
+}
+
+// ─── Commerce ────────────────────────────────────────────────────────────────
+
+model Checkout {
+  id             String         @id @default(cuid())
+  buyerId        String
+  buyer          User           @relation(fields: [buyerId], references: [id], onDelete: Restrict)
+  paymentMethod  PaymentMethod
+  status         CheckoutStatus @default(PENDING)
+  couponCode     String?
+  shippingAddressId String?
+  shippingAddress Address?      @relation(fields: [shippingAddressId], references: [id], onDelete: SetNull)
+  idempotencyKey String         @unique
+  expiresAt      DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  orders         Order[]
+  paymentIntent  PaymentIntent?
+
+  @@index([buyerId, createdAt, id])
+}
+
+model PaymentIntent {
+  id         String              @id @default(cuid())
+  checkoutId String              @unique
+  checkout   Checkout            @relation(fields: [checkoutId], references: [id], onDelete: Restrict)
+  tranId     String              @unique
+  amount     Decimal             @db.Decimal(12, 2)
+  currency   String              @default("BDT")
+  provider   String
+  status     PaymentIntentStatus @default(PENDING)
+  sessionKey String?
+  gatewayUrl String?             @db.Text
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label     String
+  phone     String
+  division  String
+  district  String
+  area      String
+  line1     String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  orders    Order[]
+  checkouts Checkout[]
+
+  @@index([userId])
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  checkoutId      String
+  checkout        Checkout      @relation(fields: [checkoutId], references: [id], onDelete: Restrict)
+  buyerId         String
+  buyer           User          @relation("OrderBuyer", fields: [buyerId], references: [id], onDelete: Restrict)
+  sellerId        String
+  seller          User          @relation("OrderSeller", fields: [sellerId], references: [id], onDelete: Restrict)
+  status          OrderStatus   @default(PENDING_PAYMENT)
+  paymentMethod   PaymentMethod
+  paymentStatus   PaymentStatus @default(PENDING)
+  subtotal        Decimal       @db.Decimal(12, 2)
+  shippingFee     Decimal       @db.Decimal(12, 2)
+  discount        Decimal       @default(0) @db.Decimal(12, 2)
+  total           Decimal       @db.Decimal(12, 2)
+  shippingAddressId String?
+  shippingAddress Address?      @relation(fields: [shippingAddressId], references: [id], onDelete: SetNull)
+  deliveredAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  lineItems     OrderLineItem[]
+  statusHistory OrderStatusHistory[]
+  claim         Claim?
+  ledgerEntries LedgerEntry[]
+  paymentEvents PaymentEvent[]
+  shipment        Shipment?
+
+  @@index([buyerId, createdAt, id])
+  @@index([sellerId, createdAt, id])
+  @@index([checkoutId])
+  @@index([status])
+}
+
+model OrderLineItem {
+  id         String  @id @default(cuid())
+  orderId    String
+  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  listingId  String?
+  listing    Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  bookId     String
+  book       Book    @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  titleSnap  String
+  unitPrice         Decimal @db.Decimal(12, 2)
+  qty               Int
+  lineTotal         Decimal @db.Decimal(12, 2)
+  sellerId          String
+  commissionBps     Int
+  commissionAmount  Decimal @db.Decimal(12, 2)
+  sellerAmount      Decimal @db.Decimal(12, 2)
+
+  @@index([orderId])
+  @@index([bookId])
+}
+
+model Coupon {
+  id           String             @id @default(cuid())
+  code         String             @unique
+  discountType CouponDiscountType
+  value        Decimal            @db.Decimal(12, 2)
+  minSubtotal  Decimal?           @db.Decimal(12, 2)
+  maxDiscount  Decimal?           @db.Decimal(12, 2)
+  active       Boolean            @default(true)
+  startsAt     DateTime?
+  endsAt       DateTime?
+  createdAt    DateTime           @default(now())
+}
+
+model DeliveryFeeRule {
+  id        String   @id @default(cuid())
+  district  String   @unique
+  baseFee   Decimal  @db.Decimal(12, 2)
+  perItemFee Decimal @default(0) @db.Decimal(12, 2)
+  perKgFee   Decimal @default(0) @db.Decimal(12, 2)
+  active    Boolean  @default(true)
+}
+
+model OrderStatusTransition {
+  id         String      @id @default(cuid())
+  fromStatus OrderStatus
+  toStatus   OrderStatus
+  note       String?
+
+  @@unique([fromStatus, toStatus])
+}
+
+model OrderStatusHistory {
+  id        String      @id @default(cuid())
+  orderId   String
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    OrderStatus
+  note      String?     @db.Text
+  actorId   String?
+  actor     User?       @relation("OrderStatusActor", fields: [actorId], references: [id], onDelete: SetNull)
+  createdAt DateTime    @default(now())
+
+  @@index([orderId, createdAt])
+}
+
+model Claim {
+  id         String      @id @default(cuid())
+  orderId    String      @unique
+  order      Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  reason     String      @db.Text
+  images     String[]
+  status     ClaimStatus @default(OPEN)
+  resolution String?     @db.Text
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Shipment {
+  id             String    @id @default(cuid())
+  orderId        String    @unique
+  order          Order     @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  provider       String
+  consignmentId  String    @unique
+  trackingCode   String?
+  codAmount      Decimal   @db.Decimal(12, 2)
+  courierStatus  String    @default("pending")
+  lastWebhookAt  DateTime?
+  pollAfter      DateTime?
+  failureCount   Int       @default(0)
+  lastError      String?   @db.Text
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  events ShipmentEvent[]
+
+  @@index([pollAfter])
+  @@index([courierStatus])
+}
+
+model ShipmentEvent {
+  id              String   @id @default(cuid())
+  shipmentId      String
+  shipment        Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  providerEventId String?
+  status          String
+  message         String?  @db.Text
+  raw             Json
+  createdAt       DateTime @default(now())
+
+  @@unique([shipmentId, providerEventId])
+  @@index([shipmentId, createdAt])
+}
+
+model CourierWebhookEvent {
+  id        String   @id @default(cuid())
+  provider  String
+  eventId   String
+  payload   Json
+  createdAt DateTime @default(now())
+
+  @@unique([provider, eventId])
+}
+
+model CourierStatusMapping {
+  id            String @id @default(cuid())
+  provider      String
+  courierStatus String
+  internalAction String
+  note          String?
+
+  @@unique([provider, courierStatus])
+}
+
+model PaymentEvent {
+  id        String   @id @default(cuid())
+  orderId   String?
+  order     Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  provider  String
+  eventId   String
+  payload   Json
+  createdAt DateTime @default(now())
+
+  @@unique([provider, eventId])
+  @@index([orderId])
+}
+
+model LedgerEntry {
+  id             String            @id @default(cuid())
+  ownerId        String
+  owner          User              @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  ownerType      LedgerOwnerType
+  orderId        String?
+  order          Order?            @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  orderLineItemId String?
+  amount         Decimal           @db.Decimal(12, 2)
+  kind           LedgerEntryKind
+  status         LedgerEntryStatus @default(PENDING)
+  idempotencyKey String            @unique
+  availableAt    DateTime?
+  payoutId       String?
+  payout         Payout?           @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+  createdAt      DateTime          @default(now())
+
+  @@index([ownerId, status])
+  @@index([orderId])
+  @@index([status, availableAt])
+}
+
+model Payout {
+  id        String       @id @default(cuid())
+  ownerId   String
+  owner     User         @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  amount    Decimal      @db.Decimal(12, 2)
+  status    PayoutStatus @default(PENDING)
+  reference String?
+  createdAt DateTime     @default(now())
+  paidAt    DateTime?
+
+  ledgerEntries LedgerEntry[]
+
+  @@index([ownerId, status])
+}
+
+model PointLedger {
+  id             String          @id @default(cuid())
+  userId         String
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  delta          Int
+  kind           PointLedgerKind
+  idempotencyKey String          @unique
+  note           String?
+  createdAt      DateTime        @default(now())
+
+  @@index([userId, createdAt])
+}
+
+// ─── Social / reading ────────────────────────────────────────────────────────
+
+model Review {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId           String
+  book             Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  rating           Int
+  body             String?  @db.Text
+  images           String[] @default([])
+  hasSpoiler       Boolean  @default(false)
+  helpfulCount     Int      @default(0)
+  isVerifiedBuyer  Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([userId, bookId])
+  @@index([bookId, createdAt, id])
+}
+
+model WishlistItem {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId      String
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  priceAtAdd  Decimal  @db.Decimal(12, 2)
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, bookId])
+}
+
+model BookshelfItem {
+  id        String          @id @default(cuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId    String
+  book      Book            @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  status    BookshelfStatus @default(WANT_TO_READ)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@unique([userId, bookId])
+}
+
+model ReadingGoal {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  year           Int
+  targetBooks    Int
+  completedBooks Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([userId, year])
+}
+
+model Post {
+  id            String   @id @default(cuid())
+  authorId      String
+  author        User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  type          PostType
+  body          String   @db.Text
+  bookId        String?
+  book          Book?    @relation(fields: [bookId], references: [id], onDelete: SetNull)
+  imageKeys     String[] @default([])
+  hasSpoiler    Boolean  @default(false)
+  isSponsored   Boolean  @default(false)
+  campaignId    String?
+  campaign      Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  likeCount     Int      @default(0)
+  dislikeCount  Int      @default(0)
+  commentCount  Int      @default(0)
+  deletedAt     DateTime?
+  hiddenAt      DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  comments  Comment[]
+  savedBy   SavedPost[]
+
+  @@index([authorId, createdAt, id])
+  @@index([createdAt, id])
+  @@index([deletedAt, hiddenAt, createdAt])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String   @db.Text
+  hasSpoiler Boolean @default(false)
+  parentId  String?
+  parent    Comment? @relation("CommentThread", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentThread")
+  deletedAt DateTime?
+  hiddenAt  DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([postId, createdAt, id])
+}
+
+model SavedPost {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+  @@index([userId, createdAt])
+}
+
+model ModerationLog {
+  id          String   @id @default(cuid())
+  moderatorId String
+  moderator   User     @relation("ModerationActor", fields: [moderatorId], references: [id], onDelete: Restrict)
+  action      String
+  targetType  String
+  targetId    String
+  note        String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  @@index([moderatorId, createdAt])
+}
+
+model Reaction {
+  id         String             @id @default(cuid())
+  userId     String
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetType ReactionTargetType
+  targetId   String
+  kind       ReactionKind
+  createdAt  DateTime           @default(now())
+
+  @@unique([userId, targetType, targetId])
+  @@index([targetType, targetId])
+}
+
+model Report {
+  id         String           @id @default(cuid())
+  reporterId String
+  reporter   User             @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  targetType ReportTargetType
+  targetId   String
+  reason     String           @db.Text
+  status     ReportStatus     @default(OPEN)
+  createdAt  DateTime         @default(now())
+
+  @@index([targetType, targetId])
+}
+
+model Block {
+  id        String   @id @default(cuid())
+  blockerId String
+  blocker   User     @relation("BlockBlocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockedId String
+  blocked   User     @relation("BlockBlocked", fields: [blockedId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  follower    User     @relation("FollowFollower", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User     @relation("FollowFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@index([followingId, createdAt, id])
+}
+
+model ReprintRequest {
+  id        String   @id @default(cuid())
+  bookId    String
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  note      String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@unique([bookId, userId])
+}
+
+model BookClub {
+  id          String   @id @default(cuid())
+  ownerId     String
+  owner       User     @relation("ClubOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  name        String
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  members ClubMember[]
+}
+
+model ClubMember {
+  id        String         @id @default(cuid())
+  clubId    String
+  club      BookClub       @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      ClubMemberRole @default(MEMBER)
+  joinedAt  DateTime       @default(now())
+
+  @@unique([clubId, userId])
+}
+
+model Campaign {
+  id        String    @id @default(cuid())
+  ownerId   String
+  owner     User      @relation("CampaignOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  name      String
+  budget    Decimal?  @db.Decimal(12, 2)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  posts Post[]
+}
+
+// ─── Notifications ───────────────────────────────────────────────────────────
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel   NotificationChannel @default(IN_APP)
+  title     String
+  body      String              @db.Text
+  dedupeKey String?
+  readAt    DateTime?
+  createdAt DateTime            @default(now())
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, createdAt, id])
+}
+
+model NotificationPreference {
+  id        String              @id @default(cuid())
+  userId    String
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel   NotificationChannel
+  enabled   Boolean             @default(true)
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  @@unique([userId, channel])
+}
+
+// ─── Admin / settings ────────────────────────────────────────────────────────
+
+model SystemSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+}
+
+model CommissionRule {
+  id         String      @id @default(cuid())
+  name       String
+  sellerType SellerType?
+  genreSlug  String?
+  bps        Int
+  priority   Int         @default(0)
+  active     Boolean     @default(true)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([active, priority])
+}
+
+model AdminAuditLog {
+  id        String   @id @default(cuid())
+  adminId   String
+  admin     User     @relation("AdminAuditActor", fields: [adminId], references: [id], onDelete: Restrict)
+  action    String
+  entity    String
+  entityId  String?
+  before    Json?
+  after     Json?
+  createdAt DateTime @default(now())
+
+  @@index([adminId, createdAt])
+}

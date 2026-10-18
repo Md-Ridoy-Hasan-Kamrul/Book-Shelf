@@ -8,15 +8,15 @@ BookVerse (working name) - social-commerce platform for books in Bangladesh. Cur
 
 ## CURRENT MODE: LOCAL-FIRST, ZERO COST
 
-No domain, no hosting, no paid service. Everything runs on the developer machine via docker-compose (postgres, redis, mailpit). Every external service sits behind a provider interface in `apps/api/src/providers/<name>/` with a local/mock implementation (default) and a real implementation (selected by env, see README).
+No domain, no hosting, no paid service. Everything runs on the developer machine via docker-compose (postgres, redis, mailpit). Every external service sits behind a provider interface in `backend/src/providers/<name>/` with a local/mock implementation (default) and a real implementation (selected by env, see README).
 
 Do NOT add Cloudflare, Vercel or Render adapters now. Use `@astrojs/node`. Future upgrades are listed in `docs/FUTURE_PLAN.md`; do not implement them unless asked.
 
 ## FIXED STACK (do not substitute without asking)
 
-- Monorepo (pnpm workspaces): `apps/web`, `apps/api`, `packages/shared`
-- `apps/web`: Astro (SSR, `@astrojs/node`) + React + Tailwind CSS + TypeScript strict + TanStack Query + Zustand + GSAP (only small, purposeful animation)
-- `apps/api`: Node + Express + TypeScript strict + Zod + Prisma + PostgreSQL + Redis + BullMQ
+- Monorepo (pnpm workspaces): `frontend/`, `backend/`, `packages/shared`
+- `frontend/`: Astro (SSR, `@astrojs/node`) + React + Tailwind CSS + TypeScript strict + TanStack Query + Zustand + GSAP (only small, purposeful animation)
+- `backend/`: Node + Express + TypeScript strict + Zod + Prisma + PostgreSQL + Redis + BullMQ
 - Auth: Better Auth (DB sessions, role field). Phone OTP via SmsProvider (console in local mode).
 - Storage: StorageProvider (local disk now, R2 later). Email: EmailProvider (SMTP->Mailpit now).
 - Payments: PaymentProvider (mock / SSLCommerz sandbox now). Courier: CourierProvider (mock now, Steadfast adapter written but off). Search: pg_trgm + simple FTS behind SearchService.
@@ -67,18 +67,18 @@ Only via Tailwind theme, never raw hex in components.
 
 Mood chips (bg/text):
 
-| Mood | bg | text |
-| --- | --- | --- |
-| Happy | `#FEF3C7` | `#92400E` |
-| Calm | `#DCFCE7` | `#166534` |
-| Sad | `#DBEAFE` | `#1E3A8A` |
-| Motivated | `#FFEDD5` | `#9A3412` |
-| Curious | `#CCFBF1` | `#115E59` |
-| Romantic | `#FFE4E6` | `#9F1239` |
-| Lonely | `#EDE9FE` | `#5B21B6` |
-| Stressed | `#E0F2FE` | `#075985` |
+| Mood        | bg        | text      |
+| ----------- | --------- | --------- |
+| Happy       | `#FEF3C7` | `#92400E` |
+| Calm        | `#DCFCE7` | `#166534` |
+| Sad         | `#DBEAFE` | `#1E3A8A` |
+| Motivated   | `#FFEDD5` | `#9A3412` |
+| Curious     | `#CCFBF1` | `#115E59` |
+| Romantic    | `#FFE4E6` | `#9F1239` |
+| Lonely      | `#EDE9FE` | `#5B21B6` |
+| Stressed    | `#E0F2FE` | `#075985` |
 | Adventurous | `#ECFCCB` | `#3F6212` |
-| Focused | `#E2E8F0` | `#1E293B` |
+| Focused     | `#E2E8F0` | `#1E293B` |
 
 Proportion ~70% cream/white, ~15% blue, ~8% leaf green, ~5% orange CTA. Max 2 orange CTAs per screen. Radius 12px, soft warm shadow. Fonts: Hind Siliguri (Bangla) + Inter (English), self-hosted, swap.
 
