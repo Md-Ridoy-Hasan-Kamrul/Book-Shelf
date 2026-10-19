@@ -106,8 +106,10 @@ export function createApp(env: ApiEnv, logger: Logger) {
   app.use('/notifications', createNotificationsRouter(auth));
   app.use('/wishlist', createWishlistRouter(auth));
   app.use('/bookshelf', createBookshelfRouter(auth, env));
-  app.use('/isbn', createIsbnRouter(env));
-  app.use('/used-listings', createUsedListingsRouter(auth, env, storage));
+  if (env.FEATURE_USED_BOOKS) {
+    app.use('/isbn', createIsbnRouter(env));
+    app.use('/used-listings', createUsedListingsRouter(auth, env, storage));
+  }
   app.use('/discover', createDiscoverRouter(auth, env, storage, llm));
   if (env.FEATURE_SPONSORED) {
     app.use('/publisher', createPublisherRouter(auth, env));

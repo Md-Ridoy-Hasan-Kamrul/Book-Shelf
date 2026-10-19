@@ -1,0 +1,46 @@
+---
+import Base from '../layouts/Base.astro';
+import Island from '../components/islands/Island.tsx';
+import AccountPanel from '../components/islands/AccountPanel.tsx';
+import { getFeatureFlags } from '../env';
+import { apiSuccessEnvelopeSchema, meResponseSchema } from '@bookverse/shared';
+
+const flags = getFeatureFlags();
+const apiBase = import.meta.env.PUBLIC_API_URL ?? 'http://127.0.0.1:4321';
+const cookie = Astro.request.headers.get('cookie') ?? '';
+const res = await fetch(`${apiBase}/me`, {
+  headers: { cookie, accept: 'application/json' },
+});
+
+if (!res.ok) {
+  return Astro.redirect(`/login?next=${encodeURIComponent('/account')}`);
+}
+
+const json: unknown = await res.json();
+const parsed = apiSuccessEnvelopeSchema(meResponseSchema).safeParse(json);
+if (!parsed.success) {
+  return Astro.redirect(`/login?next=${encodeURIComponent('/account')}`);
+}
+const u = parsed.data.data.user;
+---
+
+<Base title="Profile">
+  <main id="main" class="py-10">
+    <div class="mx-auto w-[min(100%-2rem,40rem)]">
+      <h1 class="m-0 font-display text-3xl font-bold text-ink-900">Profile</h1>
+      <p class="mt-2 text-ink-500">Account, roles, and shortcuts.</p>
+      <div class="mt-8">
+        <Island client:load>
+          <AccountPanel
+            name={u.name}
+            email={u.email}
+            role={u.role}
+            usedBooks={flags.usedBooks}
+            sponsored={flags.sponsored}
+            liveEvents={flags.liveEvents}
+          />
+        </Island>
+      </div>
+    </div>
+  </main>
+</Base>

@@ -1,8 +1,16 @@
 # BookVerse — Full project audit (PDF ↔ code)
 
-**Date:** 2026-10-19  
+**Date:** 2026-10-19 (gaps fixed same day)  
 **Sources:** `frontend/projectFiles/` (AGENTS.md + both PDFs) + root `AGENTS.md` / `CLAUDE.md` + live `frontend/` / `backend/` / `packages/shared/`  
 **Detail extracts:** [`_AUDIT_SPEC_EXTRACT.md`](./_AUDIT_SPEC_EXTRACT.md), [`_AUDIT_CODEBASE.md`](./_AUDIT_CODEBASE.md)
+
+### Post-audit fixes applied
+
+- SiteShell: Discover→`/mood`, Profile→`/account`, search GET `/search`, Used nav only if `FEATURE_USED_BOOKS`
+- Middleware redirects for used/sponsored/live pages when flags off
+- Backend: `/isbn` + `/used-listings` only registered when `FEATURE_USED_BOOKS`
+- `/account` + role-apply form; Follow/Block on writer profiles
+- `projectFiles/AGENTS.md` synced to root (React + `frontend/`/`backend/`)
 
 ---
 

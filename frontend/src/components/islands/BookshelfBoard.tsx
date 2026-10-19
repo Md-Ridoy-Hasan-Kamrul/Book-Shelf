@@ -44,7 +44,7 @@ function ProgressRing({ value, max }: { value: number; max: number }) {
     <div
       className="relative flex h-20 w-20 items-center justify-center rounded-full border-4 border-brand-100"
       style={{
-        background: `conic-gradient(var(--color-brand-600, #2563eb) ${pct}%, var(--color-sand, #F3EDE2) 0)`,
+        background: `conic-gradient(var(--color-brand-600) ${pct}%, var(--color-sand) 0)`,
       }}
       role="img"
       aria-label={`${pct}% of reading goal`}

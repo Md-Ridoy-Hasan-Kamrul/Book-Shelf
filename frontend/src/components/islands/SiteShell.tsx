@@ -4,18 +4,33 @@ import { ToastStack } from '../ui/Toast';
 import CartDrawer from './CartDrawer';
 import NotificationBell from './NotificationBell';
 
-const bottomLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/#features', label: 'Discover' },
-  { href: '/feed', label: 'Community' },
-  { href: '/bookshelf', label: 'Shelf' },
-  { href: '/used', label: 'Used' },
-  { href: '/checkout', label: 'Cart' },
-];
+export type SiteShellFlags = {
+  usedBooks?: boolean;
+};
 
-export default function SiteShell() {
+type Props = {
+  flags?: SiteShellFlags;
+};
+
+/** PDF P2 bottom nav: Home, Discover, Community, Cart, Profile */
+function buildBottomLinks(usedBooks: boolean) {
+  const links = [
+    { href: '/', label: 'Home' },
+    { href: '/mood', label: 'Discover' },
+    { href: '/feed', label: 'Community' },
+    { href: '/checkout', label: 'Cart' },
+    { href: '/account', label: 'Profile' },
+  ];
+  // Optional 6th when used marketplace on — keep 5 for PDF layout; Used lives under Profile/sell
+  void usedBooks;
+  return links;
+}
+
+export default function SiteShell({ flags }: Props) {
+  const usedBooks = Boolean(flags?.usedBooks);
   const count = useCartStore((s) => s.count());
   const [cartOpen, setCartOpen] = useState(false);
+  const bottomLinks = buildBottomLinks(usedBooks);
 
   return (
     <>
@@ -24,7 +39,19 @@ export default function SiteShell() {
           <a href="/" className="font-display text-lg font-bold text-ink-900 no-underline">
             BookVerse
           </a>
-          <form className="min-[720px]:flex-1" role="search" onSubmit={(e) => e.preventDefault()}>
+          <form
+            className="min-[720px]:flex-1"
+            role="search"
+            action="/search"
+            method="get"
+            onSubmit={(e) => {
+              const form = e.currentTarget;
+              const q = new FormData(form).get('q');
+              if (typeof q === 'string' && q.trim().length === 0) {
+                e.preventDefault();
+              }
+            }}
+          >
             <label htmlFor="site-search" className="sr-only">
               Search
             </label>
@@ -33,10 +60,36 @@ export default function SiteShell() {
               name="q"
               type="search"
               placeholder="বই, লেখক, ISBN…"
-              className="min-h-11 w-full rounded-[var(--radius-card)] border border-line bg-paper px-3 text-ink-900 placeholder:text-ink-500 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100"
+              className="min-h-11 w-full rounded-(--radius-card) border border-line bg-paper px-3 text-ink-900 placeholder:text-ink-500 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100"
             />
           </form>
           <nav className="hidden items-center gap-3 min-[720px]:flex" aria-label="Primary">
+            <a
+              href="/mood"
+              className="text-sm font-semibold text-ink-700 no-underline hover:text-brand-700"
+            >
+              Discover
+            </a>
+            <a
+              href="/bookshelf"
+              className="text-sm font-semibold text-ink-700 no-underline hover:text-brand-700"
+            >
+              Shelf
+            </a>
+            {usedBooks ? (
+              <a
+                href="/used"
+                className="text-sm font-semibold text-ink-700 no-underline hover:text-brand-700"
+              >
+                Used
+              </a>
+            ) : null}
+            <a
+              href="/account"
+              className="text-sm font-semibold text-ink-700 no-underline hover:text-brand-700"
+            >
+              Profile
+            </a>
             <a
               href="/design"
               className="text-sm font-semibold text-brand-700 no-underline hover:underline"
@@ -46,7 +99,7 @@ export default function SiteShell() {
             <NotificationBell />
             <button
               type="button"
-              className="relative rounded-full border border-line bg-cream px-3 py-2 text-sm font-semibold"
+              className="relative rounded-full border border-line bg-cream px-3 py-2 text-sm font-semibold text-ink-900"
               onClick={() => setCartOpen(true)}
             >
               Cart

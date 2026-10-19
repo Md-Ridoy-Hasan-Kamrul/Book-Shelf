@@ -7,7 +7,8 @@ import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   envDir: '../',
-  envPrefix: ['PUBLIC_'],
+  // FEATURE_* exposed for UI gating (AGENTS rule 15); not secrets
+  envPrefix: ['PUBLIC_', 'FEATURE_'],
   site: 'http://localhost:4321',
   output: 'server',
   adapter: node({ mode: 'standalone' }),

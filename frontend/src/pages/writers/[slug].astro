@@ -1,5 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Island from '../../components/islands/Island.tsx';
+import FollowButton from '../../components/islands/FollowButton.tsx';
 import { z } from 'zod';
 import { getWebEnv } from '../../env';
 
@@ -9,6 +11,7 @@ if (!slug) return Astro.redirect('/');
 const profileSchema = z.object({
   success: z.literal(true),
   data: z.object({
+    userId: z.string(),
     penName: z.string(),
     slug: z.string(),
     bio: z.string().nullable(),
@@ -58,6 +61,11 @@ if (!profile) {
       </p>
       <h1 class="m-0 mt-1 font-display text-3xl font-bold text-ink-900">{profile.penName}</h1>
       <p class="mt-2 max-w-2xl text-ink-700">{profile.bio ?? 'No bio yet.'}</p>
+      <div class="mt-4">
+        <Island client:load>
+          <FollowButton userId={profile.userId} />
+        </Island>
+      </div>
 
       <section class="mt-10" aria-labelledby="writer-books">
         <h2 id="writer-books" class="font-display text-xl font-bold text-ink-900">Books</h2>

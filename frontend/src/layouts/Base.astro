@@ -1,8 +1,9 @@
 ---
 import '../styles/global.css';
-import { getWebEnv } from '../env';
+import { getFeatureFlags, getWebEnv } from '../env';
 
 getWebEnv();
+const flags = getFeatureFlags();
 import '@fontsource/hind-siliguri/400.css';
 import '@fontsource/hind-siliguri/600.css';
 import '@fontsource/inter/400.css';
@@ -63,7 +64,7 @@ const fullTitle = title === 'BookVerse' ? title : `${title} · BookVerse`;
       Skip to content
     </a>
     <Island client:load>
-      <SiteShell />
+      <SiteShell flags={{ usedBooks: flags.usedBooks }} />
     </Island>
     <slot />
     <footer class="border-t border-line bg-paper">
@@ -75,10 +76,10 @@ const fullTitle = title === 'BookVerse' ? title : `${title} · BookVerse`;
           <p class="m-0 mt-1 max-w-md text-sm text-ink-500">Local-first · BDT · Bangla + English</p>
         </div>
         <nav class="flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold" aria-label="Footer">
+          <a href="/mood" class="text-ink-700 no-underline hover:text-brand-700">Discover</a>
+          <a href="/account" class="text-ink-700 no-underline hover:text-brand-700">Profile</a>
+          <a href="/legal/terms" class="text-ink-700 no-underline hover:text-brand-700">Terms</a>
           <a href="/design" class="text-brand-700 no-underline hover:underline">Design</a>
-          <a href="https://docs.astro.build" class="text-ink-700 no-underline hover:text-brand-700"
-            >Astro</a
-          >
         </nav>
       </div>
     </footer>
