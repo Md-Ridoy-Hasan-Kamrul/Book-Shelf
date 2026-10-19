@@ -1,7 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
 import AdminDashboard from '../../components/islands/AdminDashboard.tsx';
-import AdminDeadLetterPanel from '../../components/islands/AdminDeadLetterPanel.tsx';
 import { fetchMe } from '../../lib/session';
 
 const me = await fetchMe(Astro.request.headers.get('cookie') ?? '');
@@ -10,22 +9,10 @@ if (me.role !== 'ADMIN') return Astro.redirect('/');
 ---
 
 <Base title="Admin dashboard" description="Platform operations and KPIs">
-  <main id="main" class="mx-auto w-[min(100%-2rem,48rem)] py-8">
-    <header
-      class="rounded-[var(--radius-card)] border border-brand-100 bg-brand-50 px-4 py-4 shadow-[var(--shadow-warm)]"
-    >
-      <span
-        class="inline-flex rounded-[var(--radius-card)] bg-brand-600 px-2.5 py-1 text-xs font-bold text-paper"
-        >Admin</span
-      >
-      <h1 class="mt-2 font-display text-2xl font-bold text-ink-900">Platform admin</h1>
-      <p class="m-0 mt-1 text-sm text-ink-500">
-        ফ্রেশ ও মানবিক — trust blue for ops, leaf for growth money, orange only for action.
-      </p>
-    </header>
-    <div class="mt-6">
-      <AdminDashboard client:load />
-      <AdminDeadLetterPanel client:load />
-    </div>
+  <main
+    id="main"
+    class="mx-auto w-[min(100%-1rem,80rem)] px-2 py-6 min-[640px]:px-4 min-[640px]:py-8"
+  >
+    <AdminDashboard client:load />
   </main>
 </Base>

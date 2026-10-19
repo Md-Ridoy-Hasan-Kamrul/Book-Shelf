@@ -12,19 +12,10 @@ const ui = SELLER_ROLE_UI[me.role];
 ---
 
 <Base title={ui.heading} description={ui.blurb}>
-  <main id="main" class="mx-auto w-[min(100%-2rem,48rem)] py-8">
-    <header
-      class="rounded-[var(--radius-card)] border border-line bg-paper px-4 py-4 shadow-[var(--shadow-warm)]"
-    >
-      <span
-        class={`inline-flex rounded-[var(--radius-card)] px-2.5 py-1 text-xs font-bold ${ui.badgeClass}`}
-        >{ui.badge}</span
-      >
-      <h1 class="mt-2 font-display text-2xl font-bold text-ink-900">{ui.heading}</h1>
-      <p class="m-0 mt-1 text-sm text-ink-500">{me.displayName ?? me.name} · {ui.blurb}</p>
-    </header>
-    <div class="mt-6">
-      <SellerDashboard client:load role={me.role} />
-    </div>
+  <main
+    id="main"
+    class="mx-auto w-[min(100%-1rem,80rem)] px-2 py-6 min-[640px]:px-4 min-[640px]:py-8"
+  >
+    <SellerDashboard client:load role={me.role} />
   </main>
 </Base>

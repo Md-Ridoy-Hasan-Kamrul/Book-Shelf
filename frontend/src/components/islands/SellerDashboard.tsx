@@ -13,6 +13,7 @@ import {
 import { fh } from '../../lib/freshHuman';
 import { useMockData } from '../../lib/mockMode';
 import { SELLER_ROLE_UI, type SellerRole, type SellerTab } from '../../lib/sellerRoleUi';
+import DashboardShell from './DashboardShell';
 import SellerCatalogForm from './SellerCatalogForm';
 
 function SkeletonRows() {
@@ -92,235 +93,228 @@ function SellerDashboardInner({ role }: Props) {
     },
   });
 
+  const navItems = ui.tabs.map((t) => ({
+    id: t.id,
+    label: t.label,
+  }));
+
   return (
-    <div className="pb-24">
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <span
-          className={`inline-flex rounded-[var(--radius-card)] px-2.5 py-1 text-xs font-bold ${ui.badgeClass}`}
-        >
-          {ui.badge}
-        </span>
-        <p className="m-0 text-sm text-ink-500">{ui.blurb}</p>
-      </div>
-      {ui.growthLink ? (
-        <p className="mb-4 text-sm">
+    <DashboardShell
+      title={ui.heading}
+      subtitle={`${ui.blurb} Serving buyers across Bangladesh.`}
+      badge={ui.badge}
+      badgeClassName={ui.badgeClass}
+      items={navItems}
+      activeId={tab}
+      onNavigate={setTab}
+      footer={
+        <div className="space-y-2">
+          {ui.growthLink ? (
+            <a
+              href={ui.growthLink}
+              className="block text-xs font-semibold text-brand-700 no-underline hover:underline"
+            >
+              Growth tools →
+            </a>
+          ) : null}
           <a
-            href={ui.growthLink}
-            className="font-semibold text-brand-700 no-underline hover:underline"
+            href="/"
+            className="block text-xs font-semibold text-ink-500 no-underline hover:text-brand-700"
           >
-            Open growth &amp; sponsored tools →
+            ← Storefront
           </a>
-        </p>
-      ) : null}
+        </div>
+      }
+    >
+      {tab === 'overview' && (
+        <>
+          {overview.isLoading && <SkeletonRows />}
+          {overview.isError && (
+            <p className="text-urgent-600" role="alert">
+              Could not load overview.{' '}
+              <button type="button" className="underline" onClick={() => overview.refetch()}>
+                Retry
+              </button>
+            </p>
+          )}
+          {overview.data && (
+            <dl className="grid grid-cols-2 gap-3 text-sm min-[720px]:grid-cols-3">
+              <div className={fh.cardBrand}>
+                <dt className="text-ink-500">{role === 'WRITER' ? 'Title sales' : 'Orders'}</dt>
+                <dd className="text-xl font-bold text-brand-700">{overview.data.ordersTotal}</dd>
+              </div>
+              <div className={fh.card}>
+                <dt className="text-ink-500">{ui.ordersLabel}</dt>
+                <dd className="text-xl font-bold text-ink-900">{overview.data.ordersToPack}</dd>
+              </div>
+              <div className={fh.cardLeaf}>
+                <dt className="text-ink-500">
+                  {role === 'WRITER' ? 'Royalties (30d)' : 'Sales (30d)'}
+                </dt>
+                <dd className="text-xl font-bold text-leaf-700">
+                  ৳{overview.data.salesLast30DaysBdt}
+                </dd>
+              </div>
+              <div className={fh.card}>
+                <dt className="text-ink-500">Open claims</dt>
+                <dd className="text-xl font-bold text-ink-900">{overview.data.openClaims}</dd>
+              </div>
+              <div className={`col-span-2 ${fh.cardLeaf}`}>
+                <dt className="text-ink-500">
+                  {role === 'WRITER' ? 'Royalty balance' : 'Balance'}
+                </dt>
+                <dd className="font-semibold text-leaf-700">
+                  Pending ৳{overview.data.balancePendingBdt} · Available ৳
+                  {overview.data.balanceAvailableBdt}
+                </dd>
+              </div>
+            </dl>
+          )}
+        </>
+      )}
 
-      <nav className="flex flex-wrap gap-2" aria-label={`${ui.badge} sections`}>
-        {ui.tabs.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            className={tab === t.id ? fh.tabActive : fh.tabIdle}
-            onClick={() => setTab(t.id)}
-          >
-            {t.label}
-          </button>
-        ))}
-      </nav>
+      {tab === 'inventory' && (
+        <>
+          <h2 className="m-0 mb-3 font-display text-lg font-bold text-ink-900">
+            {ui.inventoryLabel}
+          </h2>
+          {role !== 'WRITER' ? (
+            <SellerCatalogForm />
+          ) : (
+            <p className="mb-3 text-sm text-ink-500">
+              Titles are linked via publisher contracts. Request a reprint from the book page when
+              stock is low.
+            </p>
+          )}
+          {listings.isLoading && <SkeletonRows />}
+          {listings.isError && (
+            <p className="text-urgent-600">
+              Error loading listings.{' '}
+              <button type="button" onClick={() => listings.refetch()}>
+                Retry
+              </button>
+            </p>
+          )}
+          {listings.data?.items.length === 0 && <p className="text-ink-500">Nothing listed yet.</p>}
+          <ul className="list-none space-y-2 p-0">
+            {listings.data?.items.map((l) => (
+              <li key={l.id} className={`flex justify-between gap-2 text-sm ${fh.listRow}`}>
+                <span>{l.bookTitle}</span>
+                <span className="font-semibold text-ink-700">
+                  {role === 'WRITER' ? l.price : `৳${l.price} · stock ${l.stock}`}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
-      <div className="mt-6">
-        {tab === 'overview' && (
-          <>
-            {overview.isLoading && <SkeletonRows />}
-            {overview.isError && (
-              <p className="text-urgent-600" role="alert">
-                Could not load overview.{' '}
-                <button type="button" className="underline" onClick={() => overview.refetch()}>
-                  Retry
-                </button>
-              </p>
-            )}
-            {overview.data && (
-              <dl className="grid grid-cols-2 gap-3 text-sm">
-                <div className={fh.cardBrand}>
-                  <dt className="text-ink-500">{role === 'WRITER' ? 'Title sales' : 'Orders'}</dt>
-                  <dd className="text-xl font-bold text-brand-700">{overview.data.ordersTotal}</dd>
+      {tab === 'orders' && (
+        <>
+          <h2 className="m-0 mb-3 font-display text-lg font-bold text-ink-900">{ui.ordersLabel}</h2>
+          {role === 'WRITER' ? (
+            <p className="mb-3 text-sm text-ink-500">
+              Writers do not pack shipments — these are sales attributed to your titles.
+            </p>
+          ) : null}
+          {orders.isLoading && <SkeletonRows />}
+          {orders.data?.items.length === 0 && (
+            <p className="text-ink-500">
+              {role === 'WRITER' ? 'No recent title sales.' : 'No orders waiting to pack.'}
+            </p>
+          )}
+          <ul className="list-none space-y-2 p-0">
+            {orders.data?.items.map((o) => (
+              <li
+                key={o.id}
+                className="rounded-[var(--radius-card)] border border-line bg-paper px-3 py-2 text-sm"
+              >
+                <div className="flex justify-between">
+                  <span className="font-semibold">{o.status}</span>
+                  <span>৳{o.total}</span>
                 </div>
-                <div className={fh.card}>
-                  <dt className="text-ink-500">{ui.ordersLabel}</dt>
-                  <dd className="text-xl font-bold text-ink-900">{overview.data.ordersToPack}</dd>
-                </div>
-                <div className={fh.cardLeaf}>
-                  <dt className="text-ink-500">
-                    {role === 'WRITER' ? 'Royalties (30d)' : 'Sales (30d)'}
-                  </dt>
-                  <dd className="text-xl font-bold text-leaf-700">
-                    ৳{overview.data.salesLast30DaysBdt}
-                  </dd>
-                </div>
-                <div className={fh.card}>
-                  <dt className="text-ink-500">Open claims</dt>
-                  <dd className="text-xl font-bold text-ink-900">{overview.data.openClaims}</dd>
-                </div>
-                <div className={`col-span-2 ${fh.cardLeaf}`}>
-                  <dt className="text-ink-500">
-                    {role === 'WRITER' ? 'Royalty balance' : 'Balance'}
-                  </dt>
-                  <dd className="font-semibold text-leaf-700">
-                    Pending ৳{overview.data.balancePendingBdt} · Available ৳
-                    {overview.data.balanceAvailableBdt}
-                  </dd>
-                </div>
-              </dl>
-            )}
-          </>
-        )}
+                <div className="text-ink-500">{o.buyerName}</div>
+                {role !== 'WRITER' && o.status === 'PROCESSING' && (
+                  <button
+                    type="button"
+                    className={`mt-2 ${fh.btnCta}`}
+                    disabled={pack.isPending}
+                    onClick={() => pack.mutate(o.id)}
+                  >
+                    Mark packed
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
-        {tab === 'inventory' && (
-          <>
-            <h2 className="m-0 mb-3 font-display text-lg font-bold text-ink-900">
-              {ui.inventoryLabel}
-            </h2>
-            {role !== 'WRITER' ? (
-              <SellerCatalogForm />
-            ) : (
-              <p className="mb-3 text-sm text-ink-500">
-                Titles are linked via publisher contracts. Request a reprint from the book page when
-                stock is low.
-              </p>
-            )}
-            {listings.isLoading && <SkeletonRows />}
-            {listings.isError && (
-              <p className="text-urgent-600">
-                Error loading listings.{' '}
-                <button type="button" onClick={() => listings.refetch()}>
-                  Retry
-                </button>
-              </p>
-            )}
-            {listings.data?.items.length === 0 && (
-              <p className="text-ink-500">Nothing listed yet.</p>
-            )}
-            <ul className="list-none space-y-2 p-0">
-              {listings.data?.items.map((l) => (
-                <li key={l.id} className={`flex justify-between gap-2 text-sm ${fh.listRow}`}>
-                  <span>{l.bookTitle}</span>
-                  <span className="font-semibold text-ink-700">
-                    {role === 'WRITER' ? l.price : `৳${l.price} · stock ${l.stock}`}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-
-        {tab === 'orders' && (
-          <>
-            <h2 className="m-0 mb-3 font-display text-lg font-bold text-ink-900">
-              {ui.ordersLabel}
-            </h2>
-            {role === 'WRITER' ? (
-              <p className="mb-3 text-sm text-ink-500">
-                Writers do not pack shipments — these are sales attributed to your titles.
-              </p>
-            ) : null}
-            {orders.isLoading && <SkeletonRows />}
-            {orders.data?.items.length === 0 && (
-              <p className="text-ink-500">
-                {role === 'WRITER' ? 'No recent title sales.' : 'No orders waiting to pack.'}
-              </p>
-            )}
-            <ul className="list-none space-y-2 p-0">
-              {orders.data?.items.map((o) => (
-                <li
-                  key={o.id}
-                  className="rounded-[var(--radius-card)] border border-line bg-paper px-3 py-2 text-sm"
-                >
-                  <div className="flex justify-between">
-                    <span className="font-semibold">{o.status}</span>
-                    <span>৳{o.total}</span>
+      {tab === 'earnings' && (
+        <>
+          <h2 className="m-0 mb-3 font-display text-lg font-bold text-ink-900">
+            {ui.earningsLabel}
+          </h2>
+          {earnings.isLoading && <SkeletonRows />}
+          {earnings.data?.items.length === 0 && <p className="text-ink-500">No earnings yet.</p>}
+          <ul className="list-none space-y-3 p-0">
+            {earnings.data?.items.map((e) => (
+              <li
+                key={e.orderId}
+                className="rounded-[var(--radius-card)] border border-line p-3 text-sm"
+              >
+                <div className="font-semibold">
+                  Order {e.orderId.slice(0, 8)} · ৳{e.orderTotal}
+                </div>
+                {e.lines.map((line, i) => (
+                  <div key={i} className="mt-1 text-ink-500">
+                    {line.title}: seller ৳{line.sellerAmount}, commission ৳{line.commissionAmount} (
+                    {line.commissionBps} bps)
                   </div>
-                  <div className="text-ink-500">{o.buyerName}</div>
-                  {role !== 'WRITER' && o.status === 'PROCESSING' && (
-                    <button
-                      type="button"
-                      className={`mt-2 ${fh.btnCta}`}
-                      disabled={pack.isPending}
-                      onClick={() => pack.mutate(o.id)}
-                    >
-                      Mark packed
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
+                ))}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
-        {tab === 'earnings' && (
-          <>
-            <h2 className="m-0 mb-3 font-display text-lg font-bold text-ink-900">
-              {ui.earningsLabel}
-            </h2>
-            {earnings.isLoading && <SkeletonRows />}
-            {earnings.data?.items.length === 0 && <p className="text-ink-500">No earnings yet.</p>}
-            <ul className="list-none space-y-3 p-0">
-              {earnings.data?.items.map((e) => (
-                <li
-                  key={e.orderId}
-                  className="rounded-[var(--radius-card)] border border-line p-3 text-sm"
-                >
-                  <div className="font-semibold">
-                    Order {e.orderId.slice(0, 8)} · ৳{e.orderTotal}
-                  </div>
-                  {e.lines.map((line, i) => (
-                    <div key={i} className="mt-1 text-ink-500">
-                      {line.title}: seller ৳{line.sellerAmount}, commission ৳{line.commissionAmount}{' '}
-                      ({line.commissionBps} bps)
-                    </div>
-                  ))}
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
+      {tab === 'payouts' && (
+        <>
+          {payouts.isLoading && <SkeletonRows />}
+          {payouts.data?.items.length === 0 && <p className="text-ink-500">No payouts yet.</p>}
+          <ul className="list-none space-y-2 p-0">
+            {payouts.data?.items.map((p) => (
+              <li
+                key={p.id}
+                className="flex justify-between rounded-[var(--radius-card)] border border-line p-3 text-sm"
+              >
+                <span>{p.status}</span>
+                <span className="font-semibold">৳{p.amount}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
-        {tab === 'payouts' && (
-          <>
-            {payouts.isLoading && <SkeletonRows />}
-            {payouts.data?.items.length === 0 && <p className="text-ink-500">No payouts yet.</p>}
-            <ul className="list-none space-y-2 p-0">
-              {payouts.data?.items.map((p) => (
-                <li
-                  key={p.id}
-                  className="flex justify-between rounded-[var(--radius-card)] border border-line p-3 text-sm"
-                >
-                  <span>{p.status}</span>
-                  <span className="font-semibold">৳{p.amount}</span>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-
-        {tab === 'claims' && (
-          <>
-            {claims.isLoading && <SkeletonRows />}
-            {claims.data?.items.length === 0 && (
-              <p className="text-ink-500">No claims on your orders.</p>
-            )}
-            <ul className="list-none space-y-2 p-0">
-              {claims.data?.items.map((c) => (
-                <li
-                  key={c.orderId}
-                  className="rounded-[var(--radius-card)] border border-line p-3 text-sm"
-                >
-                  <strong>{c.status}</strong> — {c.reason.slice(0, 120)}
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-      </div>
-    </div>
+      {tab === 'claims' && (
+        <>
+          {claims.isLoading && <SkeletonRows />}
+          {claims.data?.items.length === 0 && (
+            <p className="text-ink-500">No claims on your orders.</p>
+          )}
+          <ul className="list-none space-y-2 p-0">
+            {claims.data?.items.map((c) => (
+              <li
+                key={c.orderId}
+                className="rounded-[var(--radius-card)] border border-line p-3 text-sm"
+              >
+                <strong>{c.status}</strong> — {c.reason.slice(0, 120)}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </DashboardShell>
   );
 }
 
