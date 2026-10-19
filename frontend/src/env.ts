@@ -6,6 +6,7 @@ export function getWebEnv(): WebEnv {
   if (!cached) {
     cached = loadWebEnv({
       PUBLIC_API_URL: import.meta.env.PUBLIC_API_URL,
+      PUBLIC_USE_MOCK_DATA: import.meta.env.PUBLIC_USE_MOCK_DATA,
       FEATURE_USED_BOOKS: import.meta.env.FEATURE_USED_BOOKS,
       FEATURE_SPONSORED: import.meta.env.FEATURE_SPONSORED,
       FEATURE_LIVE_EVENTS: import.meta.env.FEATURE_LIVE_EVENTS,

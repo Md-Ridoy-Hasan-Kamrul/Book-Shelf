@@ -8,6 +8,8 @@ import {
 } from '@bookverse/shared';
 import { z } from 'zod';
 import { getWebEnv } from '../env';
+import { useMockData } from './mockMode';
+import { resolveMockApi } from './mockApi';
 
 function apiBase() {
   return (import.meta.env.API_INTERNAL_URL ?? getWebEnv().PUBLIC_API_URL).replace(/\/$/, '');
@@ -39,6 +41,7 @@ const addressListSchema = z.array(
 );
 
 export async function fetchAddresses() {
+  if (useMockData()) return addressListSchema.parse(resolveMockApi('/addresses'));
   const res = await authedFetch('/addresses');
   if (res.status === 401) return null;
   const json: unknown = await res.json();
@@ -47,6 +50,9 @@ export async function fetchAddresses() {
 
 export async function createAddress(input: z.infer<typeof addressCreateSchema>) {
   const body = addressCreateSchema.parse(input);
+  if (useMockData()) {
+    return addressListSchema.element.parse(resolveMockApi('/addresses', 'POST', body));
+  }
   const res = await authedFetch('/addresses', { method: 'POST', body: JSON.stringify(body) });
   const json: unknown = await res.json();
   if (!res.ok) throw new Error('Could not save address');
@@ -58,6 +64,9 @@ export async function postCheckoutQuote(body: {
   addressId?: string;
   couponCode?: string;
 }) {
+  if (useMockData()) {
+    return checkoutQuoteSchema.parse(resolveMockApi('/checkout/quote', 'POST', body));
+  }
   const res = await authedFetch('/checkout/quote', { method: 'POST', body: JSON.stringify(body) });
   const json: unknown = await res.json();
   if (!res.ok) {
@@ -68,6 +77,11 @@ export async function postCheckoutQuote(body: {
 }
 
 export async function initiatePayment(checkoutId: string) {
+  if (useMockData()) {
+    return z
+      .object({ tranId: z.string(), gatewayUrl: z.string() })
+      .parse(resolveMockApi('/payments/initiate', 'POST', { checkoutId }));
+  }
   const res = await authedFetch('/payments/initiate', {
     method: 'POST',
     body: JSON.stringify({ checkoutId }),
@@ -87,6 +101,9 @@ export async function postCheckout(
   },
   idempotencyKey: string,
 ) {
+  if (useMockData()) {
+    return checkoutResultSchema.parse(resolveMockApi('/checkout', 'POST', body));
+  }
   const res = await authedFetch('/checkout', {
     method: 'POST',
     body: JSON.stringify(body),
@@ -107,6 +124,14 @@ export async function postCheckout(
 }
 
 export async function fetchOrders() {
+  if (useMockData()) {
+    return z
+      .object({
+        items: z.array(orderSummarySchema),
+        nextCursor: z.string().nullable(),
+      })
+      .parse(resolveMockApi('/orders'));
+  }
   const res = await authedFetch('/orders');
   if (res.status === 401) return null;
   const json: unknown = await res.json();
@@ -118,6 +143,9 @@ export async function fetchOrders() {
 }
 
 export async function fetchOrder(id: string) {
+  if (useMockData()) {
+    return orderDetailSchema.parse(resolveMockApi(`/orders/${id}`));
+  }
   const res = await authedFetch(`/orders/${encodeURIComponent(id)}`);
   if (!res.ok) return null;
   const json: unknown = await res.json();

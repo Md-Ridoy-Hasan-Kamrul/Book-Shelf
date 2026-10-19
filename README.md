@@ -22,18 +22,21 @@ packages/shared/   # Zod schemas, env, HTTP envelopes
 
 - Node `>=22.12.0`, pnpm 10, **Docker Desktop** (Postgres, Redis, Mailpit)
 
-Without Docker, `pnpm dev` still starts the Astro web app, but API/worker need Redis `:6379` and Postgres `:5432`. You will see an infra banner from `scripts/check-infra.mjs`; worker stays idle instead of flooding the terminal with `ECONNREFUSED`.
+**Backend is on hold** (folder kept, not deleted). Frontend runs on **JSON mocks by default**.
+
+- `pnpm dev` → Astro web only; `PUBLIC_USE_MOCK_DATA` defaults **on** (set `false` only for live API).
+- Fixtures: `frontend/src/data/mock-books.json` + `frontend/src/lib/mockApi.ts`.
+- **Full stack later:** Docker + `PUBLIC_USE_MOCK_DATA=false` + `pnpm dev:stack`.
 
 ## Setup
 
 ```bash
 cp .env.example .env
 pnpm install
-# Start Docker Desktop first, then:
-pnpm docker:up
-pnpm db:migrate
-pnpm db:seed
+# UI only (JSON mocks — no Postgres/Redis):
 pnpm dev
+# Or full local stack:
+# pnpm docker:up && pnpm db:migrate && pnpm db:seed && pnpm dev:stack
 ```
 
 | URL                          | Service                                                      |
@@ -48,7 +51,8 @@ pnpm dev
 
 | Command            | Action                    |
 | ------------------ | ------------------------- |
-| `pnpm dev`         | Web + API + worker        |
+| `pnpm dev`         | Web only (mock data OK)   |
+| `pnpm dev:stack`   | Web + API + worker        |
 | `pnpm build`       | shared → web → api        |
 | `pnpm lint`        | ESLint                    |
 | `pnpm typecheck`   | TypeScript                |

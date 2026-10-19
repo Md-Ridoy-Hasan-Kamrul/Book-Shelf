@@ -8,6 +8,7 @@ Check off after each prompt’s ACCEPTANCE passes.
 - [x] P2 — Base.astro shell, UI kit, `/design` guide, stores, apiClient
 - [x] Dev infra guard — `scripts/check-infra.mjs` + worker Redis preflight (no ECONNREFUSED spam); `FEATURE_*=false` env parsed correctly (`boolish`)
 - [x] FE A–D pass — marketplace home (Hero + browse strip); `GET /publishers/:slug` + Follow on publisher; seller create/cover/look-inside; admin Money tab (reconcile / payout batch / COD remit)
+- [x] FE mock mode — backend **held** (not deleted); mock default ON via `mockApi.ts` + `mock-books.json`; `pnpm dev` = web only; `pnpm dev:stack` when Docker ready
 
 ## B · Data + Auth (P3–4)
 

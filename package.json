@@ -9,7 +9,8 @@
   "packageManager": "pnpm@10.17.1",
   "scripts": {
     "prepare": "husky",
-    "dev": "pnpm --filter @bookverse/shared build && node scripts/check-infra.mjs && node scripts/run-parallel.mjs dev:web dev:api dev:worker",
+    "dev": "pnpm --filter @bookverse/shared build && pnpm --filter @bookverse/web dev",
+    "dev:stack": "pnpm --filter @bookverse/shared build && node scripts/check-infra.mjs && node scripts/run-parallel.mjs dev:web dev:api dev:worker",
     "dev:web": "pnpm --filter @bookverse/web dev",
     "dev:api": "pnpm --filter @bookverse/api dev",
     "dev:backend": "pnpm --filter @bookverse/api dev",

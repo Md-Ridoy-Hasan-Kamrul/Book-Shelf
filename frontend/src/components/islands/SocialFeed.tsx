@@ -2,6 +2,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-q
 import { useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { apiFetch, apiFetchPaged } from '../../lib/apiClient';
+import { useMockData } from '../../lib/mockMode';
 import Island from './Island';
 
 const postCardSchema = z.object({
@@ -28,9 +29,43 @@ function FeedInner() {
   const [spoilerOpen, setSpoilerOpen] = useState<Record<string, boolean>>({});
 
   const feed = useInfiniteQuery({
-    queryKey: ['feed', 'mixed'],
+    queryKey: ['feed', 'mixed', useMockData() ? 'mock' : 'live'],
     initialPageParam: undefined as string | undefined,
     queryFn: async ({ pageParam }) => {
+      if (useMockData()) {
+        if (pageParam) return { items: [] as z.infer<typeof postCardSchema>[], nextCursor: null };
+        return {
+          items: [
+            {
+              id: 'mock-post-feed-1',
+              type: 'STATUS',
+              body: 'আজকের মুড: কৌতূহলী — BookVerse mock feed থেকে।',
+              hasSpoiler: false,
+              isSponsored: false,
+              likeCount: 12,
+              dislikeCount: 0,
+              commentCount: 2,
+              authorName: 'Mock Reader',
+              bookId: 'mock-book-2',
+              viewerReaction: null,
+            },
+            {
+              id: 'mock-post-feed-2',
+              type: 'QUOTE',
+              body: '“বই পড়া মানে অন্য জীবনে হাঁটা।”',
+              hasSpoiler: false,
+              isSponsored: false,
+              likeCount: 34,
+              dislikeCount: 1,
+              commentCount: 5,
+              authorName: 'Night Writer',
+              bookId: 'mock-book-8',
+              viewerReaction: null,
+            },
+          ],
+          nextCursor: null as string | null,
+        };
+      }
       const q = pageParam ? `?mode=mixed&cursor=${encodeURIComponent(pageParam)}` : '?mode=mixed';
       const { data, meta } = await apiFetchPaged(`/posts/feed${q}`, feedDataSchema);
       const nextCursor = typeof meta.nextCursor === 'string' ? meta.nextCursor : null;
@@ -52,12 +87,14 @@ function FeedInner() {
   }, [feed]);
 
   const react = useMutation({
-    mutationFn: ({ id, kind }: { id: string; kind: 'LIKE' | 'DISLIKE' }) =>
-      apiFetch(`/posts/${id}/react`, z.object({ ok: z.boolean() }), {
+    mutationFn: ({ id, kind }: { id: string; kind: 'LIKE' | 'DISLIKE' }) => {
+      if (useMockData()) return Promise.resolve({ ok: true });
+      return apiFetch(`/posts/${id}/react`, z.object({ ok: z.boolean() }), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ kind }),
-      }),
+      });
+    },
     onMutate: async ({ id, kind }) => {
       await qc.cancelQueries({ queryKey: ['feed', 'mixed'] });
       qc.setQueryData(

@@ -10,24 +10,44 @@ import { useState } from 'react';
 import { authClient } from '../../lib/authClient';
 import { z } from 'zod';
 import { apiFetch } from '../../lib/apiClient';
+import { useMockData } from '../../lib/mockMode';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { Select } from '../ui/Select';
 
 type Mode = 'login' | 'register' | 'forgot' | 'reset' | 'verify-email' | 'verify-phone';
+
+type MockRole = 'USER' | 'WRITER' | 'PUBLISHER' | 'VENDOR' | 'ADMIN' | 'MODERATOR';
 
 type Props = {
   mode: Mode;
   resetToken?: string;
 };
 
+const MOCK_PRESETS: { role: MockRole; email: string; label: string }[] = [
+  { role: 'ADMIN', email: 'admin@bookverse.local', label: 'Admin' },
+  { role: 'VENDOR', email: 'vendor1@bookverse.local', label: 'Vendor' },
+  { role: 'PUBLISHER', email: 'publisher1@bookverse.local', label: 'Publisher' },
+  { role: 'WRITER', email: 'writer1@bookverse.local', label: 'Writer' },
+  { role: 'USER', email: 'reader1@bookverse.local', label: 'Reader' },
+];
+
 export default function AuthForm({ mode, resetToken }: Props) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState<string | null>(null);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@bookverse.local');
+  const [password, setPassword] = useState('password123');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
+  const [mockRole, setMockRole] = useState<MockRole>('ADMIN');
+
+  function enterAs(role: MockRole) {
+    setStatus('success');
+    setMessage(`Mock ${role} — redirecting…`);
+    // SSR sets cookie reliably (avoids client-only cookie + 502 from Vite proxy)
+    window.location.href = `/mock-login?role=${encodeURIComponent(role)}`;
+  }
 
   async function onLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -36,6 +56,12 @@ export default function AuthForm({ mode, resetToken }: Props) {
     if (!parsed.success) {
       setStatus('error');
       setMessage('Invalid email or password');
+      return;
+    }
+    if (useMockData()) {
+      const preset = MOCK_PRESETS.find((p) => p.email === parsed.data.email);
+      const role = preset?.role ?? mockRole;
+      enterAs(role);
       return;
     }
     const { error } = await authClient.signIn.email(parsed.data);
@@ -56,6 +82,12 @@ export default function AuthForm({ mode, resetToken }: Props) {
     if (!parsed.success) {
       setStatus('error');
       setMessage('Check name, email and password (min 8 chars)');
+      return;
+    }
+    if (useMockData()) {
+      setStatus('success');
+      setMessage('Mock account created — open Profile.');
+      window.location.href = '/mock-login?role=USER';
       return;
     }
     const { error } = await authClient.signUp.email({
@@ -189,6 +221,27 @@ export default function AuthForm({ mode, resetToken }: Props) {
     <div className="mx-auto w-full max-w-md rounded-[var(--radius-card)] border border-line bg-paper p-6 shadow-[var(--shadow-warm)]">
       {mode === 'login' && (
         <form onSubmit={onLogin} className="space-y-4">
+          {useMockData() ? (
+            <div className="space-y-3 rounded-[var(--radius-card)] border border-line bg-sand/60 p-3">
+              <p className="m-0 text-xs text-ink-500">
+                Prefer the role list above, or sign in with any password using a demo email.
+              </p>
+              <Select
+                label="Demo role"
+                value={mockRole}
+                options={MOCK_PRESETS.map((p) => ({
+                  value: p.role,
+                  label: `${p.label} — ${p.email}`,
+                }))}
+                onChange={(e) => {
+                  const role = e.target.value as MockRole;
+                  setMockRole(role);
+                  const preset = MOCK_PRESETS.find((p) => p.role === role);
+                  if (preset) setEmail(preset.email);
+                }}
+              />
+            </div>
+          ) : null}
           <Input
             label="Email"
             type="email"

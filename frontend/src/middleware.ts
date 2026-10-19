@@ -7,6 +7,12 @@ function flagOn(name: string): boolean {
   return v === true || v === 'true' || v === '1';
 }
 
+function mockOn(): boolean {
+  const v = import.meta.env.PUBLIC_USE_MOCK_DATA;
+  if (v === false || v === 'false' || v === '0') return false;
+  return true;
+}
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const path = context.url.pathname;
 
@@ -20,11 +26,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (!flagOn('FEATURE_SPONSORED') && path.startsWith('/publisher/growth')) {
     return context.redirect('/');
   }
-  if (
-    !flagOn('FEATURE_LIVE_EVENTS') &&
-    (path.startsWith('/events') || path.startsWith('/writers'))
-  ) {
+  // Live AMA rooms only — public writer profiles stay reachable
+  if (!flagOn('FEATURE_LIVE_EVENTS') && path.startsWith('/events')) {
     return context.redirect('/');
+  }
+
+  // Mock mode: no live /me — allow private pages with fixture user
+  if (mockOn()) {
+    return next();
   }
 
   const isPrivate = PRIVATE_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));
@@ -33,7 +42,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   const apiBase = import.meta.env.PUBLIC_API_URL ?? 'http://127.0.0.1:4321';
-
   const cookie = context.request.headers.get('cookie') ?? '';
   const res = await fetch(`${apiBase}/me`, {
     headers: { cookie, accept: 'application/json' },

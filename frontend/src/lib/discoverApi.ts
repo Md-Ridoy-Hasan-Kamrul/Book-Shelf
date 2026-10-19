@@ -8,8 +8,11 @@ import {
 } from '@bookverse/shared';
 import { z } from 'zod';
 import { apiFetch } from './apiClient';
+import { useMockData } from './mockMode';
+import { mockDiscoverConfig, mockMoodBooks, mockRecommendations } from './mockCatalog';
 
 export async function fetchDiscoverConfig() {
+  if (useMockData()) return discoverConfigSchema.parse(mockDiscoverConfig());
   return apiFetch('/discover/config', discoverConfigSchema);
 }
 
@@ -22,6 +25,7 @@ export async function fetchMoodBooks(params: {
   sort?: string;
   cursor?: string;
 }) {
+  if (useMockData()) return moodDiscoverResultSchema.parse(mockMoodBooks(params.mood));
   const q = new URLSearchParams();
   q.set('mood', params.mood);
   if (params.minPrice != null) q.set('minPrice', String(params.minPrice));
@@ -34,10 +38,14 @@ export async function fetchMoodBooks(params: {
 }
 
 export async function fetchRecommendations() {
+  if (useMockData()) return recommendResultSchema.parse(mockRecommendations());
   return apiFetch('/discover/recommend', recommendResultSchema);
 }
 
 export async function logMood(mood: MoodEnum, source: 'chip' | 'llm' | 'fallback' = 'chip') {
+  if (useMockData()) {
+    return { id: `mock-mood-log-${mood}`, mood };
+  }
   return apiFetch('/discover/mood/log', z.object({ id: z.string(), mood: moodEnumSchema }), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -46,6 +54,17 @@ export async function logMood(mood: MoodEnum, source: 'chip' | 'llm' | 'fallback
 }
 
 export async function classifyMoodText(text: string) {
+  if (useMockData()) {
+    const lower = text.toLowerCase();
+    const mood: MoodEnum = lower.includes('sad')
+      ? 'sad'
+      : lower.includes('happy')
+        ? 'happy'
+        : lower.includes('stress')
+          ? 'stressed'
+          : 'curious';
+    return moodClassifyResultSchema.parse({ mood, source: 'fallback', model: 'mock-local' });
+  }
   return apiFetch('/discover/mood/classify', moodClassifyResultSchema, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

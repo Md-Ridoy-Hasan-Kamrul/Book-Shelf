@@ -5,6 +5,29 @@ import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 
+/**
+ * HTML page navigations must hit Astro SSR.
+ * Without this, `/seller/dashboard` and `/admin/dashboard` are proxied to :4000
+ * and return 502 when the API is down (mock-first workflow).
+ */
+/** @param {import('http').IncomingMessage} req */
+function bypassHtml(req) {
+  const accept = req.headers.accept ?? '';
+  if (typeof accept === 'string' && accept.includes('text/html')) {
+    return req.url;
+  }
+}
+
+/** @param {boolean} [ws] */
+function toApi(ws = false) {
+  return {
+    target: 'http://127.0.0.1:4000',
+    changeOrigin: true,
+    bypass: bypassHtml,
+    ...(ws ? { ws: true } : {}),
+  };
+}
+
 export default defineConfig({
   envDir: '../',
   // FEATURE_* exposed for UI gating (AGENTS rule 15); not secrets
@@ -21,32 +44,34 @@ export default defineConfig({
     plugins: [tailwindcss()],
     server: {
       proxy: {
-        '/api/auth': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/me': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/users': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/role-applications': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/phone': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/posts': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/books': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/search': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/wishlist': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/uploads': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/checkout': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/orders': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/addresses': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/payments': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/admin/money': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/seller/dashboard': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/admin/dashboard': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/reviews': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/notifications': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/bookshelf': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/isbn': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/used-listings': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/discover': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/publisher': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/writer': { target: 'http://127.0.0.1:4000', changeOrigin: true },
-        '/socket.io': { target: 'http://127.0.0.1:4000', changeOrigin: true, ws: true },
+        '/api/auth': toApi(),
+        '/me': toApi(),
+        '/users': toApi(),
+        '/role-applications': toApi(),
+        '/phone': toApi(),
+        '/posts': toApi(),
+        '/books': toApi(),
+        '/search': toApi(),
+        '/wishlist': toApi(),
+        '/uploads': toApi(),
+        '/checkout': toApi(),
+        '/orders': toApi(),
+        '/addresses': toApi(),
+        '/payments': toApi(),
+        '/admin/money': toApi(),
+        '/seller/dashboard': toApi(),
+        '/admin/dashboard': toApi(),
+        '/reviews': toApi(),
+        '/notifications': toApi(),
+        '/bookshelf': toApi(),
+        '/isbn': toApi(),
+        '/used-listings': toApi(),
+        '/discover': toApi(),
+        '/publisher': toApi(),
+        '/publishers': toApi(),
+        '/writer': toApi(),
+        '/seller': toApi(),
+        '/socket.io': toApi(true),
       },
     },
   },

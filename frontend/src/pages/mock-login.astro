@@ -1,0 +1,35 @@
+---
+/**
+ * Mock-only: set bv_mock_role cookie server-side, then redirect.
+ * Works without React/JS — fixes "login buttons do nothing" when island fails.
+ */
+import { useMockData } from '../lib/mockMode';
+
+if (!useMockData()) {
+  return Astro.redirect('/login');
+}
+
+const DEST: Record<string, string> = {
+  ADMIN: '/admin/dashboard',
+  VENDOR: '/seller/dashboard',
+  PUBLISHER: '/seller/dashboard',
+  WRITER: '/seller/dashboard',
+  USER: '/account',
+  MODERATOR: '/account',
+};
+
+const raw = (Astro.url.searchParams.get('role') ?? 'USER').toUpperCase();
+const role = raw in DEST ? raw : 'USER';
+const next = Astro.url.searchParams.get('next');
+const go =
+  next && next.startsWith('/') && !next.startsWith('//') ? next : (DEST[role] ?? '/account');
+
+Astro.cookies.set('bv_mock_role', role, {
+  path: '/',
+  maxAge: 60 * 60 * 24 * 30,
+  sameSite: 'lax',
+  httpOnly: false,
+});
+
+return Astro.redirect(go);
+---

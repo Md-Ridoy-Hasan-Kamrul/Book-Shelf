@@ -1,17 +1,12 @@
 import { useEffect, useState } from 'react';
 import { bookCardSchema } from '@bookverse/shared';
 import { z } from 'zod';
-import { apiFetch } from '../../lib/apiClient';
+import { fetchBooks } from '../../lib/catalogApi';
 import { Skeleton } from '../ui/Skeleton';
 import { ErrorState } from '../ui/ErrorState';
 import { EmptyState } from '../ui/EmptyState';
 import { Price } from '../ui/Price';
 import { Badge } from '../ui/Badge';
-
-const listSchema = z.object({
-  items: z.array(bookCardSchema),
-  nextCursor: z.string().nullable(),
-});
 
 type BookCard = z.infer<typeof bookCardSchema>;
 
@@ -21,7 +16,7 @@ export default function HomeBrowseStrip() {
 
   const load = () => {
     setStatus('loading');
-    void apiFetch('/books?limit=8&sort=newest', listSchema)
+    void fetchBooks({ limit: '8', sort: 'newest' })
       .then((data) => {
         setItems(data.items);
         setStatus('ok');
@@ -65,7 +60,7 @@ export default function HomeBrowseStrip() {
         {status === 'error' ? <ErrorState message="বই লোড করা যায়নি" onRetry={load} /> : null}
 
         {status === 'ok' && items.length === 0 ? (
-          <EmptyState title="এখনো বই নেই" description="সিড চালান বা সেলার হিসেবে বই যোগ করুন।" />
+          <EmptyState title="এখনো বই নেই">সিড চালান বা সেলার হিসেবে বই যোগ করুন।</EmptyState>
         ) : null}
 
         {status === 'ok' && items.length > 0 ? (

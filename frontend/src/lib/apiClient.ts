@@ -1,6 +1,8 @@
 import { apiErrorEnvelopeSchema, apiSuccessEnvelopeSchema } from '@bookverse/shared';
 import type { z } from 'zod';
 import { getWebEnv } from '../env';
+import { useMockData } from './mockMode';
+import { resolveMockApi } from './mockApi';
 
 export class ApiError extends Error {
   readonly code: string;
@@ -14,11 +16,36 @@ export class ApiError extends Error {
   }
 }
 
+function pathOnly(path: string) {
+  return path.startsWith('http') ? new URL(path).pathname + new URL(path).search : path;
+}
+
 export async function apiFetch<T>(
   path: string,
   dataSchema: z.ZodType<T>,
   init?: RequestInit,
 ): Promise<T> {
+  if (useMockData()) {
+    let body: unknown;
+    if (typeof init?.body === 'string') {
+      try {
+        body = JSON.parse(init.body);
+      } catch {
+        body = undefined;
+      }
+    }
+    const raw = resolveMockApi(pathOnly(path), init?.method ?? 'GET', body);
+    const parsed = dataSchema.safeParse(raw);
+    if (parsed.success) return parsed.data;
+    // Soften: try wrapping common list shapes
+    const wrapped = dataSchema.safeParse({
+      items: [],
+      ...(typeof raw === 'object' && raw ? raw : {}),
+    });
+    if (wrapped.success) return wrapped.data;
+    throw new ApiError('MOCK_MISS', `Mock parse failed for ${path}`);
+  }
+
   const base = getWebEnv().PUBLIC_API_URL.replace(/\/$/, '');
   const res = await fetch(`${base}${path}`, {
     credentials: 'include',
@@ -49,6 +76,27 @@ export async function apiFetchPaged<T>(
   dataSchema: z.ZodType<T>,
   init?: RequestInit,
 ): Promise<{ data: T; meta: Record<string, unknown> }> {
+  if (useMockData()) {
+    let body: unknown;
+    if (typeof init?.body === 'string') {
+      try {
+        body = JSON.parse(init.body);
+      } catch {
+        body = undefined;
+      }
+    }
+    const raw = resolveMockApi(pathOnly(path), init?.method ?? 'GET', body);
+    const parsed = dataSchema.safeParse(raw);
+    if (parsed.success) {
+      const meta =
+        raw && typeof raw === 'object' && 'nextCursor' in raw
+          ? { nextCursor: (raw as { nextCursor: unknown }).nextCursor }
+          : {};
+      return { data: parsed.data, meta };
+    }
+    throw new ApiError('MOCK_MISS', `Mock paged parse failed for ${path}`);
+  }
+
   const base = getWebEnv().PUBLIC_API_URL.replace(/\/$/, '');
   const res = await fetch(`${base}${path}`, {
     credentials: 'include',

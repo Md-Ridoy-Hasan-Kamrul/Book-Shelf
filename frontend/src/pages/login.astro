@@ -1,6 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
 import AuthForm from '../components/islands/AuthForm.tsx';
+import { useMockData } from '../lib/mockMode';
+
+const mock = useMockData();
+
+const MOCK_LINKS = [
+  { role: 'ADMIN', label: 'Admin', dest: 'Admin dashboard' },
+  { role: 'VENDOR', label: 'Vendor', dest: 'Seller dashboard' },
+  { role: 'PUBLISHER', label: 'Publisher', dest: 'Seller dashboard' },
+  { role: 'WRITER', label: 'Writer', dest: 'Seller dashboard' },
+  { role: 'USER', label: 'Reader', dest: 'Account' },
+] as const;
 ---
 
 <Base title="Log in" description="BookVerse login">
@@ -12,6 +23,29 @@ import AuthForm from '../components/islands/AuthForm.tsx';
         ·
         <a href="/forgot-password" class="text-brand-700">Forgot password?</a>
       </p>
+      {
+        mock ? (
+          <div class="mt-6 rounded-[var(--radius-card)] border border-line bg-paper p-4">
+            <p class="m-0 text-sm font-semibold text-ink-900">Demo roles</p>
+            <p class="m-0 mt-1 text-xs text-ink-500">
+              Local mock only — no password required. Choose a role to continue.
+            </p>
+            <ul class="m-0 mt-3 list-none space-y-1 p-0">
+              {MOCK_LINKS.map((p) => (
+                <li>
+                  <a
+                    href={`/mock-login?role=${p.role}`}
+                    class="flex min-h-11 items-center justify-between rounded-[var(--radius-card)] border border-line px-3 text-sm font-semibold text-ink-900 no-underline transition hover:border-brand-600 hover:bg-brand-50"
+                  >
+                    <span>{p.label}</span>
+                    <span class="text-xs font-medium text-ink-500">{p.dest}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null
+      }
       <div class="mt-8">
         <AuthForm client:load mode="login" />
       </div>

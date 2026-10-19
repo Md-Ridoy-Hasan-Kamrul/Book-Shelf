@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { z } from 'zod';
 import { apiFetch } from '../../lib/apiClient';
+import { useMockData } from '../../lib/mockMode';
 import { Button } from '../ui/Button';
 
 type Props = {
@@ -19,6 +20,12 @@ export default function FollowButton({ userId, initialFollowing = false }: Props
     setStatus('loading');
     setMessage(null);
     try {
+      if (useMockData()) {
+        setFollowing(!following);
+        setMessage(following ? 'Unfollowed (mock)' : 'Following (mock)');
+        setStatus('idle');
+        return;
+      }
       if (following) {
         await apiFetch(`/users/${userId}/follow`, followSchema, { method: 'DELETE' });
         setFollowing(false);
@@ -41,6 +48,12 @@ export default function FollowButton({ userId, initialFollowing = false }: Props
     if (!window.confirm('Block this user? Follows both ways will be removed.')) return;
     setStatus('loading');
     try {
+      if (useMockData()) {
+        setFollowing(false);
+        setMessage('Blocked (mock)');
+        setStatus('idle');
+        return;
+      }
       await apiFetch(`/users/${userId}/block`, z.object({ blocked: z.boolean() }), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

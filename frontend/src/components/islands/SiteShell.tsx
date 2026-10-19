@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCartStore } from '../../stores/cart';
+import { useMockData } from '../../lib/mockMode';
 import { ToastStack } from '../ui/Toast';
 import CartDrawer from './CartDrawer';
 import NotificationBell from './NotificationBell';
@@ -32,8 +33,21 @@ export default function SiteShell({ flags }: Props) {
   const [cartOpen, setCartOpen] = useState(false);
   const bottomLinks = buildBottomLinks(usedBooks);
 
+  const mock = useMockData();
+
   return (
     <>
+      {mock ? (
+        <div
+          className="border-b border-line bg-sand px-3 py-2 text-center text-xs text-ink-700"
+          role="status"
+        >
+          Demo data ·{' '}
+          <a href="/login" className="font-semibold text-brand-700 no-underline hover:underline">
+            Sign in with a demo role
+          </a>
+        </div>
+      ) : null}
       <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur">
         <div className="mx-auto flex w-[min(100%-2rem,72rem)] flex-col gap-3 py-3 min-[720px]:flex-row min-[720px]:items-center">
           <a href="/" className="font-display text-lg font-bold text-ink-900 no-underline">
@@ -84,6 +98,12 @@ export default function SiteShell({ flags }: Props) {
                 Used
               </a>
             ) : null}
+            <a
+              href="/login"
+              className="text-sm font-semibold text-ink-700 no-underline hover:text-brand-700"
+            >
+              Log in
+            </a>
             <a
               href="/account"
               className="text-sm font-semibold text-ink-700 no-underline hover:text-brand-700"

@@ -4,6 +4,8 @@ import Island from '../../components/islands/Island.tsx';
 import FollowButton from '../../components/islands/FollowButton.tsx';
 import { z } from 'zod';
 import { getWebEnv } from '../../env';
+import { useMockData } from '../../lib/mockMode';
+import { mockWriter } from '../../lib/mockCatalog';
 
 const { slug } = Astro.params;
 if (!slug) return Astro.redirect('/');
@@ -37,15 +39,19 @@ const profileSchema = z.object({
 });
 
 let profile: z.infer<typeof profileSchema>['data'] | null = null;
-try {
-  const base = getWebEnv().PUBLIC_API_URL.replace(/\/$/, '');
-  const res = await fetch(`${base}/writer/profiles/${slug}`);
-  if (res.ok) {
-    const json = profileSchema.parse(await res.json());
-    profile = json.data;
+if (useMockData()) {
+  profile = mockWriter(slug);
+} else {
+  try {
+    const base = getWebEnv().PUBLIC_API_URL.replace(/\/$/, '');
+    const res = await fetch(`${base}/writer/profiles/${slug}`);
+    if (res.ok) {
+      const json = profileSchema.parse(await res.json());
+      profile = json.data;
+    }
+  } catch {
+    profile = null;
   }
-} catch {
-  profile = null;
 }
 
 if (!profile) {

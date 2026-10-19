@@ -4,6 +4,7 @@ import { createBookListingSchema } from '@bookverse/shared';
 import { z } from 'zod';
 import { apiFetch } from '../../lib/apiClient';
 import { getWebEnv } from '../../env';
+import { useMockData } from '../../lib/mockMode';
 import { Button } from '../ui/Button';
 
 const GENRE_OPTIONS = [
@@ -57,6 +58,12 @@ export default function SellerCatalogForm() {
         condition: 'NEW',
         moodTags: [],
       });
+      if (useMockData()) {
+        return {
+          book: { id: `mock-new-${Date.now()}`, slug: 'mock-new', title: body.title },
+          listing: { id: `mock-listing-new`, price: body.price, stock: body.stock },
+        };
+      }
       return apiFetch('/seller/books', createdSchema, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,7 +72,11 @@ export default function SellerCatalogForm() {
     },
     onSuccess: (data) => {
       setBookId(data.book.id);
-      setMsg(`Created “${data.book.title}” — you can upload cover / look-inside below.`);
+      setMsg(
+        useMockData()
+          ? `Mock created “${data.book.title}” (no backend). Cover/look-inside are no-ops.`
+          : `Created “${data.book.title}” — you can upload cover / look-inside below.`,
+      );
       setErr(null);
       void qc.invalidateQueries({ queryKey: ['seller', 'listings'] });
     },
@@ -78,6 +89,7 @@ export default function SellerCatalogForm() {
   const uploadCover = useMutation({
     mutationFn: async (file: File) => {
       if (!bookId) throw new Error('Create a book first');
+      if (useMockData()) return;
       const fd = new FormData();
       fd.append('cover', file);
       const base = getWebEnv().PUBLIC_API_URL.replace(/\/$/, '');
@@ -89,7 +101,7 @@ export default function SellerCatalogForm() {
       const json = (await res.json()) as { success: boolean; message?: string };
       if (!json.success) throw new Error(json.message ?? 'Cover upload failed');
     },
-    onSuccess: () => setMsg('Cover uploaded.'),
+    onSuccess: () => setMsg(useMockData() ? 'Mock cover accepted.' : 'Cover uploaded.'),
     onError: (e: Error) => setErr(e.message),
   });
 
@@ -97,6 +109,7 @@ export default function SellerCatalogForm() {
     mutationFn: async (files: FileList) => {
       if (!bookId) throw new Error('Create a book first');
       if (!copyright) throw new Error('Confirm copyright before uploading look-inside pages');
+      if (useMockData()) return;
       const fd = new FormData();
       fd.append('copyrightConfirmed', 'true');
       Array.from(files).forEach((f) => fd.append('pages', f));
@@ -109,7 +122,8 @@ export default function SellerCatalogForm() {
       const json = (await res.json()) as { success: boolean; message?: string };
       if (!json.success) throw new Error(json.message ?? 'Look-inside upload failed');
     },
-    onSuccess: () => setMsg('Look-inside pages submitted.'),
+    onSuccess: () =>
+      setMsg(useMockData() ? 'Mock look-inside accepted.' : 'Look-inside pages submitted.'),
     onError: (e: Error) => setErr(e.message),
   });
 
