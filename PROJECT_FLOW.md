@@ -7,6 +7,7 @@ Check off after each prompt’s ACCEPTANCE passes.
 - [x] P1 — Monorepo, Docker, ESLint/Prettier/Husky, shared tsup, API health (db+redis), providers, CI
 - [x] P2 — Base.astro shell, UI kit, `/design` guide, stores, apiClient
 - [x] Dev infra guard — `scripts/check-infra.mjs` + worker Redis preflight (no ECONNREFUSED spam); `FEATURE_*=false` env parsed correctly (`boolish`)
+- [x] FE A–D pass — marketplace home (Hero + browse strip); `GET /publishers/:slug` + Follow on publisher; seller create/cover/look-inside; admin Money tab (reconcile / payout batch / COD remit)
 
 ## B · Data + Auth (P3–4)
 

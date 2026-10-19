@@ -10,6 +10,7 @@ import {
   fetchSellerPayouts,
   packSellerOrder,
 } from '../../lib/dashboardApi';
+import SellerCatalogForm from './SellerCatalogForm';
 
 type Tab = 'overview' | 'inventory' | 'orders' | 'earnings' | 'payouts' | 'claims';
 
@@ -134,6 +135,7 @@ function SellerDashboardInner() {
 
         {tab === 'inventory' && (
           <>
+            <SellerCatalogForm />
             {listings.isLoading && <SkeletonRows />}
             {listings.isError && (
               <p className="text-urgent-600">

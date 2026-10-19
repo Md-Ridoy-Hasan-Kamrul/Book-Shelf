@@ -3,8 +3,8 @@ import { prisma } from '../../lib/prisma.js';
 
 export type ReconcileIssue = {
   orderId: string;
-  expectedPaisa: bigint;
-  ledgerPaisa: bigint;
+  expectedPaisa: string;
+  ledgerPaisa: string;
   message: string;
 };
 
@@ -34,8 +34,8 @@ export async function reconcileOrdersVsLedger(): Promise<{
     if (expected !== ledger) {
       issues.push({
         orderId: order.id,
-        expectedPaisa: expected,
-        ledgerPaisa: ledger,
+        expectedPaisa: expected.toString(),
+        ledgerPaisa: ledger.toString(),
         message: 'Line seller+commission sum does not match ledger SALE+COMMISSION',
       });
     }

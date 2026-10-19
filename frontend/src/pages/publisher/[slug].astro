@@ -1,29 +1,81 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { fetchBooks } from '../../lib/catalogApi';
+import Island from '../../components/islands/Island.tsx';
+import FollowButton from '../../components/islands/FollowButton.tsx';
+import { z } from 'zod';
+import { getWebEnv } from '../../env';
 
 const slug = Astro.params.slug;
 if (!slug) return Astro.redirect('/search');
-const data = await fetchBooks({ publisher: slug, limit: '24' });
+
+const profileSchema = z.object({
+  success: z.literal(true),
+  data: z.object({
+    userId: z.string(),
+    businessName: z.string(),
+    slug: z.string(),
+    verified: z.boolean(),
+    founding: z.boolean(),
+    displayName: z.string(),
+    books: z.array(
+      z.object({
+        id: z.string(),
+        slug: z.string(),
+        title: z.string(),
+        titleBn: z.string(),
+        author: z.string(),
+      }),
+    ),
+  }),
+});
+
+let profile: z.infer<typeof profileSchema>['data'] | null = null;
+try {
+  const base = getWebEnv().PUBLIC_API_URL.replace(/\/$/, '');
+  const res = await fetch(`${base}/publishers/${encodeURIComponent(slug)}`);
+  if (res.ok) {
+    profile = profileSchema.parse(await res.json()).data;
+  }
+} catch {
+  profile = null;
+}
+
+if (!profile) {
+  return Astro.redirect('/search');
+}
 ---
 
-<Base title={`Publisher · ${slug}`}>
+<Base title={`${profile.businessName} · Publisher`}>
   <main id="main" class="py-10">
     <div class="mx-auto w-[min(100%-2rem,72rem)]">
-      <h1 class="m-0 font-display text-3xl font-bold text-ink-900">{slug}</h1>
+      <p class="m-0 text-xs font-bold tracking-wide text-brand-600 uppercase">
+        Publisher{profile.verified ? ' · verified' : ''}{profile.founding ? ' · founding' : ''}
+      </p>
+      <h1 class="m-0 mt-1 font-display text-3xl font-bold text-ink-900">{profile.businessName}</h1>
+      <p class="mt-2 text-ink-500">{profile.displayName}</p>
+      <div class="mt-4">
+        <Island client:load>
+          <FollowButton userId={profile.userId} />
+        </Island>
+      </div>
+
       <ul class="mt-8 grid list-none gap-4 p-0 min-[720px]:grid-cols-3">
         {
-          data.items.map((b) => (
-            <li>
-              <a
-                href={`/books/${b.slug}`}
-                class="block rounded-[var(--radius-card)] border border-line bg-paper p-4 no-underline"
-              >
-                <h2 class="m-0 font-display text-lg font-bold text-ink-900">{b.titleBn}</h2>
-                <p class="m-0 text-sm text-ink-500">{b.author}</p>
-              </a>
-            </li>
-          ))
+          profile.books.length === 0 ? (
+            <li class="text-ink-500">No books listed yet.</li>
+          ) : (
+            profile.books.map((b) => (
+              <li>
+                <a
+                  href={`/books/${b.slug}`}
+                  class="block rounded-[var(--radius-card)] border border-line bg-paper p-4 no-underline hover:bg-sand"
+                >
+                  <h2 class="m-0 font-display text-lg font-bold text-ink-900">{b.titleBn}</h2>
+                  <p class="m-0 text-sm text-ink-500">{b.author}</p>
+                </a>
+              </li>
+            ))
+          )
         }
       </ul>
     </div>

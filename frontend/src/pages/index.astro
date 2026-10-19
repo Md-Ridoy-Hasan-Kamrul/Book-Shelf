@@ -1,11 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import Hero from '../components/sections/Hero.astro';
-import Features from '../components/sections/Features.astro';
-import HowItWorks from '../components/sections/HowItWorks.astro';
 import ScrollReveal from '../components/islands/ScrollReveal.tsx';
 import MoodPicker from '../components/islands/MoodPicker.tsx';
 import RecommendRail from '../components/islands/RecommendRail.tsx';
+import HomeBrowseStrip from '../components/islands/HomeBrowseStrip.tsx';
 ---
 
 <Base title="BookVerse — Home">
@@ -18,7 +17,6 @@ import RecommendRail from '../components/islands/RecommendRail.tsx';
         <RecommendRail client:load />
       </div>
     </section>
-    <Features />
-    <HowItWorks />
+    <HomeBrowseStrip client:load />
   </main>
 </Base>

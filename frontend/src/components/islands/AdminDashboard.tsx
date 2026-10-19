@@ -3,19 +3,24 @@ import { useState } from 'react';
 import Island from './Island';
 import {
   approveAdminPayout,
+  confirmAdminCodRemit,
   fetchAdminClaims,
   fetchAdminKpis,
   fetchAdminMarginWarnings,
   fetchAdminOrders,
   fetchAdminPayouts,
+  fetchAdminReconcile,
   fetchAdminRoleApplications,
   fetchAdminSettings,
+  runAdminPayoutBatch,
 } from '../../lib/dashboardApi';
 
-type Tab = 'kpis' | 'approvals' | 'orders' | 'claims' | 'payouts' | 'settings';
+type Tab = 'kpis' | 'approvals' | 'orders' | 'claims' | 'payouts' | 'money' | 'settings';
 
 function AdminDashboardInner() {
   const [tab, setTab] = useState<Tab>('kpis');
+  const [codOrderId, setCodOrderId] = useState('');
+  const [moneyMsg, setMoneyMsg] = useState<string | null>(null);
   const qc = useQueryClient();
 
   const kpis = useQuery({ queryKey: ['admin', 'kpis'], queryFn: fetchAdminKpis });
@@ -49,10 +54,33 @@ function AdminDashboardInner() {
     queryFn: fetchAdminSettings,
     enabled: tab === 'settings',
   });
+  const reconcile = useQuery({
+    queryKey: ['admin', 'reconcile'],
+    queryFn: fetchAdminReconcile,
+    enabled: tab === 'money',
+  });
 
   const approvePayout = useMutation({
     mutationFn: approveAdminPayout,
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['admin', 'payouts'] }),
+  });
+
+  const payoutBatch = useMutation({
+    mutationFn: runAdminPayoutBatch,
+    onSuccess: () => {
+      setMoneyMsg('Payout batch started / completed.');
+      void qc.invalidateQueries({ queryKey: ['admin', 'payouts'] });
+    },
+    onError: (e: Error) => setMoneyMsg(e.message),
+  });
+
+  const codRemit = useMutation({
+    mutationFn: () => confirmAdminCodRemit(codOrderId.trim()),
+    onSuccess: () => {
+      setMoneyMsg(`COD remitted for ${codOrderId.trim()}`);
+      setCodOrderId('');
+    },
+    onError: (e: Error) => setMoneyMsg(e.message),
   });
 
   const tabs: { id: Tab; label: string }[] = [
@@ -61,6 +89,7 @@ function AdminDashboardInner() {
     { id: 'orders', label: 'Orders' },
     { id: 'claims', label: 'Claims' },
     { id: 'payouts', label: 'Payouts' },
+    { id: 'money', label: 'Money' },
     { id: 'settings', label: 'Settings' },
   ];
 
@@ -225,6 +254,115 @@ function AdminDashboardInner() {
               </li>
             ))}
           </ul>
+        )}
+
+        {tab === 'money' && (
+          <div className="space-y-6">
+            <section aria-labelledby="reconcile-heading">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 id="reconcile-heading" className="m-0 text-base font-bold text-ink-900">
+                  Reconcile orders vs ledger
+                </h2>
+                <button
+                  type="button"
+                  className="rounded-[var(--radius-card)] border border-line bg-sand px-3 py-1.5 text-xs font-semibold"
+                  onClick={() => void reconcile.refetch()}
+                >
+                  Refresh
+                </button>
+              </div>
+              {reconcile.isLoading && <p className="text-ink-500">Running reconcile…</p>}
+              {reconcile.isError && (
+                <p className="text-urgent-600" role="alert">
+                  Reconcile failed.{' '}
+                  <button
+                    type="button"
+                    className="underline"
+                    onClick={() => void reconcile.refetch()}
+                  >
+                    Retry
+                  </button>
+                </p>
+              )}
+              {reconcile.data && (
+                <>
+                  <p className={reconcile.data.ok ? 'text-leaf-700' : 'text-urgent-600'}>
+                    {reconcile.data.ok
+                      ? 'All captured orders match ledger SALE+COMMISSION.'
+                      : `${reconcile.data.issues.length} issue(s) found.`}
+                  </p>
+                  <ul className="mt-2 list-none space-y-2 p-0">
+                    {reconcile.data.issues.map((i) => (
+                      <li
+                        key={i.orderId}
+                        className="rounded-[var(--radius-card)] border border-urgent-600/30 bg-paper p-3 font-mono text-xs"
+                      >
+                        <div className="font-semibold text-ink-900">{i.orderId}</div>
+                        <div className="text-ink-500">{i.message}</div>
+                        <div>
+                          expected {i.expectedPaisa} paisa · ledger {i.ledgerPaisa} paisa
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </section>
+
+            <section aria-labelledby="payout-batch-heading">
+              <h2 id="payout-batch-heading" className="m-0 text-base font-bold text-ink-900">
+                Weekly payout batch
+              </h2>
+              <p className="mt-1 text-ink-500">
+                Creates pending payouts from available escrow balances (server-side).
+              </p>
+              <button
+                type="button"
+                className="mt-2 rounded-[var(--radius-card)] bg-leaf-600 px-3 py-2 text-sm font-semibold text-paper"
+                disabled={payoutBatch.isPending}
+                onClick={() => {
+                  if (window.confirm('Run weekly payout batch now?')) payoutBatch.mutate();
+                }}
+              >
+                {payoutBatch.isPending ? 'Running…' : 'Run payout batch'}
+              </button>
+            </section>
+
+            <section aria-labelledby="cod-remit-heading">
+              <h2 id="cod-remit-heading" className="m-0 text-base font-bold text-ink-900">
+                Confirm COD remit
+              </h2>
+              <p className="mt-1 text-ink-500">
+                Mark courier COD remittance received for an order.
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <input
+                  className="min-h-10 min-w-[16rem] flex-1 rounded-[var(--radius-card)] border border-line px-3 text-sm"
+                  placeholder="Order id"
+                  value={codOrderId}
+                  onChange={(e) => setCodOrderId(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="rounded-[var(--radius-card)] bg-cta-500 px-3 py-2 text-sm font-semibold text-ink-900"
+                  disabled={codRemit.isPending || !codOrderId.trim()}
+                  onClick={() => {
+                    if (window.confirm(`Confirm COD remit for ${codOrderId.trim()}?`)) {
+                      codRemit.mutate();
+                    }
+                  }}
+                >
+                  {codRemit.isPending ? 'Saving…' : 'Confirm remit'}
+                </button>
+              </div>
+            </section>
+
+            {moneyMsg ? (
+              <p className="m-0 text-sm text-ink-700" role="status">
+                {moneyMsg}
+              </p>
+            ) : null}
+          </div>
         )}
 
         {tab === 'settings' && (

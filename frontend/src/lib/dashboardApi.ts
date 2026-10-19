@@ -217,3 +217,44 @@ export async function fetchAdminSettings() {
     z.array(z.object({ key: z.string(), value: z.unknown(), updatedAt: z.string() })),
   ).parse(json).data;
 }
+
+export async function fetchAdminReconcile() {
+  const res = await authedFetch('/admin/money/reconcile');
+  const json: unknown = await res.json();
+  if (!res.ok) throw new Error('Reconcile failed');
+  return apiSuccessEnvelopeSchema(
+    z.object({
+      ok: z.boolean(),
+      issues: z.array(
+        z.object({
+          orderId: z.string(),
+          expectedPaisa: z.string(),
+          ledgerPaisa: z.string(),
+          message: z.string(),
+        }),
+      ),
+    }),
+  ).parse(json).data;
+}
+
+export async function runAdminPayoutBatch() {
+  const res = await authedFetch('/admin/money/payouts/run', { method: 'POST' });
+  const json: unknown = await res.json();
+  if (!res.ok) throw new Error('Payout batch failed');
+  return apiSuccessEnvelopeSchema(z.unknown()).parse(json).data;
+}
+
+export async function confirmAdminCodRemit(orderId: string) {
+  const res = await authedFetch(`/admin/money/orders/${encodeURIComponent(orderId)}/cod-remit`, {
+    method: 'POST',
+  });
+  const json: unknown = await res.json();
+  if (!res.ok) {
+    const msg =
+      json && typeof json === 'object' && 'message' in json
+        ? String((json as { message: unknown }).message)
+        : 'COD remit failed';
+    throw new Error(msg);
+  }
+  return apiSuccessEnvelopeSchema(z.object({ remitted: z.boolean() })).parse(json).data;
+}

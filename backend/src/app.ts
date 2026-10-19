@@ -45,6 +45,7 @@ import { createSearchService } from './services/search/pgSearchService.js';
 import { createLlmProvider } from './providers/llm/index.js';
 import { createDiscoverRouter } from './routes/discover.js';
 import { createPublisherRouter } from './routes/publisher.js';
+import { createPublishersPublicRouter } from './routes/publishersPublic.js';
 import { createWriterRouter } from './routes/writer.js';
 import { requireOrigin } from './middleware/requireOrigin.js';
 
@@ -111,6 +112,7 @@ export function createApp(env: ApiEnv, logger: Logger) {
     app.use('/used-listings', createUsedListingsRouter(auth, env, storage));
   }
   app.use('/discover', createDiscoverRouter(auth, env, storage, llm));
+  app.use('/publishers', createPublishersPublicRouter());
   if (env.FEATURE_SPONSORED) {
     app.use('/publisher', createPublisherRouter(auth, env));
   }
