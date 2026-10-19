@@ -425,6 +425,8 @@ model PublisherProfile {
   businessName String
   slug         String   @unique
   verified     Boolean  @default(false)
+  /** First 10 founding publishers — ROLE PUBLISHER_FOUNDING offer (Appendix D). */
+  founding     Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -794,6 +796,8 @@ model Shipment {
   consignmentId  String    @unique
   trackingCode   String?
   codAmount      Decimal   @db.Decimal(12, 2)
+  /** When courier remitted COD cash (Appendix C). */
+  codRemittedAt  DateTime?
   courierStatus  String    @default("pending")
   lastWebhookAt  DateTime?
   pollAfter      DateTime?
@@ -1377,17 +1381,22 @@ model SystemSetting {
 }
 
 model CommissionRule {
-  id         String      @id @default(cuid())
-  name       String
-  sellerType SellerType?
-  genreSlug  String?
-  bps        Int
-  priority   Int         @default(0)
-  active     Boolean     @default(true)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id        String    @id @default(cuid())
+  name      String
+  /** GLOBAL | ROLE | SELLER | CATEGORY | LISTING_TYPE (Appendix D). */
+  scope     String
+  scopeRef  String?
+  bps       Int
+  /** Higher wins on ties after specificity (Appendix D). */
+  priority  Int       @default(0)
+  validFrom DateTime  @default(now())
+  validTo   DateTime?
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  @@index([active, priority])
+  @@index([active, scope, priority])
+  @@index([validFrom, validTo])
 }
 
 model AdminAuditLog {

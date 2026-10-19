@@ -97,6 +97,7 @@ export const commissionRuleUpdateSchema = z.object({
   active: z.boolean().optional(),
   priority: z.number().int().min(0).max(1000).optional(),
   name: z.string().min(1).max(120).optional(),
+  validTo: z.string().datetime().nullable().optional(),
 });
 
 export const systemSettingUpdateSchema = z.object({

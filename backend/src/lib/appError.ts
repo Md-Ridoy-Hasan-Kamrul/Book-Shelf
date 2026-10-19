@@ -9,7 +9,8 @@ export type AppErrorCode =
   | 'COD_UNAVAILABLE'
   | 'INSUFFICIENT_STOCK'
   | 'INVALID_TRANSITION'
-  | 'SPAM_SUSPECT';
+  | 'SPAM_SUSPECT'
+  | 'MARGIN_GUARD';
 
 export class AppError extends Error {
   readonly code: AppErrorCode;

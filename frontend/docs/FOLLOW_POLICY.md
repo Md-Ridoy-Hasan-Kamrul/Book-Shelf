@@ -1,37 +1,32 @@
 # Appendix B — Follow policy (BookVerse)
 
-`canFollow(actor, target, ctx)` is the single source of truth. Routes must call this before any follow write.
+`canFollow(actor, target, ctx)` is the single source of truth. Enforced server-side; UI hiding is never security.
 
-## Hard denials (any roles)
+## Hard denials
 
-| Rule                                        | Result                   |
-| ------------------------------------------- | ------------------------ |
-| `actor.id === target.id`                    | deny (`SELF`)            |
-| `ctx.blocked === true` (either direction)   | deny (`BLOCKED`)         |
-| `actor.bannedAt` or `actor.deletedAt` set   | deny (`ACTOR_INACTIVE`)  |
-| `target.bannedAt` or `target.deletedAt` set | deny (`TARGET_INACTIVE`) |
+| Rule                           | Code          |
+| ------------------------------ | ------------- |
+| Self-follow                    | `NOT_ALLOWED` |
+| Blocked either direction       | `NOT_ALLOWED` |
+| Target is `ADMIN` or `RIDER`   | `NOT_ALLOWED` |
+| Actor/target banned or deleted | `NOT_ALLOWED` |
 
 ## Role matrix (actor → target)
 
-`yes` = follow allowed if hard rules pass.
+| Actor \\ Target           | USER               | WRITER | PUBLISHER | VENDOR | ADMIN | RIDER |
+| ------------------------- | ------------------ | ------ | --------- | ------ | ----- | ----- |
+| USER                      | yes                | yes    | yes       | yes    | no    | no    |
+| WRITER                    | follow-back only\* | yes    | yes       | no     | no    | no    |
+| PUBLISHER                 | never              | yes    | yes       | no     | no    | no    |
+| VENDOR                    | nobody             |        |           |        |       |       |
+| ADMIN / MODERATOR / RIDER | nobody             |        |           |        |       |       |
 
-| Actor \\ Target | USER   | WRITER | PUBLISHER | VENDOR | ADMIN | MODERATOR |
-| --------------- | ------ | ------ | --------- | ------ | ----- | --------- |
-| USER            | yes    | yes    | yes       | yes    | no    | no        |
-| WRITER          | yes    | yes    | yes       | yes    | no    | no        |
-| PUBLISHER       | **no** | yes    | yes       | yes    | no    | no        |
-| VENDOR          | yes    | yes    | yes       | yes    | no    | no        |
-| ADMIN           | yes    | yes    | yes       | yes    | yes   | yes       |
-| MODERATOR       | yes    | yes    | yes       | yes    | no    | yes       |
+\* `WRITER → USER` only when `ctx.actorIsFollowedByTarget` (user already follows the writer). Otherwise `FOLLOW_BACK_ONLY`.
 
-Deny reason when matrix says no: `ROLE_POLICY`.
+## Extra rules
 
-## Follow-back (writers)
-
-When a **USER** follows a **WRITER**, the API also creates `WRITER → USER` in the same transaction (follow-back).
-
-**Unfollow:** deleting `USER → WRITER` also deletes the writer’s follow-back edge `WRITER → USER` if it exists.
-
-## Block
-
-Creating a block removes **both** follow directions between the two users (handled in block service when implemented; follow module assumes `ctx.blocked`).
+1. **Writer follow-back:** reverse-edge check + insert in **one** DB transaction (race-safe).
+2. **Unfollow:** when a user unfollows a writer, the writer’s follow-back edge is removed.
+3. **Block:** removes follows both ways and blocks new follows.
+4. **Rate limit:** 50 follows / hour / user. Above 25 in the window, `trustScore` decrements (risk); never auto-ban.
+5. **Publisher promos:** max 3 `ANNOUNCEMENT` posts / day. Sponsored posts always set `Post.isSponsored` and show a “Sponsored” label in the UI.

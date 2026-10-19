@@ -140,7 +140,7 @@ export async function applyInternalAction(
   }
 
   if (action === 'COD_REMIT') {
-    await confirmCodRemit(orderId);
+    await confirmCodRemit(orderId, env);
   }
 }
 

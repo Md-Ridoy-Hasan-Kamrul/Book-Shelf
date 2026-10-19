@@ -1,21 +1,7 @@
-import type { UserRole } from '@bookverse/shared';
-import type { ApiEnv } from '@bookverse/shared';
+import type { ApiEnv, UserRole } from '@bookverse/shared';
 import { AppError } from '../lib/appError.js';
 import { canFollow } from '../policies/canFollow.js';
 import { prisma } from '../lib/prisma.js';
-
-async function isBlocked(a: string, b: string): Promise<boolean> {
-  const block = await prisma.block.findFirst({
-    where: {
-      OR: [
-        { blockerId: a, blockedId: b },
-        { blockerId: b, blockedId: a },
-      ],
-    },
-    select: { id: true },
-  });
-  return Boolean(block);
-}
 
 async function loadFollowUser(id: string) {
   const user = await prisma.user.findUnique({
@@ -28,13 +14,21 @@ async function loadFollowUser(id: string) {
   return { ...user, role: user.role as UserRole };
 }
 
-export async function followUser(env: ApiEnv, actorId: string, targetId: string) {
+/**
+ * Mass-follow raises COD risk (lowers trustScore). Never auto-bans (Appendix B §4).
+ */
+export async function bumpMassFollowRisk(userId: string): Promise<void> {
+  await prisma.user.updateMany({
+    where: { id: userId, trustScore: { gt: 0 } },
+    data: { trustScore: { decrement: 1 } },
+  });
+}
+
+/**
+ * Follow write — policy check (incl. writer follow-back) and insert in ONE transaction.
+ */
+export async function followUser(_env: ApiEnv, actorId: string, targetId: string) {
   const [actor, target] = await Promise.all([loadFollowUser(actorId), loadFollowUser(targetId)]);
-  const blocked = await isBlocked(actor.id, target.id);
-  const decision = canFollow(actor, target, { blocked });
-  if (!decision.allowed) {
-    throw new AppError('FORBIDDEN', `Cannot follow: ${decision.reason}`, 403);
-  }
 
   return prisma.$transaction(async (tx) => {
     const stillBlocked = await tx.block.findFirst({
@@ -46,8 +40,21 @@ export async function followUser(env: ApiEnv, actorId: string, targetId: string)
       },
       select: { id: true },
     });
-    if (stillBlocked) {
-      throw new AppError('FORBIDDEN', 'Cannot follow: BLOCKED', 403);
+
+    // Target already follows actor? Required for WRITER → USER follow-back.
+    const reverse = await tx.follow.findUnique({
+      where: {
+        followerId_followingId: { followerId: target.id, followingId: actor.id },
+      },
+      select: { id: true },
+    });
+
+    const decision = canFollow(actor, target, {
+      blocked: Boolean(stillBlocked),
+      actorIsFollowedByTarget: Boolean(reverse),
+    });
+    if (!decision.allow) {
+      throw new AppError('FORBIDDEN', `Cannot follow: ${decision.code}`, 403);
     }
 
     await tx.follow.upsert({
@@ -55,14 +62,6 @@ export async function followUser(env: ApiEnv, actorId: string, targetId: string)
       create: { followerId: actor.id, followingId: target.id },
       update: {},
     });
-
-    if (actor.role === 'USER' && target.role === 'WRITER') {
-      await tx.follow.upsert({
-        where: { followerId_followingId: { followerId: target.id, followingId: actor.id } },
-        create: { followerId: target.id, followingId: actor.id },
-        update: {},
-      });
-    }
 
     return { following: true };
   });
@@ -76,6 +75,7 @@ export async function unfollowUser(_env: ApiEnv, actorId: string, targetId: stri
       where: { followerId: actorId, followingId: targetId },
     });
 
+    // Invariant: a writer only follows users who follow them (Appendix B §2)
     if (target.role === 'WRITER') {
       await tx.follow.deleteMany({
         where: { followerId: targetId, followingId: actorId },

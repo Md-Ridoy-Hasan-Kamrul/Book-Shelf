@@ -4,7 +4,12 @@ import { AppError } from '../../lib/appError.js';
 import { cursorWhere, encodeCursor } from '../../lib/cursorPagination.js';
 import { prisma } from '../../lib/prisma.js';
 import { writeAdminAudit } from '../admin/adminAuditService.js';
-import { clearSettingsCache, getSystemSetting } from '../settings/systemSettingsService.js';
+import { resolveCommissionBps } from '../checkout/commissionService.js';
+import {
+  clearSettingsCache,
+  getMoneySetting,
+  getSystemSetting,
+} from '../settings/systemSettingsService.js';
 
 export async function getAdminKpis() {
   const orders = await prisma.order.findMany({
@@ -43,13 +48,19 @@ export async function getAdminKpis() {
   };
 }
 
+/**
+ * Appendix D — warn when resolved commission < estimated gateway fee + courier + min margin.
+ */
 export async function listMarginWarnings(cursor?: string, limit = 20) {
-  const minNetBps = await getSystemSetting<number>('margin_guard_min_bps', 500);
+  const feeBps = await getSystemSetting<number>('payment_fee_bps', 150);
+  const minMarginBps = await getSystemSetting<number>('min_platform_margin_bps', 100);
+  const courierBdt = await getMoneySetting('estimated_courier_cost_bdt', '60.00');
+  const courierPaisa = toPaisa(courierBdt);
   const take = limit + 1;
   const rows = await prisma.listing.findMany({
     where: { status: 'ACTIVE', ...(cursorWhere(cursor) ?? {}) },
     include: {
-      book: { select: { title: true } },
+      book: { select: { title: true, genre: { select: { slug: true } } } },
       seller: { select: { name: true, displayName: true } },
     },
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
@@ -59,10 +70,18 @@ export async function listMarginWarnings(cursor?: string, limit = 20) {
   const items = [];
   for (const l of rows) {
     const linePaisa = toPaisa(l.price.toString());
-    const { sellerPaisa, commissionPaisa } = splitCommission(linePaisa, 1200);
+    const commissionBps = await resolveCommissionBps({
+      sellerType: l.sellerType,
+      sellerId: l.sellerId,
+      genreSlug: l.book.genre.slug,
+      isUsed: l.isUsed,
+    });
+    const { commissionPaisa, sellerPaisa } = splitCommission(linePaisa, commissionBps);
+    const feePaisa = (linePaisa * BigInt(feeBps) + 5000n) / 10000n;
+    const minMarginPaisa = (linePaisa * BigInt(minMarginBps) + 5000n) / 10000n;
+    const floor = feePaisa + courierPaisa + minMarginPaisa;
+    if (commissionPaisa >= floor) continue;
     const netMarginBps = linePaisa > 0n ? Number((sellerPaisa * 10000n) / linePaisa) : 0;
-    const commissionBps = linePaisa > 0n ? Number((commissionPaisa * 10000n) / linePaisa) : 0;
-    if (netMarginBps >= minNetBps) continue;
     items.push({
       listingId: l.id,
       bookTitle: l.book.title,
@@ -70,6 +89,8 @@ export async function listMarginWarnings(cursor?: string, limit = 20) {
       price: l.price.toString(),
       commissionBps,
       netMarginBps,
+      floorBdt: fromPaisa(floor),
+      commissionBdt: fromPaisa(commissionPaisa),
       createdAt: l.createdAt,
       id: l.id,
     });
@@ -170,15 +191,17 @@ export async function listAdminPayouts(cursor?: string, limit = 20) {
 
 export async function listCommissionRules() {
   const rows = await prisma.commissionRule.findMany({
-    orderBy: [{ priority: 'asc' }, { createdAt: 'asc' }],
+    orderBy: [{ priority: 'desc' }, { createdAt: 'asc' }],
   });
   return rows.map((r) => ({
     id: r.id,
     name: r.name,
-    sellerType: r.sellerType,
-    genreSlug: r.genreSlug,
+    scope: r.scope,
+    scopeRef: r.scopeRef,
     bps: r.bps,
     priority: r.priority,
+    validFrom: r.validFrom.toISOString(),
+    validTo: r.validTo?.toISOString() ?? null,
     active: r.active,
   }));
 }
@@ -186,13 +209,27 @@ export async function listCommissionRules() {
 export async function updateCommissionRule(
   adminId: string,
   ruleId: string,
-  patch: { bps?: number; active?: boolean; priority?: number; name?: string },
+  patch: {
+    bps?: number;
+    active?: boolean;
+    priority?: number;
+    name?: string;
+    validTo?: string | null;
+  },
 ) {
   const before = await prisma.commissionRule.findUnique({ where: { id: ruleId } });
   if (!before) throw new AppError('NOT_FOUND', 'Rule not found', 404);
   const after = await prisma.commissionRule.update({
     where: { id: ruleId },
-    data: patch,
+    data: {
+      ...(patch.bps !== undefined ? { bps: patch.bps } : {}),
+      ...(patch.active !== undefined ? { active: patch.active } : {}),
+      ...(patch.priority !== undefined ? { priority: patch.priority } : {}),
+      ...(patch.name !== undefined ? { name: patch.name } : {}),
+      ...(patch.validTo !== undefined
+        ? { validTo: patch.validTo === null ? null : new Date(patch.validTo) }
+        : {}),
+    },
   });
   await writeAdminAudit(adminId, 'UPDATE', 'CommissionRule', ruleId, before, after);
   return after;

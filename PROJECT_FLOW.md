@@ -12,12 +12,15 @@ Check off after each prompt’s ACCEPTANCE passes.
 - [x] P3 — Prisma schema, migrate (pg_trgm + FTS), seed, money helpers
 - [x] Appendix A mapping — `docs/APPENDIX_A_MAPPING.md` (live ≠ literal Appendix; RIDER/DELIVERY_FEE/COD_REMIT/`PointLedger.balanceAfter` aligned)
 - [x] P4 — Better Auth, GET /me, RBAC, follow policy, auth pages
+- [x] Appendix B — `canFollow` matrix (VENDOR nobody; WRITER→USER follow-back in TX; unfollow clears back; block both ways; 50/h + mass-follow trustScore risk; publisher 3 announcements/day + Sponsored label)
 
 ## C · Commerce (P5–9)
 
 - [x] P5 — Catalog API, pg SearchService, book pages, local uploads, bench script
 - [x] P6 — Cart quote, COD checkout, orders, BullMQ reservation release
 - [x] P7 — Mock/SSLCommerz payments, IPN, ledger, escrow, claims, payouts, reconcile
+- [x] Appendix C — SystemSetting defaults (48h claim / 7d escrow / 500 min payout / 1500 COD new-user / trust 30); COD remit `codRemittedAt` + escrow max(delivered, remitted); margin guard; `docs/APPENDIX_C_MONEY.md`; `TEST_CLOCK_ISO`
+- [x] Appendix D — CommissionRule scope/validTo; GLOBAL 10% + founding/verified/writer/vendor launch offers; LISTING USED; resolve most-specific; admin fee+courier+margin warnings; `docs/APPENDIX_D_COMMISSION.md`
 - [x] P8 — Mock courier, PACKED→shipment job, webhooks, poll fallback, sim:courier, tracking UI
 - [x] P9 — Seller & admin dashboards (paginated APIs, audit log, IDOR tests, mobile UI)
 - [x] P10 — Reviews, wishlist alerts, notifications, separate worker process

@@ -5,7 +5,7 @@ import { getSystemSetting } from '../settings/systemSettingsService.js';
 export async function runWeeklyPayoutBatch(
   referencePrefix = 'PAYOUT',
 ): Promise<{ payouts: number }> {
-  const minBdt = await getSystemSetting<string>('payout_min_bdt', '500.00');
+  const minBdt = await getSystemSetting<string>('min_payout_amount', '500.00');
   const minPaisa = toPaisa(minBdt);
 
   const rows = await prisma.ledgerEntry.groupBy({

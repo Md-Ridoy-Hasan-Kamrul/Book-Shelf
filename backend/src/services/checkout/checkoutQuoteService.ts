@@ -62,7 +62,12 @@ async function resolveLines(
     }
     const unitPrice = listing.price.toString();
     const lineTotalPaisa = toPaisa(unitPrice) * BigInt(item.qty);
-    const commissionBps = await resolveCommissionBps(listing.sellerType, listing.book.genre.slug);
+    const commissionBps = await resolveCommissionBps({
+      sellerType: listing.sellerType,
+      sellerId: listing.sellerId,
+      genreSlug: listing.book.genre.slug,
+      isUsed: listing.isUsed,
+    });
     const sellerName =
       listing.vendor?.shopName ?? listing.seller.displayName ?? listing.seller.name ?? 'Seller';
     lines.push({

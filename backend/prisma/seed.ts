@@ -123,10 +123,12 @@ async function main() {
     await prisma.commissionRule.create({
       data: {
         name: rule.name,
-        sellerType: rule.sellerType ?? undefined,
-        genreSlug: rule.genreSlug,
+        scope: rule.scope,
+        scopeRef: rule.scopeRef,
         bps: rule.bps,
         priority: rule.priority,
+        validFrom: rule.validFrom,
+        validTo: rule.validTo,
         active: true,
       },
     });
@@ -177,8 +179,9 @@ async function main() {
     },
   });
 
+  // First 10 publishers are founding (Appendix D launch offer 2–4%).
   const publisherUsers = await Promise.all(
-    Array.from({ length: 5 }, async (_, i) => {
+    Array.from({ length: 10 }, async (_, i) => {
       const id = randomUUID();
       const user = await prisma.user.create({
         data: {
@@ -194,7 +197,8 @@ async function main() {
           userId: id,
           businessName: `Publisher House ${i + 1}`,
           slug: `publisher-${i + 1}`,
-          verified: i < 3,
+          verified: i < 5,
+          founding: true,
         },
       });
       return { user, profile };

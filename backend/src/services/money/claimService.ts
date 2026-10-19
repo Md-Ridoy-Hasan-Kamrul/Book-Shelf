@@ -24,8 +24,7 @@ export async function openOrderClaim(
   }
   if (order.claim) throw new AppError('CONFLICT', 'Claim already exists', 409);
 
-  const windowDays = await getSystemSetting<number>('claim_window_days', 3);
-  const windowHours = await getSystemSetting<number>('claim_window_hours', windowDays * 24);
+  const windowHours = await getSystemSetting<number>('claim_window_hours', 48);
   const deliveredAt = order.deliveredAt ?? order.updatedAt;
   const deadline = deliveredAt.getTime() + windowHours * 60 * 60 * 1000;
   if (appNow(env).getTime() > deadline) {

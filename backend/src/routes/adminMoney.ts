@@ -76,7 +76,7 @@ export function createAdminMoneyRouter(auth: BookVerseAuth, env: ApiEnv) {
     requireRole('ADMIN'),
     async (req, res, next) => {
       try {
-        await confirmCodRemit(paramId(req.params.orderId));
+        await confirmCodRemit(paramId(req.params.orderId), env);
         res.json(successEnvelope({ remitted: true }));
       } catch (err) {
         next(err);

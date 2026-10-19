@@ -203,6 +203,8 @@ export async function fetchAdminMarginWarnings() {
     price: z.string(),
     commissionBps: z.number(),
     netMarginBps: z.number(),
+    floorBdt: z.string().optional(),
+    commissionBdt: z.string().optional(),
   });
   return listEnvelope(row).parse(json).data;
 }

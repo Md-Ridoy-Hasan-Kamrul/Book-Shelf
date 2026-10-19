@@ -3,6 +3,7 @@ import type { Prisma } from '@prisma/client';
 import { appNow } from '../../lib/clock.js';
 import { prisma } from '../../lib/prisma.js';
 import { getSystemSetting } from '../settings/systemSettingsService.js';
+import { codEscrowStart, escrowAvailableAt } from './escrowTiming.js';
 
 export async function onOrderDelivered(
   tx: Prisma.TransactionClient,
@@ -14,8 +15,19 @@ export async function onOrderDelivered(
     where: { id: orderId },
     data: { deliveredAt },
   });
+
   const escrowDays = await getSystemSetting<number>('escrow_days', 7);
-  const availableAt = new Date(deliveredAt.getTime() + escrowDays * 24 * 60 * 60 * 1000);
+  const order = await tx.order.findUniqueOrThrow({
+    where: { id: orderId },
+    include: { shipment: { select: { codRemittedAt: true } } },
+  });
+
+  let start = deliveredAt;
+  if (order.paymentMethod === 'COD' && order.shipment?.codRemittedAt) {
+    start = codEscrowStart(deliveredAt, order.shipment.codRemittedAt);
+  }
+  const availableAt = escrowAvailableAt(start, escrowDays);
+
   await tx.ledgerEntry.updateMany({
     where: {
       orderId,

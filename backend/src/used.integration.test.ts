@@ -16,8 +16,13 @@ describe.runIf(runDb)('used-book marketplace (P13)', () => {
     HEALTH_SKIP_INFRA: 'false',
   });
 
-  it('used listing stock is 1 and commission is 10% (USER)', async () => {
-    const bps = await resolveCommissionBps('USER', 'fiction');
+  it('used listing stock is 1 and commission is 10% (LISTING USED)', async () => {
+    const bps = await resolveCommissionBps({
+      sellerType: 'USER',
+      sellerId: 'unused',
+      genreSlug: 'fiction',
+      isUsed: true,
+    });
     expect(bps).toBe(1000);
     const { sellerPaisa, commissionPaisa } = splitCommission(toPaisa('500.00'), bps);
     expect(commissionPaisa + sellerPaisa).toBe(toPaisa('500.00'));

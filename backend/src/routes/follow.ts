@@ -6,7 +6,10 @@ import { clientIp, consumeRateLimit } from '../lib/rateLimit.js';
 import { requireAuth, type AuthedRequest } from '../middleware/requireAuth.js';
 import { paramId } from '../lib/params.js';
 import { blockUser } from '../services/blockService.js';
-import { followUser, unfollowUser } from '../services/followService.js';
+import { bumpMassFollowRisk, followUser, unfollowUser } from '../services/followService.js';
+
+/** Follows in a 1h window above this raise trustScore risk (never auto-ban). */
+const MASS_FOLLOW_RISK_THRESHOLD = 25;
 
 export function createFollowRouter(auth: BookVerseAuth, env: ApiEnv) {
   const router = Router();
@@ -14,8 +17,11 @@ export function createFollowRouter(auth: BookVerseAuth, env: ApiEnv) {
   router.post('/:id/follow', requireAuth(auth), async (req, res, next) => {
     try {
       const actor = (req as AuthedRequest).user;
-      await consumeRateLimit(env, `rl:follow:${actor.id}`, 50, 3600);
+      const count = await consumeRateLimit(env, `rl:follow:${actor.id}`, 50, 3600);
       const data = await followUser(env, actor.id, paramId(req.params.id));
+      if (count > MASS_FOLLOW_RISK_THRESHOLD) {
+        await bumpMassFollowRisk(actor.id);
+      }
       res.status(201).json(successEnvelope(data));
     } catch (err) {
       next(err);

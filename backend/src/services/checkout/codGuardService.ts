@@ -11,9 +11,9 @@ export async function assertCodAllowed(user: User, orderTotalBdt: string): Promi
     reasons.push('Phone number must be verified for COD');
   }
 
-  const trustMin = await getSystemSetting<number>('cod_trust_score_min', 50);
+  const trustMin = await getSystemSetting<number>('cod_min_trust', 30);
   if (user.trustScore < trustMin) {
-    reasons.push(`Trust score must be at least ${trustMin}`);
+    reasons.push(`Trust score must be at least ${trustMin} (prepaid only below threshold)`);
   }
 
   if (user.rtoCount >= 3) {
@@ -31,7 +31,7 @@ export async function assertCodAllowed(user: User, orderTotalBdt: string): Promi
       status: { notIn: ['CANCELLED'] },
     },
   });
-  const newUserMax = await getMoneySetting('cod_new_user_max_bdt', '2000.00');
+  const newUserMax = await getMoneySetting('cod_new_user_cap', '1500.00');
   if (priorOrders === 0 && toPaisa(orderTotalBdt) > toPaisa(newUserMax)) {
     reasons.push(`First COD order cannot exceed ${newUserMax} BDT`);
   }

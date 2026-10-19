@@ -8,45 +8,74 @@ export type FollowUser = {
 };
 
 export type FollowContext = {
+  /** True when target already follows actor (required for WRITER → USER). */
+  actorIsFollowedByTarget: boolean;
+  /** Either-direction block. */
   blocked: boolean;
 };
 
-export type CanFollowReason =
-  'OK' | 'SELF' | 'BLOCKED' | 'ACTOR_INACTIVE' | 'TARGET_INACTIVE' | 'ROLE_POLICY';
+export type CanFollowResult =
+  { allow: true } | { allow: false; code: 'NOT_ALLOWED' | 'FOLLOW_BACK_ONLY' };
 
-const MATRIX: Record<UserRole, ReadonlySet<UserRole>> = {
-  USER: new Set(['USER', 'WRITER', 'PUBLISHER', 'VENDOR']),
-  WRITER: new Set(['USER', 'WRITER', 'PUBLISHER', 'VENDOR']),
-  PUBLISHER: new Set(['WRITER', 'PUBLISHER', 'VENDOR']),
-  VENDOR: new Set(['USER', 'WRITER', 'PUBLISHER', 'VENDOR']),
-  ADMIN: new Set(['USER', 'WRITER', 'PUBLISHER', 'VENDOR', 'ADMIN', 'MODERATOR']),
-  MODERATOR: new Set(['USER', 'WRITER', 'PUBLISHER', 'VENDOR', 'MODERATOR']),
-  // FEATURE_RIDER=false — no social graph until rider module ships
-  RIDER: new Set(),
-};
+function allow(): { allow: true } {
+  return { allow: true };
+}
 
+function deny(code: 'NOT_ALLOWED' | 'FOLLOW_BACK_ONLY'): {
+  allow: false;
+  code: 'NOT_ALLOWED' | 'FOLLOW_BACK_ONLY';
+} {
+  return { allow: false, code };
+}
+
+function roleIn(role: UserRole, allowed: readonly UserRole[]): boolean {
+  return allowed.includes(role);
+}
+
+/**
+ * Appendix B follow policy — enforced server-side.
+ * UI hiding is never security.
+ */
 export function canFollow(
   actor: FollowUser,
   target: FollowUser,
   ctx: FollowContext,
-): { allowed: boolean; reason: CanFollowReason } {
-  if (actor.id === target.id) {
-    return { allowed: false, reason: 'SELF' };
+): CanFollowResult {
+  if (actor.id === target.id || ctx.blocked) {
+    return deny('NOT_ALLOWED');
   }
-  if (ctx.blocked) {
-    return { allowed: false, reason: 'BLOCKED' };
+  if (actor.bannedAt || actor.deletedAt || target.bannedAt || target.deletedAt) {
+    return deny('NOT_ALLOWED');
   }
-  if (actor.bannedAt || actor.deletedAt) {
-    return { allowed: false, reason: 'ACTOR_INACTIVE' };
+  if (target.role === 'ADMIN' || target.role === 'RIDER') {
+    return deny('NOT_ALLOWED');
   }
-  if (target.bannedAt || target.deletedAt) {
-    return { allowed: false, reason: 'TARGET_INACTIVE' };
+
+  switch (actor.role) {
+    case 'USER':
+      return roleIn(target.role, ['USER', 'WRITER', 'PUBLISHER', 'VENDOR'])
+        ? allow()
+        : deny('NOT_ALLOWED');
+    case 'WRITER':
+      if (target.role === 'USER') {
+        return ctx.actorIsFollowedByTarget ? allow() : deny('FOLLOW_BACK_ONLY');
+      }
+      return roleIn(target.role, ['WRITER', 'PUBLISHER']) ? allow() : deny('NOT_ALLOWED');
+    case 'PUBLISHER':
+      return roleIn(target.role, ['WRITER', 'PUBLISHER']) ? allow() : deny('NOT_ALLOWED');
+    // VENDOR, ADMIN, MODERATOR, RIDER → nobody
+    default:
+      return deny('NOT_ALLOWED');
   }
-  if (!MATRIX[actor.role].has(target.role)) {
-    return { allowed: false, reason: 'ROLE_POLICY' };
-  }
-  return { allowed: true, reason: 'OK' };
 }
 
-/** All actor × target role pairs for exhaustive tests (Appendix B). */
-export const ALL_USER_ROLES = Object.keys(MATRIX) as UserRole[];
+/** All roles for exhaustive matrix tests. */
+export const ALL_USER_ROLES: UserRole[] = [
+  'USER',
+  'WRITER',
+  'PUBLISHER',
+  'VENDOR',
+  'ADMIN',
+  'MODERATOR',
+  'RIDER',
+];

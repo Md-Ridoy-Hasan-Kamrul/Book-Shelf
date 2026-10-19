@@ -132,7 +132,11 @@ function AdminDashboardInner() {
                         key={w.listingId}
                         className="rounded border border-sun-200 bg-sun-100 px-2 py-1 text-sun-800"
                       >
-                        {w.bookTitle} — net {w.netMarginBps} bps (৳{w.price})
+                        {w.bookTitle} — commission {w.commissionBps} bps
+                        {w.commissionBdt && w.floorBdt
+                          ? ` (৳${w.commissionBdt} < floor ৳${w.floorBdt})`
+                          : ''}{' '}
+                        · ৳{w.price}
                       </li>
                     ))}
                   </ul>

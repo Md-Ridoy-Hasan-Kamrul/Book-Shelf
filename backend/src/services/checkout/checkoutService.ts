@@ -7,6 +7,7 @@ import { AppError } from '../../lib/appError.js';
 import { prisma } from '../../lib/prisma.js';
 import { assertCodAllowed } from './codGuardService.js';
 import { buildCheckoutQuote } from './checkoutQuoteService.js';
+import { assertCommissionCoversFeeAndMargin } from './marginGuard.js';
 import { reserveListingStock } from './stockReservationService.js';
 import { transitionOrderStatus } from '../order/orderStateMachine.js';
 import { getSystemSetting } from '../settings/systemSettingsService.js';
@@ -146,6 +147,7 @@ export async function performCheckout(
           line.lineTotalPaisa,
           line.commissionBps,
         );
+        await assertCommissionCoversFeeAndMargin(line.lineTotalPaisa, commissionPaisa);
         await tx.orderLineItem.create({
           data: {
             orderId: order.id,
