@@ -96,27 +96,27 @@ function AdminDashboardInner() {
             {kpis.data && (
               <>
                 <dl className="grid grid-cols-2 gap-2">
-                  <div className="rounded-[var(--radius-card)] border border-line p-3">
+                  <div className="rounded-(--radius-card) border border-line p-3">
                     <dt className="text-ink-500">GMV</dt>
                     <dd className="text-lg font-bold">৳{kpis.data.gmvBdt}</dd>
                   </div>
-                  <div className="rounded-[var(--radius-card)] border border-line p-3">
+                  <div className="rounded-(--radius-card) border border-line p-3">
                     <dt className="text-ink-500">Orders</dt>
                     <dd className="text-lg font-bold">{kpis.data.orderCount}</dd>
                   </div>
-                  <div className="rounded-[var(--radius-card)] border border-line p-3">
+                  <div className="rounded-(--radius-card) border border-line p-3">
                     <dt className="text-ink-500">AOV</dt>
                     <dd className="text-lg font-bold">৳{kpis.data.aovBdt}</dd>
                   </div>
-                  <div className="rounded-[var(--radius-card)] border border-line p-3">
+                  <div className="rounded-(--radius-card) border border-line p-3">
                     <dt className="text-ink-500">Take rate</dt>
                     <dd className="text-lg font-bold">{kpis.data.takeRatePct}%</dd>
                   </div>
-                  <div className="rounded-[var(--radius-card)] border border-line p-3">
+                  <div className="rounded-(--radius-card)er border-line p-3">
                     <dt className="text-ink-500">RTO rate</dt>
                     <dd>{kpis.data.rtoRatePct}%</dd>
                   </div>
-                  <div className="rounded-[var(--radius-card)] border border-line p-3">
+                  <div className="rounded-(--radius-card) border border-line p-3">
                     <dt className="text-ink-500">Claim rate</dt>
                     <dd>{kpis.data.claimRatePct}%</dd>
                   </div>
@@ -153,7 +153,7 @@ function AdminDashboardInner() {
             )}
             <ul className="list-none space-y-2 p-0">
               {apps.data?.items.map((a) => (
-                <li key={a.id} className="rounded-[var(--radius-card)] border border-line p-3">
+                <li key={a.id} className="rounded-(--radius-card) border border-line p-3">
                   <strong>{a.type}</strong> — {a.userName} ({a.userEmail})
                   <div className="text-ink-500">{a.status}</div>
                 </li>
@@ -167,7 +167,7 @@ function AdminDashboardInner() {
             {orders.data?.items.map((o) => (
               <li
                 key={o.id}
-                className="flex justify-between rounded-[var(--radius-card)] border border-line p-3"
+                className="flex justify-between rounded-(--radius-card)er border-line p-3"
               >
                 <span>{o.sellerName}</span>
                 <span>
@@ -181,7 +181,7 @@ function AdminDashboardInner() {
         {tab === 'claims' && (
           <ul className="list-none space-y-3 p-0">
             {claims.data?.items.map((c) => (
-              <li key={c.id} className="rounded-[var(--radius-card)] border border-line p-3">
+              <li key={c.id} className="rounded-(--radius-card) border border-line p-3">
                 <div className="font-semibold">
                   {c.status} · {c.buyerName} → {c.sellerName}
                 </div>
@@ -207,7 +207,7 @@ function AdminDashboardInner() {
             {payouts.data?.items.map((p) => (
               <li
                 key={p.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius-card)] border border-line p-3"
+                className="flex flex-wrap items-center justify-between gap-2 rounded-(--radius-card) border border-line p-3"
               >
                 <span>
                   {p.ownerName} · ৳{p.amount}
@@ -216,7 +216,7 @@ function AdminDashboardInner() {
                 {p.status === 'PENDING' && (
                   <button
                     type="button"
-                    className="rounded-[var(--radius-card)] bg-leaf-600 px-2 py-1 text-xs font-semibold text-paper"
+                    className="rounded-(--radius-card) bg-leaf-600 px-2 py-1 text-xs font-semibold text-paper"
                     onClick={() => approvePayout.mutate(p.id)}
                   >
                     Approve
