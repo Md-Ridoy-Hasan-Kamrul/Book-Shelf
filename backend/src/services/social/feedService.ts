@@ -1,13 +1,13 @@
 import type { ApiEnv } from '@bookverse/shared';
-import { Redis } from 'ioredis';
 import { prisma } from '../../lib/prisma.js';
+import { createBullmqConnection } from '../../lib/bullmqConnection.js';
 import { cursorWhere, encodeCursor } from '../../lib/cursorPagination.js';
 import { mapPostsToCards, type PostCard } from './postService.js';
 
 const TRENDING_KEY = 'feed:trending:v1';
 
 function redis(env: ApiEnv) {
-  return new Redis(env.REDIS_URL, { maxRetriesPerRequest: null });
+  return createBullmqConnection(env);
 }
 
 export async function rebuildTrendingCache(env: ApiEnv): Promise<string[]> {

@@ -1,5 +1,6 @@
 import { loadApiEnv } from './env.js';
 import { createLogger } from './lib/logger.js';
+import { pingRedis } from './lib/bullmqConnection.js';
 import { getCheckoutQueue, startCheckoutWorker, closeCheckoutQueue } from './jobs/checkoutQueue.js';
 import {
   getMoneyQueue,
@@ -39,36 +40,47 @@ if (env.NODE_ENV === 'test' && env.HEALTH_SKIP_INFRA) {
   process.exit(0);
 }
 
-getCheckoutQueue(env);
-getMoneyQueue(env);
-getCourierQueue(env);
-getNotificationQueue(env);
-getFeedQueue(env);
-getBadgeQueue(env);
+const redisOk = await pingRedis(env);
 
-startCheckoutWorker(env, logger);
-startMoneyWorker(env, logger);
-void scheduleMoneyJobs(env);
-startCourierWorker(env, logger);
-void scheduleCourierPoll(env);
-startNotificationWorker(env, logger);
-startFeedWorker(env, logger);
-void scheduleTrendingRebuild(env);
-startBadgeWorker(env, logger);
-void scheduleNightlyBadges(env);
+if (!redisOk) {
+  logger.error(
+    { redisUrl: env.REDIS_URL },
+    'Redis unreachable — worker idle. Install Docker Desktop, then: pnpm docker:up (and restart)',
+  );
+  // Stay alive so `tsx watch` does not restart-spam; Ctrl+C to quit.
+  setInterval(() => {}, 60_000);
+} else {
+  getCheckoutQueue(env);
+  getMoneyQueue(env);
+  getCourierQueue(env);
+  getNotificationQueue(env);
+  getFeedQueue(env);
+  getBadgeQueue(env);
 
-logger.info('BookVerse worker process started (BullMQ)');
+  startCheckoutWorker(env, logger);
+  startMoneyWorker(env, logger);
+  void scheduleMoneyJobs(env);
+  startCourierWorker(env, logger);
+  void scheduleCourierPoll(env);
+  startNotificationWorker(env, logger);
+  startFeedWorker(env, logger);
+  void scheduleTrendingRebuild(env);
+  startBadgeWorker(env, logger);
+  void scheduleNightlyBadges(env);
 
-async function shutdown(signal: string) {
-  logger.info({ signal }, 'Worker graceful shutdown');
-  await closeBadgeQueue();
-  await closeFeedQueue();
-  await closeNotificationQueue();
-  await closeCourierQueue();
-  await closeMoneyQueue();
-  await closeCheckoutQueue();
-  process.exit(0);
+  logger.info('BookVerse worker process started (BullMQ)');
+
+  async function shutdown(signal: string) {
+    logger.info({ signal }, 'Worker graceful shutdown');
+    await closeBadgeQueue();
+    await closeFeedQueue();
+    await closeNotificationQueue();
+    await closeCourierQueue();
+    await closeMoneyQueue();
+    await closeCheckoutQueue();
+    process.exit(0);
+  }
+
+  process.on('SIGINT', () => void shutdown('SIGINT'));
+  process.on('SIGTERM', () => void shutdown('SIGTERM'));
 }
-
-process.on('SIGINT', () => void shutdown('SIGINT'));
-process.on('SIGTERM', () => void shutdown('SIGTERM'));

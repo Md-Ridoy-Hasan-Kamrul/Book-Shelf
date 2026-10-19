@@ -1,7 +1,7 @@
 import { Queue, Worker } from 'bullmq';
-import { Redis } from 'ioredis';
 import type { ApiEnv } from '@bookverse/shared';
 import type { Logger } from '../lib/logger.js';
+import { createBullmqConnection } from '../lib/bullmqConnection.js';
 import { createCourierProvider } from '../providers/courier/index.js';
 import { applyTrackingPoll } from '../services/courier/courierWebhookService.js';
 import { createShipmentForOrder } from '../services/courier/shipmentService.js';
@@ -13,7 +13,7 @@ let queue: Queue | null = null;
 let worker: Worker | null = null;
 
 function connection(env: ApiEnv) {
-  return new Redis(env.REDIS_URL, { maxRetriesPerRequest: null });
+  return createBullmqConnection(env);
 }
 
 export function getCourierQueue(env: ApiEnv): Queue {

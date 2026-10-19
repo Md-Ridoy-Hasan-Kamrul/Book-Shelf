@@ -1,7 +1,7 @@
 import { Queue, Worker } from 'bullmq';
-import { Redis } from 'ioredis';
 import type { ApiEnv } from '@bookverse/shared';
 import type { Logger } from '../lib/logger.js';
+import { createBullmqConnection } from '../lib/bullmqConnection.js';
 import { recomputeBadges } from '../services/points/badgeService.js';
 
 const QUEUE_NAME = 'badges';
@@ -10,7 +10,7 @@ let queue: Queue | null = null;
 let worker: Worker | null = null;
 
 function connection(env: ApiEnv) {
-  return new Redis(env.REDIS_URL, { maxRetriesPerRequest: null });
+  return createBullmqConnection(env);
 }
 
 export function getBadgeQueue(env: ApiEnv): Queue {

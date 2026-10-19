@@ -15,6 +15,7 @@
     "typecheck": "prisma generate && tsc --noEmit",
     "lint": "eslint src",
     "test": "vitest run",
+    "test:watch": "vitest",
     "db:generate": "tsx --env-file-if-exists=../.env prisma/run-prisma.ts generate",
     "db:validate": "tsx --env-file-if-exists=../.env prisma/run-prisma.ts validate",
     "db:migrate": "tsx --env-file-if-exists=../.env prisma/run-prisma.ts migrate deploy",

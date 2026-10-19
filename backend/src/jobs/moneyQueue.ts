@@ -1,7 +1,7 @@
 import { Queue, Worker } from 'bullmq';
-import { Redis } from 'ioredis';
 import type { ApiEnv } from '@bookverse/shared';
 import type { Logger } from '../lib/logger.js';
+import { createBullmqConnection } from '../lib/bullmqConnection.js';
 import { releaseDueEscrowEntries } from '../services/money/escrowService.js';
 import { reconcileOrdersVsLedger } from '../services/money/reconcileService.js';
 
@@ -11,7 +11,7 @@ let queue: Queue | null = null;
 let worker: Worker | null = null;
 
 function connection(env: ApiEnv) {
-  return new Redis(env.REDIS_URL, { maxRetriesPerRequest: null });
+  return createBullmqConnection(env);
 }
 
 export function getMoneyQueue(env: ApiEnv): Queue {

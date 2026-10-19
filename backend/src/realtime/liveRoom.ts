@@ -1,9 +1,9 @@
 import type { Server as HttpServer } from 'node:http';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { Redis } from 'ioredis';
 import { Server, type Socket } from 'socket.io';
 import type { ApiEnv } from '@bookverse/shared';
 import type { Logger } from '../lib/logger.js';
+import { createBullmqConnection } from '../lib/bullmqConnection.js';
 import { prisma } from '../lib/prisma.js';
 import { isBannedFromEvent } from '../services/writer/liveEventService.js';
 import { consumeRateLimit } from '../lib/rateLimit.js';
@@ -31,8 +31,8 @@ export function attachLiveRoom(httpServer: HttpServer, env: ApiEnv, logger: Logg
   });
 
   try {
-    const pub = new Redis(env.REDIS_URL, { maxRetriesPerRequest: null });
-    const sub = pub.duplicate();
+    const pub = createBullmqConnection(env);
+    const sub = createBullmqConnection(env);
     io.adapter(createAdapter(pub, sub));
     logger.info('Socket.io Redis adapter attached');
   } catch (err) {

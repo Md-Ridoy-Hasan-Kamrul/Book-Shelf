@@ -20,14 +20,17 @@ packages/shared/   # Zod schemas, env, HTTP envelopes
 
 ## Prerequisites
 
-- Node `>=22.12.0`, pnpm 10, Docker (Postgres, Redis, Mailpit)
+- Node `>=22.12.0`, pnpm 10, **Docker Desktop** (Postgres, Redis, Mailpit)
+
+Without Docker, `pnpm dev` still starts the Astro web app, but API/worker need Redis `:6379` and Postgres `:5432`. You will see an infra banner from `scripts/check-infra.mjs`; worker stays idle instead of flooding the terminal with `ECONNREFUSED`.
 
 ## Setup
 
 ```bash
 cp .env.example .env
 pnpm install
-docker compose up -d
+# Start Docker Desktop first, then:
+pnpm docker:up
 pnpm db:migrate
 pnpm db:seed
 pnpm dev

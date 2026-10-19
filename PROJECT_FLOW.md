@@ -6,6 +6,7 @@ Check off after each prompt’s ACCEPTANCE passes.
 
 - [x] P1 — Monorepo, Docker, ESLint/Prettier/Husky, shared tsup, API health (db+redis), providers, CI
 - [x] P2 — Base.astro shell, UI kit, `/design` guide, stores, apiClient
+- [x] Dev infra guard — `scripts/check-infra.mjs` + worker Redis preflight (no ECONNREFUSED spam); `FEATURE_*=false` env parsed correctly (`boolish`)
 
 ## B · Data + Auth (P3–4)
 

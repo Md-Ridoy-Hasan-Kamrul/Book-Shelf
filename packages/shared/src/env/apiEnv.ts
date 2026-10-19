@@ -1,5 +1,15 @@
 import { z } from 'zod';
 
+/** Env strings: only "true"/"1" are true — Boolean("false") must not become true. */
+const boolish = z
+  .union([z.boolean(), z.string()])
+  .optional()
+  .transform((v) => {
+    if (v === undefined) return false;
+    if (typeof v === 'boolean') return v;
+    return v === 'true' || v === '1';
+  });
+
 const providerEnum = (name: string, values: readonly [string, ...string[]]) =>
   z
     .string()
@@ -35,12 +45,12 @@ export const ApiEnvSchema = z.object({
   R2_ACCESS_KEY_ID: z.string().default(''),
   R2_SECRET_ACCESS_KEY: z.string().default(''),
   R2_BUCKET: z.string().default(''),
-  FEATURE_RIDER: z.coerce.boolean().default(false),
-  FEATURE_LIVE_EVENTS: z.coerce.boolean().default(false),
-  FEATURE_SPONSORED: z.coerce.boolean().default(false),
-  FEATURE_MOOD_LLM: z.coerce.boolean().default(false),
-  FEATURE_USED_BOOKS: z.coerce.boolean().default(false),
-  HEALTH_SKIP_INFRA: z.coerce.boolean().default(false),
+  FEATURE_RIDER: boolish,
+  FEATURE_LIVE_EVENTS: boolish,
+  FEATURE_SPONSORED: boolish,
+  FEATURE_MOOD_LLM: boolish,
+  FEATURE_USED_BOOKS: boolish,
+  HEALTH_SKIP_INFRA: boolish,
   SMTP_HOST: z.string().default('localhost'),
   SMTP_PORT: z.coerce.number().int().positive().default(1025),
   SMTP_FROM: z.string().email().default('noreply@bookverse.local'),
