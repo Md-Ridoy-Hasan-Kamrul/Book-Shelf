@@ -10,9 +10,9 @@ import {
   fetchSellerPayouts,
   packSellerOrder,
 } from '../../lib/dashboardApi';
+import { useMockData } from '../../lib/mockMode';
+import { SELLER_ROLE_UI, type SellerRole, type SellerTab } from '../../lib/sellerRoleUi';
 import SellerCatalogForm from './SellerCatalogForm';
-
-type Tab = 'overview' | 'inventory' | 'orders' | 'earnings' | 'payouts' | 'claims';
 
 function SkeletonRows() {
   return (
@@ -24,33 +24,61 @@ function SkeletonRows() {
   );
 }
 
-function SellerDashboardInner() {
-  const [tab, setTab] = useState<Tab>('overview');
-  const qc = useQueryClient();
+type Props = {
+  role: SellerRole;
+};
 
-  const overview = useQuery({ queryKey: ['seller', 'overview'], queryFn: fetchSellerOverview });
+function SellerDashboardInner({ role }: Props) {
+  const ui = SELLER_ROLE_UI[role];
+  const [tab, setTab] = useState<SellerTab>('overview');
+  const qc = useQueryClient();
+  const mock = useMockData();
+
+  const overview = useQuery({
+    queryKey: ['seller', 'overview', role],
+    queryFn: async () => {
+      if (mock) return ui.overview;
+      return fetchSellerOverview();
+    },
+  });
   const listings = useQuery({
-    queryKey: ['seller', 'listings'],
-    queryFn: () => fetchSellerListings(),
+    queryKey: ['seller', 'listings', role],
+    queryFn: async () => {
+      if (mock) {
+        return {
+          items: ui.sampleListings.map((l, i) => ({
+            id: `mock-${role.toLowerCase()}-${i}`,
+            bookTitle: l.title,
+            price: l.price,
+            stock: l.stock,
+            reservedQty: 0,
+            status: 'ACTIVE',
+            updatedAt: new Date().toISOString(),
+          })),
+          nextCursor: null as string | null,
+        };
+      }
+      return fetchSellerListings();
+    },
     enabled: tab === 'inventory',
   });
   const orders = useQuery({
-    queryKey: ['seller', 'orders', 'to_pack'],
+    queryKey: ['seller', 'orders', 'to_pack', role],
     queryFn: () => fetchSellerOrders('to_pack'),
     enabled: tab === 'orders',
   });
   const earnings = useQuery({
-    queryKey: ['seller', 'earnings'],
+    queryKey: ['seller', 'earnings', role],
     queryFn: fetchSellerEarnings,
     enabled: tab === 'earnings',
   });
   const payouts = useQuery({
-    queryKey: ['seller', 'payouts'],
+    queryKey: ['seller', 'payouts', role],
     queryFn: fetchSellerPayouts,
     enabled: tab === 'payouts',
   });
   const claims = useQuery({
-    queryKey: ['seller', 'claims'],
+    queryKey: ['seller', 'claims', role],
     queryFn: fetchSellerClaims,
     enabled: tab === 'claims',
   });
@@ -63,23 +91,33 @@ function SellerDashboardInner() {
     },
   });
 
-  const tabs: { id: Tab; label: string }[] = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'inventory', label: 'Inventory' },
-    { id: 'orders', label: 'Orders' },
-    { id: 'earnings', label: 'Earnings' },
-    { id: 'payouts', label: 'Payouts' },
-    { id: 'claims', label: 'Claims' },
-  ];
-
   return (
     <div className="pb-24">
-      <nav className="flex flex-wrap gap-2" aria-label="Seller sections">
-        {tabs.map((t) => (
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <span
+          className={`inline-flex rounded-[var(--radius-card)] px-2.5 py-1 text-xs font-bold ${ui.badgeClass}`}
+        >
+          {ui.badge}
+        </span>
+        <p className="m-0 text-sm text-ink-500">{ui.blurb}</p>
+      </div>
+      {ui.growthLink ? (
+        <p className="mb-4 text-sm">
+          <a
+            href={ui.growthLink}
+            className="font-semibold text-brand-700 no-underline hover:underline"
+          >
+            Open growth &amp; sponsored tools →
+          </a>
+        </p>
+      ) : null}
+
+      <nav className="flex flex-wrap gap-2" aria-label={`${ui.badge} sections`}>
+        {ui.tabs.map((t) => (
           <button
             key={t.id}
             type="button"
-            className={`rounded-full px-3 py-1.5 text-sm font-semibold ${
+            className={`cursor-pointer rounded-[var(--radius-card)] px-3 py-1.5 text-sm font-semibold ${
               tab === t.id ? 'bg-brand-600 text-paper' : 'bg-sand text-ink-700'
             }`}
             onClick={() => setTab(t.id)}
@@ -104,15 +142,17 @@ function SellerDashboardInner() {
             {overview.data && (
               <dl className="grid grid-cols-2 gap-3 text-sm">
                 <div className="rounded-[var(--radius-card)] border border-line bg-paper p-3">
-                  <dt className="text-ink-500">Orders</dt>
+                  <dt className="text-ink-500">{role === 'WRITER' ? 'Title sales' : 'Orders'}</dt>
                   <dd className="text-xl font-bold text-ink-900">{overview.data.ordersTotal}</dd>
                 </div>
                 <div className="rounded-[var(--radius-card)] border border-line bg-paper p-3">
-                  <dt className="text-ink-500">To pack</dt>
+                  <dt className="text-ink-500">{ui.ordersLabel}</dt>
                   <dd className="text-xl font-bold text-ink-900">{overview.data.ordersToPack}</dd>
                 </div>
                 <div className="rounded-[var(--radius-card)] border border-line bg-paper p-3">
-                  <dt className="text-ink-500">Sales (30d)</dt>
+                  <dt className="text-ink-500">
+                    {role === 'WRITER' ? 'Royalties (30d)' : 'Sales (30d)'}
+                  </dt>
                   <dd className="text-xl font-bold text-ink-900">
                     ৳{overview.data.salesLast30DaysBdt}
                   </dd>
@@ -122,7 +162,9 @@ function SellerDashboardInner() {
                   <dd className="text-xl font-bold text-ink-900">{overview.data.openClaims}</dd>
                 </div>
                 <div className="col-span-2 rounded-[var(--radius-card)] border border-line bg-leaf-50 p-3">
-                  <dt className="text-ink-500">Balance</dt>
+                  <dt className="text-ink-500">
+                    {role === 'WRITER' ? 'Royalty balance' : 'Balance'}
+                  </dt>
                   <dd className="font-semibold text-ink-900">
                     Pending ৳{overview.data.balancePendingBdt} · Available ৳
                     {overview.data.balanceAvailableBdt}
@@ -135,7 +177,17 @@ function SellerDashboardInner() {
 
         {tab === 'inventory' && (
           <>
-            <SellerCatalogForm />
+            <h2 className="m-0 mb-3 font-display text-lg font-bold text-ink-900">
+              {ui.inventoryLabel}
+            </h2>
+            {role !== 'WRITER' ? (
+              <SellerCatalogForm />
+            ) : (
+              <p className="mb-3 text-sm text-ink-500">
+                Titles are linked via publisher contracts. Request a reprint from the book page when
+                stock is low.
+              </p>
+            )}
             {listings.isLoading && <SkeletonRows />}
             {listings.isError && (
               <p className="text-urgent-600">
@@ -145,7 +197,9 @@ function SellerDashboardInner() {
                 </button>
               </p>
             )}
-            {listings.data?.items.length === 0 && <p className="text-ink-500">No listings yet.</p>}
+            {listings.data?.items.length === 0 && (
+              <p className="text-ink-500">Nothing listed yet.</p>
+            )}
             <ul className="list-none space-y-2 p-0">
               {listings.data?.items.map((l) => (
                 <li
@@ -153,8 +207,8 @@ function SellerDashboardInner() {
                   className="flex justify-between gap-2 rounded-[var(--radius-card)] border border-line bg-paper px-3 py-2 text-sm"
                 >
                   <span>{l.bookTitle}</span>
-                  <span className="font-semibold">
-                    ৳{l.price} · stock {l.stock}
+                  <span className="font-semibold text-ink-700">
+                    {role === 'WRITER' ? l.price : `৳${l.price} · stock ${l.stock}`}
                   </span>
                 </li>
               ))}
@@ -164,9 +218,19 @@ function SellerDashboardInner() {
 
         {tab === 'orders' && (
           <>
+            <h2 className="m-0 mb-3 font-display text-lg font-bold text-ink-900">
+              {ui.ordersLabel}
+            </h2>
+            {role === 'WRITER' ? (
+              <p className="mb-3 text-sm text-ink-500">
+                Writers do not pack shipments — these are sales attributed to your titles.
+              </p>
+            ) : null}
             {orders.isLoading && <SkeletonRows />}
             {orders.data?.items.length === 0 && (
-              <p className="text-ink-500">No orders waiting to pack.</p>
+              <p className="text-ink-500">
+                {role === 'WRITER' ? 'No recent title sales.' : 'No orders waiting to pack.'}
+              </p>
             )}
             <ul className="list-none space-y-2 p-0">
               {orders.data?.items.map((o) => (
@@ -179,10 +243,10 @@ function SellerDashboardInner() {
                     <span>৳{o.total}</span>
                   </div>
                   <div className="text-ink-500">{o.buyerName}</div>
-                  {o.status === 'PROCESSING' && (
+                  {role !== 'WRITER' && o.status === 'PROCESSING' && (
                     <button
                       type="button"
-                      className="mt-2 rounded-[var(--radius-card)] bg-cta-500 px-3 py-1.5 text-xs font-bold text-ink-900"
+                      className="mt-2 cursor-pointer rounded-[var(--radius-card)] bg-cta-500 px-3 py-1.5 text-xs font-bold text-ink-900"
                       disabled={pack.isPending}
                       onClick={() => pack.mutate(o.id)}
                     >
@@ -197,6 +261,9 @@ function SellerDashboardInner() {
 
         {tab === 'earnings' && (
           <>
+            <h2 className="m-0 mb-3 font-display text-lg font-bold text-ink-900">
+              {ui.earningsLabel}
+            </h2>
             {earnings.isLoading && <SkeletonRows />}
             {earnings.data?.items.length === 0 && <p className="text-ink-500">No earnings yet.</p>}
             <ul className="list-none space-y-3 p-0">
@@ -261,10 +328,10 @@ function SellerDashboardInner() {
   );
 }
 
-export default function SellerDashboard() {
+export default function SellerDashboard({ role }: Props) {
   return (
     <Island>
-      <SellerDashboardInner />
+      <SellerDashboardInner role={role} />
     </Island>
   );
 }

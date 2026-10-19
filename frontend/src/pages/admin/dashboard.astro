@@ -11,7 +11,16 @@ if (me.role !== 'ADMIN') return Astro.redirect('/');
 
 <Base title="Admin dashboard" description="Platform operations and KPIs">
   <main id="main" class="mx-auto w-[min(100%-2rem,48rem)] py-8">
-    <h1 class="font-display text-2xl font-bold text-ink-900">Admin dashboard</h1>
+    <div class="mb-2">
+      <span
+        class="inline-flex rounded-[var(--radius-card)] bg-urgent-50 px-2.5 py-1 text-xs font-bold text-urgent-600"
+        >Admin</span
+      >
+    </div>
+    <h1 class="font-display text-2xl font-bold text-ink-900">Platform admin</h1>
+    <p class="text-sm text-ink-500">
+      KPIs, seller approvals, money tools — not the same as Vendor / Publisher / Writer dashboards.
+    </p>
     <div class="mt-6">
       <AdminDashboard client:load />
       <AdminDeadLetterPanel client:load />

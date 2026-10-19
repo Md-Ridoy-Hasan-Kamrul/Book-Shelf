@@ -2,19 +2,21 @@
 import Base from '../../layouts/Base.astro';
 import SellerDashboard from '../../components/islands/SellerDashboard.tsx';
 import { fetchMe } from '../../lib/session';
+import { isSellerRole, SELLER_ROLE_UI } from '../../lib/sellerRoleUi';
 
 const me = await fetchMe(Astro.request.headers.get('cookie') ?? '');
 if (!me) return Astro.redirect('/login?next=/seller/dashboard');
-const sellerRoles = ['PUBLISHER', 'VENDOR', 'WRITER'];
-if (!sellerRoles.includes(me.role)) return Astro.redirect('/');
+if (!isSellerRole(me.role)) return Astro.redirect('/');
+
+const ui = SELLER_ROLE_UI[me.role];
 ---
 
-<Base title="Seller dashboard" description="Manage inventory, orders, and earnings">
+<Base title={ui.heading} description={ui.blurb}>
   <main id="main" class="mx-auto w-[min(100%-2rem,48rem)] py-8">
-    <h1 class="font-display text-2xl font-bold text-ink-900">Seller dashboard</h1>
+    <h1 class="font-display text-2xl font-bold text-ink-900">{ui.heading}</h1>
     <p class="text-sm text-ink-500">{me.displayName ?? me.name}</p>
     <div class="mt-6">
-      <SellerDashboard client:load />
+      <SellerDashboard client:load role={me.role} />
     </div>
   </main>
 </Base>
