@@ -8,6 +8,7 @@ import { resolveCommissionBps } from './commissionService.js';
 import { formatDiscount, resolveCouponDiscount } from './couponService.js';
 import { computeShippingFeePaisa, shippingFeeDisplay } from './deliveryFeeService.js';
 import { mergeCartLines, type CartLine } from './cartLines.js';
+import { applyOffersToLines } from '../publisher/offerService.js';
 
 type QuoteInput = z.infer<typeof checkoutQuoteBodySchema>;
 
@@ -85,10 +86,25 @@ async function resolveLines(
 }
 
 export async function buildCheckoutQuote(input: QuoteInput) {
-  const { lines, issues } = await resolveLines(input.items);
-  if (lines.length === 0) {
+  const { lines: rawLines, issues } = await resolveLines(input.items);
+  if (rawLines.length === 0) {
     throw new AppError('VALIDATION_ERROR', 'No valid items in cart', 400);
   }
+
+  const offered = await applyOffersToLines(
+    rawLines.map((l) => ({
+      listingId: l.listingId,
+      unitPrice: l.unitPrice,
+      qty: l.qty,
+      lineTotalPaisa: l.lineTotalPaisa,
+    })),
+  );
+  const offerByListing = new Map(offered.lines.map((l) => [l.listingId, l]));
+  const lines = rawLines.map((l) => {
+    const o = offerByListing.get(l.listingId);
+    if (!o) return l;
+    return { ...l, unitPrice: o.unitPrice, lineTotalPaisa: o.lineTotalPaisa };
+  });
 
   let district = 'Default';
   if (input.addressId) {
@@ -153,8 +169,10 @@ export async function buildCheckoutQuote(input: QuoteInput) {
   }
 
   const coupon = await resolveCouponDiscount(input.couponCode, subtotalPaisa);
-  const discountTotalPaisa = coupon.discountPaisa;
-  const totalPaisa = subtotalPaisa + shippingTotalPaisa - discountTotalPaisa;
+  const discountTotalPaisa = coupon.discountPaisa + offered.offerDiscountPaisa;
+  const totalPaisa = subtotalPaisa + shippingTotalPaisa - coupon.discountPaisa;
+  // Flash/bundle already baked into line totals; offerDiscount is informational.
+  // total uses post-offer subtotal minus coupon only.
 
   const minOrder = await getSystemSetting<string>('min_order_bdt', '100.00');
   if (totalPaisa < toPaisa(minOrder)) {
@@ -167,7 +185,7 @@ export async function buildCheckoutQuote(input: QuoteInput) {
       coupon: input.couponCode
         ? {
             code: coupon.code || input.couponCode,
-            discount: formatDiscount(discountTotalPaisa),
+            discount: formatDiscount(coupon.discountPaisa),
             applied: coupon.applied,
             message: coupon.message,
           }
@@ -175,8 +193,10 @@ export async function buildCheckoutQuote(input: QuoteInput) {
       subtotal: fromPaisa(subtotalPaisa),
       shippingTotal: fromPaisa(shippingTotalPaisa),
       discountTotal: fromPaisa(discountTotalPaisa),
+      offerDiscount: fromPaisa(offered.offerDiscountPaisa),
       total: fromPaisa(totalPaisa),
       issues,
+      appliedOffers: offered.appliedOffers,
     },
     lines,
     subtotalPaisa,

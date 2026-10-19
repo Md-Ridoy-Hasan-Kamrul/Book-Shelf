@@ -63,6 +63,7 @@ export const bookDetailSchema = bookCardSchema.extend({
   pageCount: z.number().nullable(),
   publishedYear: z.number().nullable(),
   moodTags: z.array(z.string()),
+  genreId: z.string().optional(),
   genreName: z.string(),
   genreNameBn: z.string(),
   publisherSlug: z.string().nullable(),
@@ -70,6 +71,16 @@ export const bookDetailSchema = bookCardSchema.extend({
   writerPenName: z.string().nullable(),
   listings: z.array(bookListingSchema),
   lookInsidePages: z.array(z.string()).optional(),
+  release: z
+    .object({
+      releaseAt: z.string(),
+      preorderEnabled: z.boolean(),
+      serverNow: z.string(),
+      msUntilRelease: z.number().int(),
+    })
+    .nullable()
+    .optional(),
+  outOfStock: z.boolean().optional(),
 });
 
 export const searchSuggestSchema = z.object({

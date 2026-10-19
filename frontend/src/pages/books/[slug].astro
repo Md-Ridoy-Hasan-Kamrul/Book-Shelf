@@ -4,6 +4,9 @@ import { fetchBookBySlug } from '../../lib/catalogApi';
 import AddToCartButton from '../../components/islands/AddToCartButton.tsx';
 import WishlistButton from '../../components/islands/WishlistButton.tsx';
 import BookReviews from '../../components/islands/BookReviews.tsx';
+import ReprintRequestButton from '../../components/islands/ReprintRequestButton.tsx';
+import ReleaseCountdown from '../../components/islands/ReleaseCountdown.tsx';
+import SponsoredPlacement from '../../components/islands/SponsoredPlacement.tsx';
 
 const { slug } = Astro.params;
 if (!slug) {
@@ -99,6 +102,20 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=120, stale-while-re
         <div class="mt-4 flex flex-wrap gap-2">
           <WishlistButton client:load bookId={book.id} />
         </div>
+        <ReprintRequestButton client:load bookId={book.id} outOfStock={Boolean(book.outOfStock)} />
+        {
+          book.release && (
+            <ReleaseCountdown
+              client:load
+              bookId={book.id}
+              releaseAt={book.release.releaseAt}
+              serverNow={book.release.serverNow}
+              msUntilRelease={book.release.msUntilRelease}
+              preorderEnabled={book.release.preorderEnabled}
+            />
+          )
+        }
+        <SponsoredPlacement client:load genreId={book.genreId} />
         <p class="mt-6 max-w-2xl text-ink-700">{book.descriptionBn ?? book.description}</p>
 
         <section class="mt-8" aria-labelledby="listings-title">

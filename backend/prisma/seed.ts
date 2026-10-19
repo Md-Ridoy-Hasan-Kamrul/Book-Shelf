@@ -52,7 +52,6 @@ async function clearDatabase() {
     'SavedPost',
     'ModerationLog',
     'Post',
-    'Campaign',
     'ReadingGoal',
     'BookshelfItem',
     'MoodLog',
@@ -79,8 +78,14 @@ async function clearDatabase() {
     'CourierStatusMapping',
     'OrderStatusTransition',
     'Address',
+    'CampaignEvent',
+    'CampaignInvoice',
+    'Offer',
+    'ReleaseNotify',
+    'BookRelease',
     'Listing',
     'RoleApplication',
+    'Campaign',
     'Book',
     'WriterProfile',
     'PublisherProfile',
@@ -435,13 +440,94 @@ async function main() {
     update: { value: adminId, updatedBy: 'seed' },
   });
 
+  // P15 — sponsored campaign with deterministic events (metrics must match)
+  const pubOwner = publisherUsers[0]!.user;
+  const promoBook = books[0]!;
+  const promoListing = await prisma.listing.findFirst({
+    where: { bookId: promoBook.id, sellerId: pubOwner.id },
+  });
+  const campaign = await prisma.campaign.create({
+    data: {
+      ownerId: pubOwner.id,
+      name: 'Seed Genre Promo',
+      budget: '5000.00',
+      costBdt: '1000.00',
+      status: 'ACTIVE',
+      targetGenreIds: [promoBook.genreId],
+      followersOnly: false,
+      bookId: promoBook.id,
+      listingId: promoListing?.id,
+      startsAt: new Date(Date.now() - 7 * 86400_000),
+      endsAt: new Date(Date.now() + 30 * 86400_000),
+    },
+  });
+  const eventKinds = [
+    ...Array.from({ length: 100 }, () => 'IMPRESSION' as const),
+    ...Array.from({ length: 20 }, () => 'CLICK' as const),
+    ...Array.from({ length: 5 }, () => 'ADD_TO_CART' as const),
+    ...Array.from({ length: 2 }, () => 'PURCHASE' as const),
+  ];
+  for (let i = 0; i < eventKinds.length; i++) {
+    const kind = eventKinds[i]!;
+    await prisma.campaignEvent.create({
+      data: {
+        campaignId: campaign.id,
+        kind,
+        trackingId: `seed-track-${campaign.id}-${kind}-${i}`,
+        bookId: promoBook.id,
+        listingId: promoListing?.id,
+        amountBdt: kind === 'PURCHASE' ? '500.00' : null,
+      },
+    });
+  }
+  // Expected: CTR=0.2, conversion=0.1, revenue=1000.00, cost=1000.00, ROAS=1
+
+  await prisma.bookRelease.create({
+    data: {
+      bookId: books[1]!.id,
+      releaseAt: new Date(Date.now() + 14 * 86400_000),
+      preorderEnabled: true,
+    },
+  });
+
+  // Force one title OOS for reprint button
+  const oosBook = books[2]!;
+  await prisma.listing.updateMany({
+    where: { bookId: oosBook.id },
+    data: { stock: 0 },
+  });
+  for (let i = 0; i < 8; i++) {
+    await prisma.reprintRequest.create({
+      data: {
+        bookId: oosBook.id,
+        userId: regularUsers[i]!.id,
+        district: i % 2 === 0 ? 'Dhaka' : 'Chattogram',
+        createdAt: new Date(Date.now() - (7 - i) * 86400_000),
+      },
+    });
+  }
+
+  if (promoListing) {
+    await prisma.offer.create({
+      data: {
+        ownerId: pubOwner.id,
+        kind: 'FLASH',
+        listingId: promoListing.id,
+        flashPrice: (Number(promoListing.price) * 0.8).toFixed(2),
+        startsAt: new Date(Date.now() - 86400_000),
+        endsAt: new Date(Date.now() + 7 * 86400_000),
+        active: true,
+      },
+    });
+  }
+
   await prisma.adminAuditLog.create({
     data: {
       adminId,
       action: 'SEED_COMPLETE',
       entity: 'System',
       entityId: 'bookverse',
-      after: { books: 200, users: 50 + 5 + 10 + 3 + 1 },
+      after: { books: 200, users: 50 + 5 + 10 + 3 + 1, campaignId: campaign.id },
     },
   });
 

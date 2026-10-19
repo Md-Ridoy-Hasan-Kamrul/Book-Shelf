@@ -193,6 +193,17 @@ export async function performCheckout(
     },
   });
 
+  if (env.FEATURE_SPONSORED && body.trackingIds?.length && full.orders[0]) {
+    const { attributePurchases } = await import('../publisher/campaignService.js');
+    await attributePurchases(
+      env,
+      user.id,
+      body.trackingIds,
+      full.orders[0].id,
+      full.orders[0].total.toString(),
+    ).catch(() => undefined);
+  }
+
   return formatCheckoutResult(full);
 }
 

@@ -120,6 +120,32 @@ enum PointLedgerKind {
   EXPIRE
 }
 
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ENDED
+}
+
+enum CampaignEventKind {
+  IMPRESSION
+  CLICK
+  ADD_TO_CART
+  PURCHASE
+}
+
+enum CampaignInvoiceStatus {
+  NONE
+  DRAFT
+  SENT
+  PAID
+}
+
+enum OfferKind {
+  FLASH
+  BUNDLE
+}
+
 enum ClaimStatus {
   OPEN
   UNDER_REVIEW
@@ -293,6 +319,12 @@ model User {
   lookInsideSubmitted  BookLookInside[]      @relation("LookInsideSubmitter")
   lookInsideApproved   BookLookInside[]      @relation("LookInsideApprover")
   moodLogs             MoodLog[]
+  campaignEvents       CampaignEvent[]
+  releaseNotifies      ReleaseNotify[]
+  offersOwned          Offer[]               @relation("OfferOwner")
+  reviewsFeatured      Review[]              @relation("ReviewFeaturedBy")
+  postsFeatured        Post[]                @relation("PostFeaturedBy")
+  campaignInvoices     CampaignInvoice[]
 
   @@index([role])
   @@index([createdAt, id])
@@ -429,6 +461,9 @@ model Book {
   posts           Post[]
   reprintRequests ReprintRequest[]
   lookInside      BookLookInside?
+  release         BookRelease?
+  releaseNotifies ReleaseNotify[]
+  campaigns       Campaign[]
 
   @@index([genreId])
   @@index([publisherId])
@@ -474,6 +509,8 @@ model Listing {
 
   orderLineItems OrderLineItem[]
   sellerRatings  SellerRating[]
+  offers         Offer[]
+  campaigns      Campaign[]
 
   @@index([bookId, status])
   @@index([sellerId])
@@ -861,11 +898,15 @@ model Review {
   hasSpoiler       Boolean  @default(false)
   helpfulCount     Int      @default(0)
   isVerifiedBuyer  Boolean  @default(false)
+  featuredAt       DateTime?
+  featuredById     String?
+  featuredBy       User?    @relation("ReviewFeaturedBy", fields: [featuredById], references: [id], onDelete: SetNull)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   @@unique([userId, bookId])
   @@index([bookId, createdAt, id])
+  @@index([bookId, featuredAt])
 }
 
 model WishlistItem {
@@ -921,6 +962,9 @@ model Post {
   isSponsored   Boolean  @default(false)
   campaignId    String?
   campaign      Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  featuredAt    DateTime?
+  featuredById  String?
+  featuredBy    User?    @relation("PostFeaturedBy", fields: [featuredById], references: [id], onDelete: SetNull)
   likeCount     Int      @default(0)
   dislikeCount  Int      @default(0)
   commentCount  Int      @default(0)
@@ -1035,10 +1079,13 @@ model ReprintRequest {
   book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  district  String?
   note      String?  @db.Text
   createdAt DateTime @default(now())
 
   @@unique([bookId, userId])
+  @@index([bookId, createdAt])
+  @@index([district, createdAt])
 }
 
 model BookClub {
@@ -1065,16 +1112,106 @@ model ClubMember {
 }
 
 model Campaign {
-  id        String    @id @default(cuid())
-  ownerId   String
-  owner     User      @relation("CampaignOwner", fields: [ownerId], references: [id], onDelete: Restrict)
-  name      String
-  budget    Decimal?  @db.Decimal(12, 2)
-  startsAt  DateTime?
-  endsAt    DateTime?
-  createdAt DateTime  @default(now())
+  id              String                @id @default(cuid())
+  ownerId         String
+  owner           User                  @relation("CampaignOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  name            String
+  budget          Decimal?              @db.Decimal(12, 2)
+  costBdt         Decimal               @default(0) @db.Decimal(12, 2)
+  status          CampaignStatus        @default(DRAFT)
+  targetGenreIds  String[]              @default([])
+  followersOnly   Boolean               @default(false)
+  bookId          String?
+  book            Book?                 @relation(fields: [bookId], references: [id], onDelete: SetNull)
+  listingId       String?
+  listing         Listing?              @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  startsAt        DateTime?
+  endsAt          DateTime?
+  invoiceStatus   CampaignInvoiceStatus @default(NONE)
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
 
-  posts Post[]
+  posts    Post[]
+  events   CampaignEvent[]
+  invoices CampaignInvoice[]
+
+  @@index([ownerId, status])
+  @@index([status, startsAt, endsAt])
+}
+
+model CampaignEvent {
+  id          String            @id @default(cuid())
+  campaignId  String
+  campaign    Campaign          @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  kind        CampaignEventKind
+  trackingId  String
+  userId      String?
+  user        User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  listingId   String?
+  bookId      String?
+  orderId     String?
+  amountBdt   Decimal?          @db.Decimal(12, 2)
+  createdAt   DateTime          @default(now())
+
+  @@unique([trackingId, kind])
+  @@index([campaignId, kind, createdAt])
+}
+
+model CampaignInvoice {
+  id          String                @id @default(cuid())
+  campaignId  String
+  campaign    Campaign              @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  ownerId     String
+  owner       User                  @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  amountBdt   Decimal               @db.Decimal(12, 2)
+  status      CampaignInvoiceStatus @default(DRAFT)
+  note        String?               @db.Text
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  @@index([ownerId, createdAt, id])
+}
+
+model BookRelease {
+  id              String   @id @default(cuid())
+  bookId          String   @unique
+  book            Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  releaseAt       DateTime
+  preorderEnabled Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ReleaseNotify {
+  id        String   @id @default(cuid())
+  bookId    String
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([bookId, userId])
+}
+
+model Offer {
+  id                String    @id @default(cuid())
+  ownerId           String
+  owner             User      @relation("OfferOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  kind              OfferKind
+  listingId         String?
+  listing           Listing?  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  bundleListingIds  String[]  @default([])
+  flashPrice        Decimal?  @db.Decimal(12, 2)
+  buyQty            Int?
+  freeQty           Int?
+  startsAt          DateTime
+  endsAt            DateTime
+  active            Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([kind, active, startsAt, endsAt])
+  @@index([listingId, active])
 }
 
 // ─── Notifications ───────────────────────────────────────────────────────────

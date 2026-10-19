@@ -61,3 +61,10 @@ pnpm dev
 - Mood chips + `/discover/mood` query `Book.moodTags` (no LLM). Copy: _these books may match your mood_.
 - Rule-based `/discover/recommend` (weights in `SystemSetting.recommend_weights`), 10‑minute Redis cache, in-stock only.
 - Optional free-text classify: `FEATURE_MOOD_LLM=true` + `LLM_PROVIDER=mock` (default `off` uses rule fallback when enabled).
+
+## P15 publisher growth (`FEATURE_SPONSORED=true`)
+
+- Sponsored campaigns: genre + follower targeting only; impression/click/ATC/purchase via signed tracking IDs; dashboard CTR/conversion/revenue/cost/ROAS; manual invoice.
+- Reprint request (1/user/book) + publisher demand by date/district + trend.
+- Release countdown (server time), notify-me, pre-order; flash + bundle in quote service only.
+- Feature review/post → notify author. UI: `/publisher/growth`.

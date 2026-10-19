@@ -44,6 +44,7 @@ import { createStorageProvider } from './providers/storage/index.js';
 import { createSearchService } from './services/search/pgSearchService.js';
 import { createLlmProvider } from './providers/llm/index.js';
 import { createDiscoverRouter } from './routes/discover.js';
+import { createPublisherRouter } from './routes/publisher.js';
 
 export function createApp(env: ApiEnv, logger: Logger) {
   const app = express();
@@ -105,7 +106,11 @@ export function createApp(env: ApiEnv, logger: Logger) {
   app.use('/isbn', createIsbnRouter(env));
   app.use('/used-listings', createUsedListingsRouter(auth, env, storage));
   app.use('/discover', createDiscoverRouter(auth, env, storage, llm));
+  if (env.FEATURE_SPONSORED) {
+    app.use('/publisher', createPublisherRouter(auth, env));
+  }
   app.use('/checkout', createCheckoutRouter(auth, env));
+
   app.use('/orders', createOrdersRouter(auth, env));
   app.use('/orders', createSellerRatingRouter(auth, env));
   app.use('/addresses', createAddressesRouter(auth));

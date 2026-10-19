@@ -43,6 +43,7 @@ export default defineConfig({
         '/isbn': { target: 'http://127.0.0.1:4000', changeOrigin: true },
         '/used-listings': { target: 'http://127.0.0.1:4000', changeOrigin: true },
         '/discover': { target: 'http://127.0.0.1:4000', changeOrigin: true },
+        '/publisher': { target: 'http://127.0.0.1:4000', changeOrigin: true },
       },
     },
   },

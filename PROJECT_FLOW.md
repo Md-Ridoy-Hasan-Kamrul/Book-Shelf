@@ -24,6 +24,7 @@ Check off after each prompt’s ACCEPTANCE passes.
 - [x] P12 — Bookshelf, reading goals, awardPoints/PointLedger, badges, points UI
 - [x] P13 — Used-book marketplace, ISBN lookup/scanner, near-me, seller ratings
 - [x] P14 — Mood discovery (chip query + MoodLog consent) & rule-based recommendations (10m cache); optional FEATURE_MOOD_LLM classify via LlmProvider
+- [x] P15 — Publisher growth (FEATURE_SPONSORED): sponsored campaigns + signed tracking, reprint demand, release/notify/preorder, flash/bundle in quote, feature review/post
 - [ ] Delivery courier remit → full payout rails (live Steadfast/Pathao)
 
 ## D · Retention (P10–12)

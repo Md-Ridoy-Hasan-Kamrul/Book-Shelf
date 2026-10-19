@@ -152,6 +152,18 @@ export async function getBookBySlug(env: ApiEnv, storage: StorageProvider, slug:
 
   const prices = listings.map((l) => Number(l.price));
   const minPrice = prices.length ? Math.min(...prices).toFixed(2) : null;
+  const hasStock = listings.some((l) => l.stock > 0);
+
+  const releaseRow = await prisma.bookRelease.findUnique({ where: { bookId: book.id } });
+  const now = Date.now();
+  const release = releaseRow
+    ? {
+        releaseAt: releaseRow.releaseAt.toISOString(),
+        preorderEnabled: releaseRow.preorderEnabled,
+        serverNow: new Date(now).toISOString(),
+        msUntilRelease: Math.max(0, releaseRow.releaseAt.getTime() - now),
+      }
+    : null;
 
   return {
     id: book.id,
@@ -169,7 +181,9 @@ export async function getBookBySlug(env: ApiEnv, storage: StorageProvider, slug:
     language: book.language,
     coverUrl: coverUrl(env, storage, book.coverKey),
     minPrice,
-    hasStock: listings.some((l) => l.stock > 0),
+    hasStock,
+    outOfStock: !hasStock,
+    genreId: book.genreId,
     genreSlug: book.genre.slug,
     genreName: book.genre.name,
     genreNameBn: book.genre.nameBn,
@@ -181,5 +195,6 @@ export async function getBookBySlug(env: ApiEnv, storage: StorageProvider, slug:
       book.lookInside?.status === 'APPROVED'
         ? book.lookInside.pageKeys.map((k) => storage.resolvePublicUrl(k))
         : undefined,
+    release,
   };
 }

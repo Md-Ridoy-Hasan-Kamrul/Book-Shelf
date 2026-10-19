@@ -9,6 +9,8 @@ export const checkoutQuoteBodySchema = z.object({
   items: z.array(cartLineSchema).min(1).max(20),
   addressId: z.string().min(1).optional(),
   couponCode: z.string().trim().min(1).max(40).optional(),
+  /** Signed sponsored tracking IDs — attribution only; prices ignored from client. */
+  trackingIds: z.array(z.string().min(16).max(512)).max(20).optional(),
 });
 
 export const checkoutBodySchema = checkoutQuoteBodySchema.extend({
@@ -48,8 +50,10 @@ export const checkoutQuoteSchema = z.object({
   subtotal: z.string(),
   shippingTotal: z.string(),
   discountTotal: z.string(),
+  offerDiscount: z.string().optional(),
   total: z.string(),
   issues: z.array(z.string()),
+  appliedOffers: z.array(z.string()).optional(),
 });
 
 export const orderSummarySchema = z.object({

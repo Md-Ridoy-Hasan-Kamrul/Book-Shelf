@@ -107,3 +107,18 @@ export {
   discoverConfigSchema,
   type MoodEnum,
 } from './discover/schemas.js';
+export {
+  campaignEventKindSchema,
+  campaignCreateSchema,
+  campaignTrackBodySchema,
+  campaignMetricsSchema,
+  campaignInvoiceCreateSchema,
+  reprintRequestBodySchema,
+  reprintDemandQuerySchema,
+  releaseUpsertSchema,
+  offerCreateSchema,
+  featureReviewBodySchema,
+  featurePostBodySchema,
+  serverTimeSchema,
+  bookReleasePublicSchema,
+} from './publisher/schemas.js';
