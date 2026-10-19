@@ -1,5 +1,6 @@
 import { prisma } from '../../lib/prisma.js';
 import { AppError } from '../../lib/appError.js';
+import { assertSafeExternalUrl, safeFetch } from '../../lib/ssrfGuard.js';
 
 export type IsbnBookMeta = {
   isbn: string;
@@ -18,11 +19,20 @@ function normalizeIsbn(raw: string): string {
   return raw.replace(/[-\s]/g, '');
 }
 
+function sanitizeCoverUrl(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  try {
+    assertSafeExternalUrl(raw);
+    return raw;
+  } catch {
+    return null;
+  }
+}
+
 async function fromOpenLibrary(isbn: string): Promise<IsbnBookMeta | null> {
-  const res = await fetch(`https://openlibrary.org/isbn/${isbn}.json`, {
+  const res = await safeFetch(`https://openlibrary.org/isbn/${encodeURIComponent(isbn)}.json`, {
     headers: { Accept: 'application/json' },
-    signal: AbortSignal.timeout(8000),
-  }).catch(() => null);
+  });
   if (!res?.ok) return null;
   const data = (await res.json()) as {
     title?: string;
@@ -39,9 +49,8 @@ async function fromOpenLibrary(isbn: string): Promise<IsbnBookMeta | null> {
   if (data.authors?.length) {
     const names = await Promise.all(
       data.authors.slice(0, 3).map(async (a) => {
-        const ar = await fetch(`https://openlibrary.org${a.key}.json`, {
-          signal: AbortSignal.timeout(5000),
-        }).catch(() => null);
+        if (!a.key?.startsWith('/authors/')) return null;
+        const ar = await safeFetch(`https://openlibrary.org${a.key}.json`);
         if (!ar?.ok) return null;
         const aj = (await ar.json()) as { name?: string };
         return aj.name ?? null;
@@ -60,9 +69,9 @@ async function fromOpenLibrary(isbn: string): Promise<IsbnBookMeta | null> {
     titleBn: null,
     authors,
     description: desc,
-    coverUrl: data.covers?.[0]
-      ? `https://covers.openlibrary.org/b/id/${data.covers[0]}-M.jpg`
-      : null,
+    coverUrl: sanitizeCoverUrl(
+      data.covers?.[0] ? `https://covers.openlibrary.org/b/id/${data.covers[0]}-M.jpg` : null,
+    ),
     pageCount: data.number_of_pages ?? null,
     publishedYear: yearMatch ? Number(yearMatch[0]) : null,
     language: data.languages?.[0]?.key?.replace('/languages/', '') ?? null,
@@ -71,10 +80,9 @@ async function fromOpenLibrary(isbn: string): Promise<IsbnBookMeta | null> {
 }
 
 async function fromGoogleBooks(isbn: string): Promise<IsbnBookMeta | null> {
-  const res = await fetch(
+  const res = await safeFetch(
     `https://www.googleapis.com/books/v1/volumes?q=isbn:${encodeURIComponent(isbn)}`,
-    { signal: AbortSignal.timeout(8000) },
-  ).catch(() => null);
+  );
   if (!res?.ok) return null;
   const data = (await res.json()) as {
     items?: Array<{
@@ -98,7 +106,9 @@ async function fromGoogleBooks(isbn: string): Promise<IsbnBookMeta | null> {
     titleBn: null,
     authors: info.authors ?? [],
     description: info.description ?? null,
-    coverUrl: info.imageLinks?.thumbnail ?? info.imageLinks?.smallThumbnail ?? null,
+    coverUrl: sanitizeCoverUrl(
+      info.imageLinks?.thumbnail ?? info.imageLinks?.smallThumbnail ?? null,
+    ),
     pageCount: info.pageCount ?? null,
     publishedYear: yearMatch ? Number(yearMatch[0]) : null,
     language: info.language ?? null,
@@ -108,7 +118,7 @@ async function fromGoogleBooks(isbn: string): Promise<IsbnBookMeta | null> {
 
 export async function lookupIsbn(rawIsbn: string): Promise<IsbnBookMeta> {
   const isbn = normalizeIsbn(rawIsbn);
-  if (isbn.length < 10) {
+  if (!/^\d{9}[\dXx]$|^\d{13}$/.test(isbn) || isbn.length < 10) {
     throw new AppError('VALIDATION_ERROR', 'Invalid ISBN', 400);
   }
 

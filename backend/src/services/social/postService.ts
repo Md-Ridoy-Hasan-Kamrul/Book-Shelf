@@ -46,6 +46,21 @@ export async function createPost(user: MeUser, env: ApiEnv, input: CreateInput) 
     throw new AppError('SPAM_SUSPECT', 'Post flagged for review — try again later', 403);
   }
 
+  if (
+    input.followersOnly &&
+    user.role !== 'WRITER' &&
+    user.role !== 'PUBLISHER' &&
+    user.role !== 'ADMIN'
+  ) {
+    throw new AppError('FORBIDDEN', 'Follower-only posts require writer/publisher role', 403);
+  }
+  if (input.type === 'BLOG' && user.role !== 'WRITER' && user.role !== 'ADMIN') {
+    throw new AppError('FORBIDDEN', 'Blog posts require writer role', 403);
+  }
+  if (input.type === 'ANNOUNCEMENT' && user.role === 'WRITER' && !input.bookId) {
+    throw new AppError('VALIDATION_ERROR', 'Book announcements need a bookId', 400);
+  }
+
   const isSponsored = input.type === 'SPONSORED';
   return prisma.post.create({
     data: {
@@ -57,6 +72,7 @@ export async function createPost(user: MeUser, env: ApiEnv, input: CreateInput) 
       imageKeys: input.imageKeys,
       isSponsored,
       campaignId: input.campaignId,
+      followersOnly: input.followersOnly,
     },
   });
 }

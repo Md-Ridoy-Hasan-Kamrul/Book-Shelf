@@ -68,3 +68,16 @@ pnpm dev
 - Reprint request (1/user/book) + publisher demand by date/district + trend.
 - Release countdown (server time), notify-me, pre-order; flash + bundle in quote service only.
 - Feature review/post → notify author. UI: `/publisher/growth`.
+
+## P17 local hardening (no new features)
+
+- Report: `docs/HARDENING_REPORT.md` · VERIFY list: `docs/FUTURE_PLAN.md`
+- `pnpm backup` / `pnpm restore` · `pnpm reconcile` · `pnpm verify:points` · `pnpm audit:deps` · `pnpm load:k6`
+- Legal drafts: `/legal/terms|privacy|refund|seller` · Dockerfiles prepared under `frontend/` + `backend/`
+
+## P16 writer tools / live (`FEATURE_LIVE_EVENTS=true`)
+
+- Writer profiles (`/writers/:slug`), blog + book announcements, `followersOnly` posts.
+- Beta-reader invites by eligibility score (purchases + helpfulness + badges − abuse), deadlines, rewards via `awardPoints` / PointLedger.
+- AMA room: Socket.io + Redis adapter, moderated chat, question queue, pinned book Buy, countdown, rate limits; **external live URL only** (no self-hosted video).
+- Quote card: lazy island + client `html-to-image` (1080×1920 / 1080×1080), Hind Siliguri for Bangla conjuncts.

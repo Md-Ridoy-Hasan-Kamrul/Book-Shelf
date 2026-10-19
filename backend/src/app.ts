@@ -45,6 +45,8 @@ import { createSearchService } from './services/search/pgSearchService.js';
 import { createLlmProvider } from './providers/llm/index.js';
 import { createDiscoverRouter } from './routes/discover.js';
 import { createPublisherRouter } from './routes/publisher.js';
+import { createWriterRouter } from './routes/writer.js';
+import { requireOrigin } from './middleware/requireOrigin.js';
 
 export function createApp(env: ApiEnv, logger: Logger) {
   const app = express();
@@ -86,6 +88,7 @@ export function createApp(env: ApiEnv, logger: Logger) {
   );
 
   app.use(express.json({ limit: '1mb' }));
+  app.use(requireOrigin(env));
 
   app.use('/health', createHealthRouter(env));
   app.use('/me', createMeRouter(auth));
@@ -99,7 +102,7 @@ export function createApp(env: ApiEnv, logger: Logger) {
   app.use('/seller', createSellerRouter(auth, env, storage));
   app.use('/seller/dashboard', createSellerDashboardRouter(auth, env));
   app.use('/admin/dashboard', createAdminDashboardRouter(auth, env));
-  app.use('/reviews', createReviewsRouter(auth));
+  app.use('/reviews', createReviewsRouter(auth, env));
   app.use('/notifications', createNotificationsRouter(auth));
   app.use('/wishlist', createWishlistRouter(auth));
   app.use('/bookshelf', createBookshelfRouter(auth, env));
@@ -108,6 +111,9 @@ export function createApp(env: ApiEnv, logger: Logger) {
   app.use('/discover', createDiscoverRouter(auth, env, storage, llm));
   if (env.FEATURE_SPONSORED) {
     app.use('/publisher', createPublisherRouter(auth, env));
+  }
+  if (env.FEATURE_LIVE_EVENTS) {
+    app.use('/writer', createWriterRouter(auth, env));
   }
   app.use('/checkout', createCheckoutRouter(auth, env));
 

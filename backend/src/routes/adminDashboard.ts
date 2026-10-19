@@ -28,10 +28,55 @@ import { approvePayout } from '../services/money/payoutApprovalService.js';
 import { runWeeklyPayoutBatch } from '../services/money/payoutService.js';
 import { listDeadLetterJobs } from '../services/jobs/deadLetterService.js';
 import type { ApiEnv } from '@bookverse/shared';
+import { requireAdmin2fa } from '../middleware/requireAdmin2fa.js';
+import {
+  confirmAdmin2fa,
+  setupAdmin2fa,
+  verifyAdmin2faSession,
+} from '../services/admin/admin2faService.js';
+import { z } from 'zod';
+
+const totpBodySchema = z.object({
+  token: z.string().trim().min(6).max(8),
+});
 
 export function createAdminDashboardRouter(auth: BookVerseAuth, env: ApiEnv) {
   const router = Router();
   router.use(requireAuth(auth), requireRole('ADMIN'));
+
+  router.post('/2fa/setup', async (req, res, next) => {
+    try {
+      const user = (req as AuthedRequest).user;
+      const data = await setupAdmin2fa(user.id, user.role);
+      res.json(successEnvelope(data));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/2fa/confirm', async (req, res, next) => {
+    try {
+      const user = (req as AuthedRequest).user;
+      const body = totpBodySchema.parse(req.body);
+      const data = await confirmAdmin2fa(user.id, user.role, body.token);
+      res.json(successEnvelope(data));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/2fa/verify', async (req, res, next) => {
+    try {
+      const user = (req as AuthedRequest).user;
+      const body = totpBodySchema.parse(req.body);
+      const data = await verifyAdmin2faSession(user.id, user.role, body.token);
+      res.json(successEnvelope(data));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.use(requireAdmin2fa(env));
 
   router.get('/dead-letter-jobs', async (_req, res, next) => {
     try {

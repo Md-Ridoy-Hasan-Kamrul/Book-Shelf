@@ -10,6 +10,7 @@ Check off after each prompt’s ACCEPTANCE passes.
 ## B · Data + Auth (P3–4)
 
 - [x] P3 — Prisma schema, migrate (pg_trgm + FTS), seed, money helpers
+- [x] Appendix A mapping — `docs/APPENDIX_A_MAPPING.md` (live ≠ literal Appendix; RIDER/DELIVERY_FEE/COD_REMIT/`PointLedger.balanceAfter` aligned)
 - [x] P4 — Better Auth, GET /me, RBAC, follow policy, auth pages
 
 ## C · Commerce (P5–9)
@@ -25,6 +26,7 @@ Check off after each prompt’s ACCEPTANCE passes.
 - [x] P13 — Used-book marketplace, ISBN lookup/scanner, near-me, seller ratings
 - [x] P14 — Mood discovery (chip query + MoodLog consent) & rule-based recommendations (10m cache); optional FEATURE_MOOD_LLM classify via LlmProvider
 - [x] P15 — Publisher growth (FEATURE_SPONSORED): sponsored campaigns + signed tracking, reprint demand, release/notify/preorder, flash/bundle in quote, feature review/post
+- [x] P16 — Writer tools / live events (FEATURE_LIVE_EVENTS): writer profiles, blog+announcements+followersOnly, beta-reader eligibility+PointLedger rewards, Socket.io AMA room (Redis adapter, external live link), quote card html-to-image
 - [ ] Delivery courier remit → full payout rails (live Steadfast/Pathao)
 
 ## D · Retention (P10–12)
@@ -32,3 +34,5 @@ Check off after each prompt’s ACCEPTANCE passes.
 ## E · Differentiators (P13–16)
 
 ## F · Hardening (P17)
+
+- [x] P17 — Local hardening: security (Origin, SSRF, IDOR docs, rate-limit report, admin TOTP), k6 script, backup/restore, Redis AOF, BullMQ DLQ UI, reconcile+points, legal drafts, Dockerfiles (not run), `docs/HARDENING_REPORT.md`

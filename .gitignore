@@ -41,3 +41,8 @@ test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
+
+# P17 local backups & k6 artifacts
+backups/*
+!backups/.gitkeep
+docs/k6-last-run.json

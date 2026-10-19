@@ -17,6 +17,7 @@ const EXPECTED: Record<UserRole, Record<UserRole, boolean>> = {
     VENDOR: true,
     ADMIN: false,
     MODERATOR: false,
+    RIDER: false,
   },
   WRITER: {
     USER: true,
@@ -25,6 +26,7 @@ const EXPECTED: Record<UserRole, Record<UserRole, boolean>> = {
     VENDOR: true,
     ADMIN: false,
     MODERATOR: false,
+    RIDER: false,
   },
   PUBLISHER: {
     USER: false,
@@ -33,6 +35,7 @@ const EXPECTED: Record<UserRole, Record<UserRole, boolean>> = {
     VENDOR: true,
     ADMIN: false,
     MODERATOR: false,
+    RIDER: false,
   },
   VENDOR: {
     USER: true,
@@ -41,6 +44,7 @@ const EXPECTED: Record<UserRole, Record<UserRole, boolean>> = {
     VENDOR: true,
     ADMIN: false,
     MODERATOR: false,
+    RIDER: false,
   },
   ADMIN: {
     USER: true,
@@ -49,6 +53,7 @@ const EXPECTED: Record<UserRole, Record<UserRole, boolean>> = {
     VENDOR: true,
     ADMIN: true,
     MODERATOR: true,
+    RIDER: false,
   },
   MODERATOR: {
     USER: true,
@@ -57,6 +62,16 @@ const EXPECTED: Record<UserRole, Record<UserRole, boolean>> = {
     VENDOR: true,
     ADMIN: false,
     MODERATOR: true,
+    RIDER: false,
+  },
+  RIDER: {
+    USER: false,
+    WRITER: false,
+    PUBLISHER: false,
+    VENDOR: false,
+    ADMIN: false,
+    MODERATOR: false,
+    RIDER: false,
   },
 };
 

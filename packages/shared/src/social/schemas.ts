@@ -12,6 +12,7 @@ export const postTypeSchema = z.enum([
   'STATUS',
   'PHOTO',
   'POLL',
+  'BLOG',
 ]);
 
 export const postCreateSchema = z.object({
@@ -21,6 +22,8 @@ export const postCreateSchema = z.object({
   hasSpoiler: z.boolean().default(false),
   imageKeys: z.array(z.string()).max(4).default([]),
   campaignId: z.string().optional(),
+  /** Follower-only content — visible only to followers of the author. */
+  followersOnly: z.boolean().default(false),
 });
 
 export const postUpdateSchema = z.object({

@@ -21,6 +21,8 @@ const MATRIX: Record<UserRole, ReadonlySet<UserRole>> = {
   VENDOR: new Set(['USER', 'WRITER', 'PUBLISHER', 'VENDOR']),
   ADMIN: new Set(['USER', 'WRITER', 'PUBLISHER', 'VENDOR', 'ADMIN', 'MODERATOR']),
   MODERATOR: new Set(['USER', 'WRITER', 'PUBLISHER', 'VENDOR', 'MODERATOR']),
+  // FEATURE_RIDER=false — no social graph until rider module ships
+  RIDER: new Set(),
 };
 
 export function canFollow(

@@ -55,9 +55,14 @@ export async function approveRoleApplication(adminId: string, applicationId: str
     });
 
     if (app.type === 'WRITER') {
+      const short = app.userId.slice(0, 8);
       await tx.writerProfile.upsert({
         where: { userId: app.userId },
-        create: { userId: app.userId, penName: `Writer ${app.userId.slice(0, 6)}` },
+        create: {
+          userId: app.userId,
+          penName: `Writer ${app.userId.slice(0, 6)}`,
+          slug: `writer-${short}`,
+        },
         update: {},
       });
     }

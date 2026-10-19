@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import AdminDashboard from '../../components/islands/AdminDashboard.tsx';
+import AdminDeadLetterPanel from '../../components/islands/AdminDeadLetterPanel.tsx';
 import { fetchMe } from '../../lib/session';
 
 const me = await fetchMe(Astro.request.headers.get('cookie') ?? '');
@@ -13,6 +14,7 @@ if (me.role !== 'ADMIN') return Astro.redirect('/');
     <h1 class="font-display text-2xl font-bold text-ink-900">Admin dashboard</h1>
     <div class="mt-6">
       <AdminDashboard client:load />
+      <AdminDeadLetterPanel client:load />
     </div>
   </main>
 </Base>

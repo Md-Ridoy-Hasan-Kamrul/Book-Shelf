@@ -8,6 +8,7 @@ export type PointReason =
   | 'FINISH_BOOK'
   | 'GOAL_COMPLETE'
   | 'HELPFUL_VOTE'
+  | 'BETA_READER_REWARD'
   | 'REDEEM'
   | 'ADJUSTMENT';
 
@@ -46,15 +47,15 @@ export async function awardPoints(
       return { awarded: false, pointsBalance: user.pointsBalance };
     }
 
-    if (delta < 0) {
-      const user = await tx.user.findUniqueOrThrow({
-        where: { id: userId },
-        select: { pointsBalance: true },
-      });
-      if (user.pointsBalance + delta < 0) {
-        throw new AppError('VALIDATION_ERROR', 'Insufficient points', 400);
-      }
+    const user = await tx.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: { pointsBalance: true },
+    });
+    if (delta < 0 && user.pointsBalance + delta < 0) {
+      throw new AppError('VALIDATION_ERROR', 'Insufficient points', 400);
     }
+
+    const balanceAfter = user.pointsBalance + delta;
 
     await tx.pointLedger.create({
       data: {
@@ -63,6 +64,7 @@ export async function awardPoints(
         kind,
         reason,
         refId,
+        balanceAfter,
         idempotencyKey,
         note: opts?.note,
       },
@@ -70,7 +72,7 @@ export async function awardPoints(
 
     const updated = await tx.user.update({
       where: { id: userId },
-      data: { pointsBalance: { increment: delta } },
+      data: { pointsBalance: balanceAfter },
       select: { pointsBalance: true },
     });
 

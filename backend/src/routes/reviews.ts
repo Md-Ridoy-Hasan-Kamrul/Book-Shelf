@@ -8,14 +8,16 @@ import { Router } from 'express';
 import type { BookVerseAuth } from '../auth/createAuth.js';
 import { paramId } from '../lib/params.js';
 import { requireAuth, type AuthedRequest } from '../middleware/requireAuth.js';
+import type { ApiEnv } from '@bookverse/shared';
 import {
+  afterReviewCreated,
   createReview,
   listBookReviews,
   markReviewHelpful,
   reportReview,
 } from '../services/retention/reviewService.js';
 
-export function createReviewsRouter(auth: BookVerseAuth) {
+export function createReviewsRouter(auth: BookVerseAuth, env?: ApiEnv) {
   const router = Router();
 
   router.get('/books/:bookId', async (req, res, next) => {
@@ -32,7 +34,9 @@ export function createReviewsRouter(auth: BookVerseAuth) {
     try {
       const user = (req as AuthedRequest).user;
       const body = reviewCreateSchema.parse(req.body);
-      const data = await createReview(user.id, paramId(req.params.bookId), body);
+      const bookId = paramId(req.params.bookId);
+      const data = await createReview(user.id, bookId, body);
+      if (env) await afterReviewCreated(env, user.id, bookId);
       res.status(201).json(successEnvelope(data));
     } catch (err) {
       next(err);

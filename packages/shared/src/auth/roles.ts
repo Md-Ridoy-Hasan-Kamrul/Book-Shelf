@@ -7,6 +7,7 @@ export const userRoleSchema = z.enum([
   'VENDOR',
   'ADMIN',
   'MODERATOR',
+  'RIDER', // FEATURE_RIDER=false — enum only until rider module ships
 ]);
 
 export type UserRole = z.infer<typeof userRoleSchema>;

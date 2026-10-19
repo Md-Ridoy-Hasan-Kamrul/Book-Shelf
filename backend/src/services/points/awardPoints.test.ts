@@ -25,14 +25,19 @@ describe.runIf(runDb)('awardPoints (P12)', () => {
     expect(check.ok).toBe(true);
   });
 
-  it('balance equals SUM(delta)', async () => {
+  it('balance equals SUM(delta) and balanceAfter snapshot', async () => {
     const user = await prisma.user.findFirst({ where: { role: 'USER' } });
     expect(user).toBeTruthy();
-    await awardPoints(user!.id, 'ADJUSTMENT', `sum-${Date.now()}`, 3, {
+    const ref = `sum-${Date.now()}`;
+    const result = await awardPoints(user!.id, 'ADJUSTMENT', ref, 3, {
       kind: 'ADJUSTMENT',
     });
     const check = await verifyUserPointBalance(user!.id);
     expect(check.ok).toBe(true);
     expect(check.pointsBalance).toBe(check.sumDelta);
+    const row = await prisma.pointLedger.findUniqueOrThrow({
+      where: { userId_reason_refId: { userId: user!.id, reason: 'ADJUSTMENT', refId: ref } },
+    });
+    expect(row.balanceAfter).toBe(result.pointsBalance);
   });
 });

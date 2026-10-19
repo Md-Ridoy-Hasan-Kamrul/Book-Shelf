@@ -86,10 +86,32 @@ export async function getFeed(
   const blocked = await blockedAuthorIds(viewerId);
   queryCount += 1;
 
+  const followingIds = viewerId
+    ? (
+        await prisma.follow.findMany({
+          where: { followerId: viewerId },
+          select: { followingId: true },
+        })
+      ).map((f) => f.followingId)
+    : [];
+  if (viewerId) queryCount += 1;
+
+  /** Follower-only posts: author themselves or followers only. */
+  const followersOnlyFilter = viewerId
+    ? {
+        OR: [
+          { followersOnly: false },
+          { authorId: viewerId },
+          { followersOnly: true, authorId: { in: followingIds } },
+        ],
+      }
+    : { followersOnly: false };
+
   const baseWhere = {
     deletedAt: null,
     hiddenAt: null,
     authorId: blocked.length ? { notIn: blocked } : undefined,
+    AND: [followersOnlyFilter],
     ...(cursorWhere(cursor) ?? {}),
   };
 
@@ -99,12 +121,7 @@ export async function getFeed(
     if (!viewerId) {
       return { items: [], nextCursor: null, queryCount };
     }
-    const following = await prisma.follow.findMany({
-      where: { followerId: viewerId },
-      select: { followingId: true },
-    });
-    queryCount += 1;
-    const ids = following.map((f) => f.followingId);
+    const ids = followingIds;
     if (ids.length === 0) return { items: [], nextCursor: null, queryCount };
 
     const rows = await prisma.post.findMany({

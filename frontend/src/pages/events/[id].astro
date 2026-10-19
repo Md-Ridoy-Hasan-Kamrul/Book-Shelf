@@ -1,0 +1,15 @@
+---
+import Base from '../../layouts/Base.astro';
+import LiveEventRoom from '../../components/islands/LiveEventRoom.tsx';
+
+const { id } = Astro.params;
+if (!id) return Astro.redirect('/');
+---
+
+<Base title="Live event">
+  <main id="main" class="py-10">
+    <div class="mx-auto w-[min(100%-2rem,72rem)]">
+      <LiveEventRoom client:only="react" eventId={id} />
+    </div>
+  </main>
+</Base>

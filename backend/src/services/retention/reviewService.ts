@@ -58,6 +58,15 @@ export async function createReview(userId: string, bookId: string, input: Create
   return review;
 }
 
+export async function afterReviewCreated(
+  env: import('@bookverse/shared').ApiEnv,
+  userId: string,
+  bookId: string,
+) {
+  const { recordBetaReview } = await import('../writer/betaReaderService.js');
+  await recordBetaReview(env, userId, bookId).catch(() => undefined);
+}
+
 export async function listBookReviews(bookId: string, cursor?: string, limit = 20) {
   const take = limit + 1;
   const rows = await prisma.review.findMany({

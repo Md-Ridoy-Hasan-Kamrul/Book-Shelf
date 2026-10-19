@@ -167,6 +167,7 @@ export async function upsertBookshelfItem(
       bookId: book.id,
       hasSpoiler: false,
       imageKeys: [],
+      followersOnly: false,
     });
   }
 

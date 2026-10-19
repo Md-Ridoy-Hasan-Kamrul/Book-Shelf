@@ -83,6 +83,11 @@ async function clearDatabase() {
     'Offer',
     'ReleaseNotify',
     'BookRelease',
+    'LiveEventBan',
+    'LiveEventQuestion',
+    'LiveEvent',
+    'BetaReaderInvite',
+    'BetaReaderProgram',
     'Listing',
     'RoleApplication',
     'Campaign',
@@ -212,6 +217,7 @@ async function main() {
         data: {
           userId: id,
           penName: `Pen Name ${i + 1}`,
+          slug: `pen-name-${i + 1}`,
           verified: i < 5,
         },
       });
@@ -517,6 +523,22 @@ async function main() {
         startsAt: new Date(Date.now() - 86400_000),
         endsAt: new Date(Date.now() + 7 * 86400_000),
         active: true,
+      },
+    });
+  }
+
+  // P16 — sample AMA / live launch (external link only)
+  const writerHost = await prisma.user.findFirst({ where: { role: 'WRITER' } });
+  if (writerHost) {
+    await prisma.liveEvent.create({
+      data: {
+        hostId: writerHost.id,
+        title: 'Seed AMA · Fresh pages',
+        description: 'Ask anything — video is an external link only.',
+        startsAt: new Date(Date.now() + 2 * 3600_000),
+        status: 'SCHEDULED',
+        externalLiveUrl: 'https://example.com/live/seed-ama',
+        pinnedBookId: books[0]!.id,
       },
     });
   }

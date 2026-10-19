@@ -7,6 +7,7 @@ import BookReviews from '../../components/islands/BookReviews.tsx';
 import ReprintRequestButton from '../../components/islands/ReprintRequestButton.tsx';
 import ReleaseCountdown from '../../components/islands/ReleaseCountdown.tsx';
 import SponsoredPlacement from '../../components/islands/SponsoredPlacement.tsx';
+import QuoteCardGenerator from '../../components/islands/QuoteCardGenerator.tsx';
 
 const { slug } = Astro.params;
 if (!slug) {
@@ -168,6 +169,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=120, stale-while-re
     </div>
     <div class="mx-auto w-[min(100%-2rem,72rem)]">
       <BookReviews client:load bookId={book.id} />
+      <QuoteCardGenerator client:visible title={book.titleBn || book.title} author={book.author} />
     </div>
   </main>
 </Base>

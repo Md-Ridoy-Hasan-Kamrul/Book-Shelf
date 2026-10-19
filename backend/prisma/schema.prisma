@@ -19,6 +19,7 @@ enum UserRole {
   VENDOR
   ADMIN
   MODERATOR
+  RIDER // FEATURE_RIDER=false — no routes/UI until enabled
 }
 
 enum SellerType {
@@ -100,6 +101,8 @@ enum LedgerEntryKind {
   REFUND
   PAYOUT
   PAYMENT_FEE
+  DELIVERY_FEE
+  COD_REMIT
   RTO_COST
   ADJUSTMENT
   ESCROW_HOLD
@@ -190,6 +193,27 @@ enum PostType {
   QUESTION
   ANNOUNCEMENT
   SPONSORED
+  BLOG
+}
+
+enum BetaInviteStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  COMPLETED
+  EXPIRED
+}
+
+enum LiveEventStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+}
+
+enum LiveQuestionStatus {
+  QUEUED
+  ANSWERED
+  DISMISSED
 }
 
 enum ReactionKind {
@@ -274,6 +298,9 @@ model User {
   bannedAt      DateTime?
   suspendedUntil DateTime?
   moderationWarnings Int @default(0)
+  /** Admin TOTP 2FA (P17). Secret stored only when enrolled. */
+  totpSecret    String?
+  totpEnabled   Boolean   @default(false)
   deletedAt     DateTime?
 
   sessions      Session[]
@@ -325,6 +352,11 @@ model User {
   reviewsFeatured      Review[]              @relation("ReviewFeaturedBy")
   postsFeatured        Post[]                @relation("PostFeaturedBy")
   campaignInvoices     CampaignInvoice[]
+  betaProgramsHosted   BetaReaderProgram[]   @relation("BetaProgramHost")
+  betaInvites          BetaReaderInvite[]
+  liveEventsHosted     LiveEvent[]           @relation("LiveEventHost")
+  liveQuestions        LiveEventQuestion[]
+  liveEventBans        LiveEventBan[]
 
   @@index([role])
   @@index([createdAt, id])
@@ -404,6 +436,7 @@ model WriterProfile {
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   penName   String
+  slug      String   @unique
   bio       String?  @db.Text
   verified  Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -464,6 +497,8 @@ model Book {
   release         BookRelease?
   releaseNotifies ReleaseNotify[]
   campaigns       Campaign[]
+  betaPrograms    BetaReaderProgram[]
+  liveEventsPinned LiveEvent[]
 
   @@index([genreId])
   @@index([publisherId])
@@ -865,6 +900,7 @@ model PointLedger {
   kind           PointLedgerKind
   reason         String
   refId          String
+  balanceAfter   Int // snapshot after this row; pointsBalance cache must match SUM(delta)
   idempotencyKey String          @unique
   note           String?
   createdAt      DateTime        @default(now())
@@ -965,6 +1001,7 @@ model Post {
   featuredAt    DateTime?
   featuredById  String?
   featuredBy    User?    @relation("PostFeaturedBy", fields: [featuredById], references: [id], onDelete: SetNull)
+  followersOnly Boolean  @default(false)
   likeCount     Int      @default(0)
   dislikeCount  Int      @default(0)
   commentCount  Int      @default(0)
@@ -979,6 +1016,7 @@ model Post {
   @@index([authorId, createdAt, id])
   @@index([createdAt, id])
   @@index([deletedAt, hiddenAt, createdAt])
+  @@index([followersOnly, createdAt])
 }
 
 model Comment {
@@ -1241,6 +1279,92 @@ model NotificationPreference {
   updatedAt DateTime            @updatedAt
 
   @@unique([userId, channel])
+}
+
+// ─── P16 Writer tools / live events ──────────────────────────────────────────
+
+model BetaReaderProgram {
+  id                  String   @id @default(cuid())
+  hostId              String
+  host                User     @relation("BetaProgramHost", fields: [hostId], references: [id], onDelete: Cascade)
+  bookId              String
+  book                Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  title               String
+  deadline            DateTime
+  requiredReviews     Int      @default(1)
+  rewardPoints        Int      @default(50)
+  minEligibilityScore Int      @default(30)
+  active              Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  invites BetaReaderInvite[]
+
+  @@index([hostId, createdAt, id])
+  @@index([bookId])
+}
+
+model BetaReaderInvite {
+  id          String           @id @default(cuid())
+  programId   String
+  program     BetaReaderProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status      BetaInviteStatus @default(PENDING)
+  reviewsDone Int              @default(0)
+  eligibility Int
+  invitedAt   DateTime         @default(now())
+  respondedAt DateTime?
+  completedAt DateTime?
+
+  @@unique([programId, userId])
+  @@index([userId, status])
+}
+
+model LiveEvent {
+  id              String          @id @default(cuid())
+  hostId          String
+  host            User            @relation("LiveEventHost", fields: [hostId], references: [id], onDelete: Cascade)
+  title           String
+  description     String?         @db.Text
+  startsAt        DateTime
+  status          LiveEventStatus @default(SCHEDULED)
+  externalLiveUrl String?         @db.Text
+  pinnedBookId    String?
+  pinnedBook      Book?           @relation(fields: [pinnedBookId], references: [id], onDelete: SetNull)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  questions LiveEventQuestion[]
+  bans      LiveEventBan[]
+
+  @@index([hostId, startsAt])
+  @@index([status, startsAt])
+}
+
+model LiveEventQuestion {
+  id        String             @id @default(cuid())
+  eventId   String
+  event     LiveEvent          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  body      String             @db.Text
+  status    LiveQuestionStatus @default(QUEUED)
+  createdAt DateTime           @default(now())
+
+  @@index([eventId, status, createdAt])
+}
+
+model LiveEventBan {
+  id        String    @id @default(cuid())
+  eventId   String
+  event     LiveEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reason    String?
+  createdAt DateTime  @default(now())
+
+  @@unique([eventId, userId])
 }
 
 // ─── Admin / settings ────────────────────────────────────────────────────────
