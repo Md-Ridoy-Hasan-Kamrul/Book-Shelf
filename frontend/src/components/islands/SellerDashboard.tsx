@@ -10,6 +10,7 @@ import {
   fetchSellerPayouts,
   packSellerOrder,
 } from '../../lib/dashboardApi';
+import { fh } from '../../lib/freshHuman';
 import { useMockData } from '../../lib/mockMode';
 import { SELLER_ROLE_UI, type SellerRole, type SellerTab } from '../../lib/sellerRoleUi';
 import SellerCatalogForm from './SellerCatalogForm';
@@ -117,9 +118,7 @@ function SellerDashboardInner({ role }: Props) {
           <button
             key={t.id}
             type="button"
-            className={`cursor-pointer rounded-[var(--radius-card)] px-3 py-1.5 text-sm font-semibold ${
-              tab === t.id ? 'bg-brand-600 text-paper' : 'bg-sand text-ink-700'
-            }`}
+            className={tab === t.id ? fh.tabActive : fh.tabIdle}
             onClick={() => setTab(t.id)}
           >
             {t.label}
@@ -141,31 +140,31 @@ function SellerDashboardInner({ role }: Props) {
             )}
             {overview.data && (
               <dl className="grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-[var(--radius-card)] border border-line bg-paper p-3">
+                <div className={fh.cardBrand}>
                   <dt className="text-ink-500">{role === 'WRITER' ? 'Title sales' : 'Orders'}</dt>
-                  <dd className="text-xl font-bold text-ink-900">{overview.data.ordersTotal}</dd>
+                  <dd className="text-xl font-bold text-brand-700">{overview.data.ordersTotal}</dd>
                 </div>
-                <div className="rounded-[var(--radius-card)] border border-line bg-paper p-3">
+                <div className={fh.card}>
                   <dt className="text-ink-500">{ui.ordersLabel}</dt>
                   <dd className="text-xl font-bold text-ink-900">{overview.data.ordersToPack}</dd>
                 </div>
-                <div className="rounded-[var(--radius-card)] border border-line bg-paper p-3">
+                <div className={fh.cardLeaf}>
                   <dt className="text-ink-500">
                     {role === 'WRITER' ? 'Royalties (30d)' : 'Sales (30d)'}
                   </dt>
-                  <dd className="text-xl font-bold text-ink-900">
+                  <dd className="text-xl font-bold text-leaf-700">
                     ৳{overview.data.salesLast30DaysBdt}
                   </dd>
                 </div>
-                <div className="rounded-[var(--radius-card)] border border-line bg-paper p-3">
+                <div className={fh.card}>
                   <dt className="text-ink-500">Open claims</dt>
                   <dd className="text-xl font-bold text-ink-900">{overview.data.openClaims}</dd>
                 </div>
-                <div className="col-span-2 rounded-[var(--radius-card)] border border-line bg-leaf-50 p-3">
+                <div className={`col-span-2 ${fh.cardLeaf}`}>
                   <dt className="text-ink-500">
                     {role === 'WRITER' ? 'Royalty balance' : 'Balance'}
                   </dt>
-                  <dd className="font-semibold text-ink-900">
+                  <dd className="font-semibold text-leaf-700">
                     Pending ৳{overview.data.balancePendingBdt} · Available ৳
                     {overview.data.balanceAvailableBdt}
                   </dd>
@@ -202,10 +201,7 @@ function SellerDashboardInner({ role }: Props) {
             )}
             <ul className="list-none space-y-2 p-0">
               {listings.data?.items.map((l) => (
-                <li
-                  key={l.id}
-                  className="flex justify-between gap-2 rounded-[var(--radius-card)] border border-line bg-paper px-3 py-2 text-sm"
-                >
+                <li key={l.id} className={`flex justify-between gap-2 text-sm ${fh.listRow}`}>
                   <span>{l.bookTitle}</span>
                   <span className="font-semibold text-ink-700">
                     {role === 'WRITER' ? l.price : `৳${l.price} · stock ${l.stock}`}
@@ -246,7 +242,7 @@ function SellerDashboardInner({ role }: Props) {
                   {role !== 'WRITER' && o.status === 'PROCESSING' && (
                     <button
                       type="button"
-                      className="mt-2 cursor-pointer rounded-[var(--radius-card)] bg-cta-500 px-3 py-1.5 text-xs font-bold text-ink-900"
+                      className={`mt-2 ${fh.btnCta}`}
                       disabled={pack.isPending}
                       onClick={() => pack.mutate(o.id)}
                     >

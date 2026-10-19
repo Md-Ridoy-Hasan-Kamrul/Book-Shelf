@@ -1,0 +1,113 @@
+---
+/**
+ * P2 shell footer + P17 legal links (Terms, Privacy, Refund, Seller).
+ * Fresh & Human: cream/paper, brand links, soft border — no cold gray.
+ */
+import { getFeatureFlags } from '../../env';
+
+const flags = getFeatureFlags();
+const isDev = import.meta.env.DEV;
+---
+
+<footer class="mt-auto border-t border-line bg-paper">
+  <div class="mx-auto w-[min(100%-2rem,72rem)] py-10">
+    <div class="grid gap-8 min-[640px]:grid-cols-2 min-[960px]:grid-cols-4">
+      <div>
+        <a href="/" class="font-display text-lg font-bold text-ink-900 no-underline">BookVerse</a>
+        <p class="m-0 mt-2 max-w-xs text-sm leading-relaxed text-ink-500">
+          বাংলাদেশের বই মার্কেটপ্লেস ও রিডিং কমিউনিটি। BDT · Bangla + English · ফ্রেশ ও মানবিক।
+        </p>
+      </div>
+
+      <div>
+        <p class="m-0 text-xs font-bold tracking-wide text-ink-500 uppercase">Explore</p>
+        <ul class="mt-3 list-none space-y-2 p-0 text-sm font-semibold">
+          <li>
+            <a href="/mood" class="text-ink-700 no-underline hover:text-brand-700">Discover</a>
+          </li>
+          <li>
+            <a href="/search" class="text-ink-700 no-underline hover:text-brand-700">Search</a>
+          </li>
+          <li>
+            <a href="/feed" class="text-ink-700 no-underline hover:text-brand-700">Community</a>
+          </li>
+          <li>
+            <a href="/bookshelf" class="text-ink-700 no-underline hover:text-brand-700">Shelf</a>
+          </li>
+          {
+            flags.usedBooks ? (
+              <li>
+                <a href="/used" class="text-ink-700 no-underline hover:text-brand-700">
+                  Used books
+                </a>
+              </li>
+            ) : null
+          }
+        </ul>
+      </div>
+
+      <div>
+        <p class="m-0 text-xs font-bold tracking-wide text-ink-500 uppercase">Account</p>
+        <ul class="mt-3 list-none space-y-2 p-0 text-sm font-semibold">
+          <li>
+            <a href="/login" class="text-ink-700 no-underline hover:text-brand-700">Log in</a>
+          </li>
+          <li>
+            <a href="/register" class="text-ink-700 no-underline hover:text-brand-700">Register</a>
+          </li>
+          <li>
+            <a href="/account" class="text-ink-700 no-underline hover:text-brand-700">Profile</a>
+          </li>
+          <li>
+            <a href="/orders" class="text-ink-700 no-underline hover:text-brand-700">Orders</a>
+          </li>
+          <li>
+            <a href="/checkout" class="text-ink-700 no-underline hover:text-brand-700">Checkout</a>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="m-0 text-xs font-bold tracking-wide text-ink-500 uppercase">Legal</p>
+        <ul class="mt-3 list-none space-y-2 p-0 text-sm font-semibold">
+          <li>
+            <a href="/legal/terms" class="text-ink-700 no-underline hover:text-brand-700"
+              >Terms · শর্তাবলি</a
+            >
+          </li>
+          <li>
+            <a href="/legal/privacy" class="text-ink-700 no-underline hover:text-brand-700"
+              >Privacy · গোপনীয়তা</a
+            >
+          </li>
+          <li>
+            <a href="/legal/refund" class="text-ink-700 no-underline hover:text-brand-700"
+              >Refund · রিফান্ড</a
+            >
+          </li>
+          <li>
+            <a href="/legal/seller" class="text-ink-700 no-underline hover:text-brand-700"
+              >Seller agreement</a
+            >
+          </li>
+          {
+            isDev ? (
+              <li>
+                <a href="/design" class="text-brand-700 no-underline hover:underline">
+                  Design system (dev)
+                </a>
+              </li>
+            ) : null
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div
+      class="mt-10 flex flex-col gap-2 border-t border-line pt-6 text-xs text-ink-500 min-[720px]:flex-row min-[720px]:items-center min-[720px]:justify-between"
+    >
+      <p class="m-0">© {new Date().getFullYear()} BookVerse · Local-first marketplace</p>
+      <p class="m-0">Made for readers in Bangladesh</p>
+    </div>
+  </div>
+</footer>

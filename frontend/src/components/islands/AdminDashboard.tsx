@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { fh } from '../../lib/freshHuman';
 import Island from './Island';
 import {
   approveAdminPayout,
@@ -100,9 +101,7 @@ function AdminDashboardInner() {
           <button
             key={t.id}
             type="button"
-            className={`rounded-full px-3 py-1.5 text-sm font-semibold ${
-              tab === t.id ? 'bg-brand-600 text-paper' : 'bg-sand text-ink-700'
-            }`}
+            className={tab === t.id ? fh.tabActive : fh.tabIdle}
             onClick={() => setTab(t.id)}
           >
             {t.label}
@@ -110,56 +109,58 @@ function AdminDashboardInner() {
         ))}
       </nav>
 
-      <div className="mt-6 text-sm">
+      <div className="mt-6 text-sm text-ink-900">
         {tab === 'kpis' && (
           <>
             {kpis.isLoading && <p className="text-ink-500">Loading KPIs…</p>}
             {kpis.isError && (
-              <p className="text-urgent-600">
+              <p className="text-urgent-600" role="alert">
                 Failed.{' '}
-                <button type="button" onClick={() => kpis.refetch()}>
+                <button type="button" className="underline" onClick={() => kpis.refetch()}>
                   Retry
                 </button>
               </p>
             )}
             {kpis.data && (
               <>
-                <dl className="grid grid-cols-2 gap-2">
-                  <div className="rounded-(--radius-card) border border-line p-3">
+                <dl className="grid grid-cols-2 gap-3">
+                  <div className={fh.cardBrand}>
                     <dt className="text-ink-500">GMV</dt>
-                    <dd className="text-lg font-bold">৳{kpis.data.gmvBdt}</dd>
+                    <dd className="text-lg font-bold text-brand-700">৳{kpis.data.gmvBdt}</dd>
                   </div>
-                  <div className="rounded-(--radius-card) border border-line p-3">
+                  <div className={fh.card}>
                     <dt className="text-ink-500">Orders</dt>
-                    <dd className="text-lg font-bold">{kpis.data.orderCount}</dd>
+                    <dd className="text-lg font-bold text-ink-900">{kpis.data.orderCount}</dd>
                   </div>
-                  <div className="rounded-(--radius-card) border border-line p-3">
+                  <div className={fh.card}>
                     <dt className="text-ink-500">AOV</dt>
-                    <dd className="text-lg font-bold">৳{kpis.data.aovBdt}</dd>
+                    <dd className="text-lg font-bold text-ink-900">৳{kpis.data.aovBdt}</dd>
                   </div>
-                  <div className="rounded-(--radius-card) border border-line p-3">
+                  <div className={fh.cardLeaf}>
                     <dt className="text-ink-500">Take rate</dt>
-                    <dd className="text-lg font-bold">{kpis.data.takeRatePct}%</dd>
+                    <dd className="text-lg font-bold text-leaf-700">{kpis.data.takeRatePct}%</dd>
                   </div>
-                  <div className="rounded-(--radius-card)er border-line p-3">
+                  <div className={fh.card}>
                     <dt className="text-ink-500">RTO rate</dt>
-                    <dd>{kpis.data.rtoRatePct}%</dd>
+                    <dd className="font-semibold text-ink-900">{kpis.data.rtoRatePct}%</dd>
                   </div>
-                  <div className="rounded-(--radius-card) border border-line p-3">
+                  <div className={fh.card}>
                     <dt className="text-ink-500">Claim rate</dt>
-                    <dd>{kpis.data.claimRatePct}%</dd>
+                    <dd className="font-semibold text-ink-900">{kpis.data.claimRatePct}%</dd>
                   </div>
                 </dl>
                 <section className="mt-6">
-                  <h2 className="text-base font-bold text-ink-900">Margin-guard warnings</h2>
+                  <h2 className="m-0 font-display text-base font-bold text-ink-900">
+                    Margin-guard warnings
+                  </h2>
                   {margin.data?.items.length === 0 && (
-                    <p className="text-ink-500">No low-margin listings flagged.</p>
+                    <p className="mt-2 text-ink-500">No low-margin listings flagged.</p>
                   )}
-                  <ul className="mt-2 list-none space-y-1 p-0">
+                  <ul className="mt-2 list-none space-y-2 p-0">
                     {margin.data?.items.slice(0, 5).map((w) => (
                       <li
                         key={w.listingId}
-                        className="rounded border border-sun-200 bg-sun-100 px-2 py-1 text-sun-800"
+                        className="rounded-[var(--radius-card)] border border-sun-200 bg-sun-100 px-3 py-2 text-sm text-sun-800"
                       >
                         {w.bookTitle} — commission {w.commissionBps} bps
                         {w.commissionBdt && w.floorBdt
@@ -182,8 +183,12 @@ function AdminDashboardInner() {
             )}
             <ul className="list-none space-y-2 p-0">
               {apps.data?.items.map((a) => (
-                <li key={a.id} className="rounded-(--radius-card) border border-line p-3">
-                  <strong>{a.type}</strong> — {a.userName} ({a.userEmail})
+                <li key={a.id} className={fh.listRow}>
+                  <strong className="text-ink-900">{a.type}</strong>
+                  <span className="text-ink-700">
+                    {' '}
+                    — {a.userName} ({a.userEmail})
+                  </span>
                   <div className="text-ink-500">{a.status}</div>
                 </li>
               ))}
@@ -194,12 +199,9 @@ function AdminDashboardInner() {
         {tab === 'orders' && (
           <ul className="list-none space-y-2 p-0">
             {orders.data?.items.map((o) => (
-              <li
-                key={o.id}
-                className="flex justify-between rounded-(--radius-card)er border-line p-3"
-              >
-                <span>{o.sellerName}</span>
-                <span>
+              <li key={o.id} className={`flex justify-between gap-2 ${fh.listRow}`}>
+                <span className="text-ink-900">{o.sellerName}</span>
+                <span className="text-ink-700">
                   {o.status} · ৳{o.total}
                 </span>
               </li>
@@ -210,16 +212,21 @@ function AdminDashboardInner() {
         {tab === 'claims' && (
           <ul className="list-none space-y-3 p-0">
             {claims.data?.items.map((c) => (
-              <li key={c.id} className="rounded-(--radius-card) border border-line p-3">
-                <div className="font-semibold">
+              <li key={c.id} className={fh.listRow}>
+                <div className="font-semibold text-ink-900">
                   {c.status} · {c.buyerName} → {c.sellerName}
                 </div>
-                <p className="text-ink-700">{c.reason}</p>
+                <p className="m-0 mt-1 text-ink-700">{c.reason}</p>
                 {c.images.length > 0 && (
                   <ul className="mt-2 flex flex-wrap gap-2 p-0">
                     {c.images.map((url) => (
                       <li key={url}>
-                        <a href={url} className="text-brand-700" target="_blank" rel="noreferrer">
+                        <a
+                          href={url}
+                          className="font-semibold text-brand-700 no-underline hover:underline"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
                           Evidence
                         </a>
                       </li>
@@ -236,16 +243,16 @@ function AdminDashboardInner() {
             {payouts.data?.items.map((p) => (
               <li
                 key={p.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-(--radius-card) border border-line p-3"
+                className={`flex flex-wrap items-center justify-between gap-2 ${fh.listRow}`}
               >
-                <span>
+                <span className="text-ink-900">
                   {p.ownerName} · ৳{p.amount}
                 </span>
-                <span>{p.status}</span>
+                <span className="text-ink-500">{p.status}</span>
                 {p.status === 'PENDING' && (
                   <button
                     type="button"
-                    className="rounded-(--radius-card) bg-leaf-600 px-2 py-1 text-xs font-semibold text-paper"
+                    className={fh.btnLeaf}
                     onClick={() => approvePayout.mutate(p.id)}
                   >
                     Approve
@@ -258,22 +265,25 @@ function AdminDashboardInner() {
 
         {tab === 'money' && (
           <div className="space-y-6">
-            <section aria-labelledby="reconcile-heading">
+            <section className={fh.card} aria-labelledby="reconcile-heading">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h2 id="reconcile-heading" className="m-0 text-base font-bold text-ink-900">
+                <h2
+                  id="reconcile-heading"
+                  className="m-0 font-display text-base font-bold text-ink-900"
+                >
                   Reconcile orders vs ledger
                 </h2>
                 <button
                   type="button"
-                  className="rounded-[var(--radius-card)] border border-line bg-sand px-3 py-1.5 text-xs font-semibold"
+                  className={fh.btnGhost}
                   onClick={() => void reconcile.refetch()}
                 >
                   Refresh
                 </button>
               </div>
-              {reconcile.isLoading && <p className="text-ink-500">Running reconcile…</p>}
+              {reconcile.isLoading && <p className="mt-2 text-ink-500">Running reconcile…</p>}
               {reconcile.isError && (
-                <p className="text-urgent-600" role="alert">
+                <p className="mt-2 text-urgent-600" role="alert">
                   Reconcile failed.{' '}
                   <button
                     type="button"
@@ -286,7 +296,9 @@ function AdminDashboardInner() {
               )}
               {reconcile.data && (
                 <>
-                  <p className={reconcile.data.ok ? 'text-leaf-700' : 'text-urgent-600'}>
+                  <p
+                    className={`mt-2 font-semibold ${reconcile.data.ok ? 'text-leaf-700' : 'text-urgent-600'}`}
+                  >
                     {reconcile.data.ok
                       ? 'All captured orders match ledger SALE+COMMISSION.'
                       : `${reconcile.data.issues.length} issue(s) found.`}
@@ -295,11 +307,11 @@ function AdminDashboardInner() {
                     {reconcile.data.issues.map((i) => (
                       <li
                         key={i.orderId}
-                        className="rounded-[var(--radius-card)] border border-urgent-600/30 bg-paper p-3 font-mono text-xs"
+                        className="rounded-[var(--radius-card)] border border-urgent-600/20 bg-urgent-50 p-3 font-mono text-xs"
                       >
                         <div className="font-semibold text-ink-900">{i.orderId}</div>
                         <div className="text-ink-500">{i.message}</div>
-                        <div>
+                        <div className="text-ink-700">
                           expected {i.expectedPaisa} paisa · ledger {i.ledgerPaisa} paisa
                         </div>
                       </li>
@@ -309,8 +321,11 @@ function AdminDashboardInner() {
               )}
             </section>
 
-            <section aria-labelledby="payout-batch-heading">
-              <h2 id="payout-batch-heading" className="m-0 text-base font-bold text-ink-900">
+            <section className={fh.cardLeaf} aria-labelledby="payout-batch-heading">
+              <h2
+                id="payout-batch-heading"
+                className="m-0 font-display text-base font-bold text-ink-900"
+              >
                 Weekly payout batch
               </h2>
               <p className="mt-1 text-ink-500">
@@ -318,7 +333,7 @@ function AdminDashboardInner() {
               </p>
               <button
                 type="button"
-                className="mt-2 rounded-[var(--radius-card)] bg-leaf-600 px-3 py-2 text-sm font-semibold text-paper"
+                className={`mt-3 ${fh.btnLeaf}`}
                 disabled={payoutBatch.isPending}
                 onClick={() => {
                   if (window.confirm('Run weekly payout batch now?')) payoutBatch.mutate();
@@ -328,23 +343,26 @@ function AdminDashboardInner() {
               </button>
             </section>
 
-            <section aria-labelledby="cod-remit-heading">
-              <h2 id="cod-remit-heading" className="m-0 text-base font-bold text-ink-900">
+            <section className={fh.card} aria-labelledby="cod-remit-heading">
+              <h2
+                id="cod-remit-heading"
+                className="m-0 font-display text-base font-bold text-ink-900"
+              >
                 Confirm COD remit
               </h2>
               <p className="mt-1 text-ink-500">
                 Mark courier COD remittance received for an order.
               </p>
-              <div className="mt-2 flex flex-wrap gap-2">
+              <div className="mt-3 flex flex-wrap gap-2">
                 <input
-                  className="min-h-10 min-w-[16rem] flex-1 rounded-[var(--radius-card)] border border-line px-3 text-sm"
+                  className="min-h-11 min-w-[16rem] flex-1 rounded-[var(--radius-card)] border border-line bg-paper px-3 text-sm text-ink-900 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100"
                   placeholder="Order id"
                   value={codOrderId}
                   onChange={(e) => setCodOrderId(e.target.value)}
                 />
                 <button
                   type="button"
-                  className="rounded-[var(--radius-card)] bg-cta-500 px-3 py-2 text-sm font-semibold text-ink-900"
+                  className={fh.btnCta}
                   disabled={codRemit.isPending || !codOrderId.trim()}
                   onClick={() => {
                     if (window.confirm(`Confirm COD remit for ${codOrderId.trim()}?`)) {
@@ -358,7 +376,10 @@ function AdminDashboardInner() {
             </section>
 
             {moneyMsg ? (
-              <p className="m-0 text-sm text-ink-700" role="status">
+              <p
+                className="m-0 rounded-[var(--radius-card)] bg-leaf-50 px-3 py-2 text-sm font-semibold text-leaf-700"
+                role="status"
+              >
                 {moneyMsg}
               </p>
             ) : null}
@@ -366,10 +387,11 @@ function AdminDashboardInner() {
         )}
 
         {tab === 'settings' && (
-          <ul className="list-none space-y-1 p-0 font-mono text-xs">
+          <ul className="list-none space-y-2 p-0 font-mono text-xs">
             {settings.data?.map((s) => (
-              <li key={s.key} className="rounded border border-line px-2 py-1">
-                {s.key}: {JSON.stringify(s.value)}
+              <li key={s.key} className={fh.listRow}>
+                <span className="text-brand-700">{s.key}</span>
+                <span className="text-ink-700">: {JSON.stringify(s.value)}</span>
               </li>
             ))}
           </ul>

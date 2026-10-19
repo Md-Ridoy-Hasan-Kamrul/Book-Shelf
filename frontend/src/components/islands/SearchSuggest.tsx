@@ -59,9 +59,13 @@ export default function SearchSuggest({ initialQ = '' }: Props) {
   }, [items]);
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <form action="/search" method="get" role="search" className="flex gap-2">
+        <label htmlFor="header-search-q" className="sr-only">
+          Search books
+        </label>
         <input
+          id="header-search-q"
           name="q"
           value={q}
           onChange={(e) => {
@@ -69,28 +73,37 @@ export default function SearchSuggest({ initialQ = '' }: Props) {
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          placeholder="বই, লেখক, প্রকাশক…"
-          className="min-h-11 flex-1 rounded-[var(--radius-card)] border border-line bg-paper px-3 text-ink-900"
+          onBlur={() => {
+            // Allow click on suggestion before close
+            window.setTimeout(() => setOpen(false), 150);
+          }}
+          placeholder="বই, লেখক, ISBN…"
+          className="min-h-11 w-full flex-1 rounded-[var(--radius-card)] border border-line bg-cream px-3 text-ink-900 placeholder:text-ink-500 focus:border-brand-600 focus:bg-paper focus:outline-none focus:ring-2 focus:ring-brand-100"
           autoComplete="off"
+          enterKeyHint="search"
         />
         <button
           type="submit"
-          className="min-h-11 rounded-[var(--radius-card)] bg-brand-600 px-4 text-sm font-semibold text-paper"
+          className="min-h-11 shrink-0 cursor-pointer rounded-[var(--radius-card)] bg-brand-600 px-4 text-sm font-semibold text-paper hover:bg-brand-700"
         >
           Search
         </button>
       </form>
       {open && debounced.length >= 2 && (
-        <ul className="absolute z-20 mt-1 max-h-72 w-full overflow-auto rounded-[var(--radius-card)] border border-line bg-paper p-2 shadow-[var(--shadow-warm)]">
+        <ul
+          className="absolute z-50 mt-1 max-h-72 w-full overflow-auto rounded-[var(--radius-card)] border border-line bg-paper p-2 shadow-[var(--shadow-warm)]"
+          role="listbox"
+        >
           {loading && <li className="px-2 py-2 text-sm text-ink-500">Loading…</li>}
           {!loading && flat.length === 0 && (
             <li className="px-2 py-2 text-sm text-ink-500">No suggestions</li>
           )}
           {flat.map((row) => (
-            <li key={`${row.kind}-${row.href}`}>
+            <li key={`${row.kind}-${row.href}`} role="option">
               <a
                 href={row.href}
-                className="block rounded-lg px-2 py-2 text-sm no-underline hover:bg-sand"
+                className="block rounded-[var(--radius-card)] px-2 py-2 text-sm no-underline hover:bg-brand-50"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setOpen(false)}
               >
                 <span className="font-semibold text-ink-900">{row.label}</span>

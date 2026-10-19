@@ -43,3 +43,4 @@ Check off after each prompt’s ACCEPTANCE passes.
 
 - [x] P17 — Local hardening: security (Origin, SSRF, IDOR docs, rate-limit report, admin TOTP), k6 script, backup/restore, Redis AOF, BullMQ DLQ UI, reconcile+points, legal drafts, Dockerfiles (not run), `docs/HARDENING_REPORT.md`
 - [x] Audit gaps fixed — SiteShell PDF nav (Home/Discover/Community/Cart/Profile) + search→`/search`; FEATURE_* UI/route hide; `/account` + role-apply; Follow/Block on writer profiles; projectFiles AGENTS synced to React/`frontend`
+- [x] P2 shell production polish — sticky header + suggest search + active states; mobile bottom nav icons (BN labels) + cart drawer; `SiteFooter` columns (Explore / Account / Legal P17) + Fresh & Human tokens

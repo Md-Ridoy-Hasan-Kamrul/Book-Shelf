@@ -29,7 +29,7 @@ export const SELLER_ROLE_UI: Record<SellerRole, SellerRoleUi> = {
     heading: 'Vendor dashboard',
     blurb: 'Your shop: stock, pack queue, and payouts.',
     badge: 'Vendor',
-    badgeClass: 'bg-brand-100 text-brand-700',
+    badgeClass: 'bg-brand-100 text-brand-700', // trust blue
     inventoryLabel: 'Shop stock',
     ordersLabel: 'To pack',
     earningsLabel: 'Shop earnings',
@@ -59,7 +59,7 @@ export const SELLER_ROLE_UI: Record<SellerRole, SellerRoleUi> = {
     heading: 'Publisher dashboard',
     blurb: 'House catalog, warehouse fulfilment, and commission.',
     badge: 'Publisher',
-    badgeClass: 'bg-leaf-100 text-leaf-700',
+    badgeClass: 'bg-leaf-100 text-leaf-700', // growth green
     inventoryLabel: 'Catalog SKUs',
     ordersLabel: 'Warehouse orders',
     earningsLabel: 'House earnings',
@@ -90,7 +90,7 @@ export const SELLER_ROLE_UI: Record<SellerRole, SellerRoleUi> = {
     heading: 'Writer dashboard',
     blurb: 'Your titles, royalties, and reprint signals — not a shop floor.',
     badge: 'Writer',
-    badgeClass: 'bg-premium-50 text-premium-600',
+    badgeClass: 'bg-brand-50 text-brand-700', // calm trust
     inventoryLabel: 'My titles',
     ordersLabel: 'Recent sales',
     earningsLabel: 'Royalties',

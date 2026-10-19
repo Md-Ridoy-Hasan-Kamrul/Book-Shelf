@@ -15,6 +15,7 @@ import hindSiliguri400 from '@fontsource/hind-siliguri/files/hind-siliguri-benga
 import hindSiliguri600 from '@fontsource/hind-siliguri/files/hind-siliguri-bengali-600-normal.woff2?url';
 import Island from '../components/islands/Island.tsx';
 import SiteShell from '../components/islands/SiteShell.tsx';
+import SiteFooter from '../components/shell/SiteFooter.astro';
 
 interface Props {
   title?: string;
@@ -32,10 +33,11 @@ const {
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
 const fullTitle = title === 'BookVerse' ? title : `${title} · BookVerse`;
+const pathname = Astro.url.pathname;
 ---
 
 <!doctype html>
-<html lang="bn">
+<html lang="bn" class="h-full">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -56,7 +58,7 @@ const fullTitle = title === 'BookVerse' ? title : `${title} · BookVerse`;
     <title>{fullTitle}</title>
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
-  <body class="bg-cream pb-20 text-ink-900 min-[720px]:pb-0">
+  <body class="flex min-h-full flex-col bg-cream pb-20 text-ink-900 min-[720px]:pb-0">
     <a
       href="#main"
       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-[var(--radius-card)] focus:bg-brand-600 focus:px-3 focus:py-2 focus:text-paper"
@@ -64,25 +66,11 @@ const fullTitle = title === 'BookVerse' ? title : `${title} · BookVerse`;
       Skip to content
     </a>
     <Island client:load>
-      <SiteShell flags={{ usedBooks: flags.usedBooks }} />
+      <SiteShell flags={{ usedBooks: flags.usedBooks }} pathname={pathname} />
     </Island>
-    <slot />
-    <footer class="border-t border-line bg-paper">
-      <div
-        class="mx-auto flex w-[min(100%-2rem,72rem)] flex-col gap-4 py-8 min-[720px]:flex-row min-[720px]:items-end min-[720px]:justify-between"
-      >
-        <div>
-          <p class="m-0 font-display text-lg font-bold text-ink-900">BookVerse</p>
-          <p class="m-0 mt-1 max-w-md text-sm text-ink-500">Local-first · BDT · Bangla + English</p>
-        </div>
-        <nav class="flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold" aria-label="Footer">
-          <a href="/login" class="text-ink-700 no-underline hover:text-brand-700">Log in</a>
-          <a href="/mood" class="text-ink-700 no-underline hover:text-brand-700">Discover</a>
-          <a href="/account" class="text-ink-700 no-underline hover:text-brand-700">Profile</a>
-          <a href="/legal/terms" class="text-ink-700 no-underline hover:text-brand-700">Terms</a>
-          <a href="/design" class="text-brand-700 no-underline hover:underline">Design</a>
-        </nav>
-      </div>
-    </footer>
+    <div class="flex-1">
+      <slot />
+    </div>
+    <SiteFooter />
   </body>
 </html>
