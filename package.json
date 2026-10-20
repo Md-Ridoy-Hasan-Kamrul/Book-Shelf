@@ -24,7 +24,6 @@
     "test:watch:api": "pnpm --filter @bookverse/api test:watch",
     "test:e2e": "pnpm --filter @bookverse/web test:e2e",
     "test:e2e:ui": "pnpm --filter @bookverse/web test:e2e:ui",
-    "test:dino": "pnpm --filter @bookverse/web test:dino",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "db:validate": "pnpm --filter @bookverse/api db:validate",
