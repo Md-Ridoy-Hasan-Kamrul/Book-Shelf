@@ -10,7 +10,7 @@ const results = q ? await searchBooks(q) : { items: [], nextCursor: null };
 
 <Base title={q ? `Search: ${q}` : 'Search'}>
   <main id="main" class="py-10">
-    <div class="mx-auto w-[min(100%-2rem,72rem)]">
+    <div class="bv-container">
       <h1 class="m-0 font-display text-3xl font-bold text-ink-900">Search</h1>
       <div class="mt-6">
         <SearchSuggest client:load initialQ={q} />

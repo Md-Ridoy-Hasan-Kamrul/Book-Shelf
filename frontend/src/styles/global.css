@@ -1,10 +1,19 @@
 @import 'tailwindcss';
 
+/**
+ * Breakpoints (design targets):
+ * Mobile S 320 · M 375 · L 425 · Tablet 768 · Laptop 1020 · Laptop L 1440 · Desktop+
+ */
 @theme {
   --font-display: 'Inter', system-ui, sans-serif;
   --font-body: 'Hind Siliguri', system-ui, sans-serif;
   --radius-card: 12px;
   --shadow-warm: 0 18px 40px rgb(31 42 55 / 0.08);
+  --breakpoint-mm: 375px;
+  --breakpoint-ml: 425px;
+  --breakpoint-tab: 768px;
+  --breakpoint-lap: 1020px;
+  --breakpoint-lapl: 1440px;
   --color-paper: #ffffff;
   --color-cream: #fbf7f0;
   --color-sand: #f3ede2;
@@ -58,18 +67,54 @@
 @layer base {
   html {
     overflow-x: clip;
+    /* Fluid root: ~15px @320 → ~17px @1440+ */
+    font-size: clamp(0.9375rem, 0.88rem + 0.28vw, 1.0625rem);
   }
 
   body {
     min-height: 100%;
     margin: 0;
     font-family: var(--font-body);
-    font-size: 1.0625rem;
-    line-height: 1.6;
+    font-size: 1rem;
+    line-height: 1.55;
     color: var(--color-ink-900);
     background-color: var(--color-cream);
     cursor: default;
     overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      line-height: 1.6;
+    }
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--color-ink-900);
+  }
+
+  h1 {
+    font-size: clamp(1.375rem, 1.1rem + 1.35vw, 2rem);
+  }
+
+  h2 {
+    font-size: clamp(1.125rem, 1.02rem + 0.55vw, 1.5rem);
+  }
+
+  h3 {
+    font-size: clamp(1.05rem, 1rem + 0.3vw, 1.25rem);
+  }
+
+  p {
+    max-width: 70ch;
   }
 
   a,
@@ -113,5 +158,81 @@
   .spoiler-blur {
     filter: blur(6px);
     user-select: none;
+  }
+
+  /* Professional type scale (use on any page) */
+  .type-hero {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.15rem + 3.2vw, 3.5rem);
+    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+
+  .type-page {
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 1.12rem + 1.1vw, 1.875rem);
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .type-section {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1.02rem + 0.45vw, 1.35rem);
+    line-height: 1.25;
+    font-weight: 700;
+  }
+
+  .type-lead {
+    font-size: clamp(0.9rem, 0.86rem + 0.28vw, 1.125rem);
+    line-height: 1.55;
+  }
+
+  .type-body {
+    font-size: clamp(0.875rem, 0.85rem + 0.15vw, 1rem);
+    line-height: 1.55;
+  }
+
+  .type-ui {
+    font-size: clamp(0.8125rem, 0.8rem + 0.12vw, 0.9375rem);
+    line-height: 1.4;
+  }
+
+  .type-meta {
+    font-size: clamp(0.6875rem, 0.66rem + 0.12vw, 0.75rem);
+    line-height: 1.35;
+  }
+
+  .type-kpi {
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 1.15rem + 0.95vw, 1.85rem);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  /* Gutters: 320 → 1440 without horizontal overflow */
+  .bv-container {
+    width: min(100% - 1.5rem, 72rem);
+    margin-inline: auto;
+  }
+
+  @media (min-width: 375px) {
+    .bv-container {
+      width: min(100% - 2rem, 72rem);
+    }
+  }
+
+  @media (min-width: 1020px) {
+    .bv-container {
+      width: min(100% - 2.5rem, 72rem);
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .bv-container {
+      width: min(100% - 3rem, 80rem);
+    }
   }
 }

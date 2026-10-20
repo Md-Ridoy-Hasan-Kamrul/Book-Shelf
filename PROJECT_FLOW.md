@@ -46,4 +46,5 @@ Check off after each prompt’s ACCEPTANCE passes.
 - [x] Reader post-login hub — `/home` (orders · reading · points); role redirects via `postLogin` / `mock-login` / `/post-login`; guest `/` storefront kept
 - [x] Ops dashboard polish — Donezo-like shell (sidebar · search · user chip · KPI grid · widgets) on Admin/Seller, Fresh & Human tokens
 - [x] Ops dashboards use `DashboardLayout` (no storefront navbar / footer / bottom nav)
+- [x] Site-wide fluid type + `bv-container` gutters (320→375→425→768→1020→1440)
 - [x] P2 shell production polish — sticky header + suggest search + active states; mobile bottom nav icons (BN labels) + cart drawer; `SiteFooter` columns (Explore / Account / Legal P17) + Fresh & Human tokens

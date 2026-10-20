@@ -145,7 +145,7 @@ function SellerDashboardInner({ role, userName, userEmail }: Props) {
           )}
           {overview.data && (
             <div className="grid gap-4">
-              <div className="grid grid-cols-2 gap-3 min-[720px]:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2 min-[375px]:gap-3 min-[768px]:grid-cols-4 min-[1440px]:gap-4">
                 <DashStat
                   label={role === 'WRITER' ? 'Title sales' : 'Orders'}
                   value={overview.data.ordersTotal}

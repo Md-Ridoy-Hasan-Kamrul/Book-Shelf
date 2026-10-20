@@ -30,13 +30,13 @@ export default function HomeBrowseStrip() {
 
   return (
     <section className="py-10" aria-labelledby="browse-heading">
-      <div className="mx-auto w-[min(100%-2rem,72rem)]">
+      <div className="bv-container">
         <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 id="browse-heading" className="m-0 font-display text-2xl font-bold text-ink-900">
+            <h2 id="browse-heading" className="type-page m-0 text-ink-900">
               নতুন বই
             </h2>
-            <p className="m-0 mt-1 text-sm text-ink-500">ক্যাটালগ থেকে সাম্প্রতিক যোগ</p>
+            <p className="type-ui m-0 mt-1 text-ink-500">ক্যাটালগ থেকে সাম্প্রতিক যোগ</p>
           </div>
           <a
             href="/search"

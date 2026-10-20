@@ -12,7 +12,7 @@ import HomeBrowseStrip from '../components/islands/HomeBrowseStrip.tsx';
   <main id="main">
     <Hero />
     <section class="py-10" aria-label="Mood discovery">
-      <div class="mx-auto grid w-[min(100%-2rem,72rem)] min-w-0 max-w-full gap-8">
+      <div class="bv-container grid min-w-0 max-w-full gap-6 min-[768px]:gap-8">
         <MoodPicker client:load />
         <RecommendRail client:load />
       </div>

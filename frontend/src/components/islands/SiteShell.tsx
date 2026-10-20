@@ -137,10 +137,10 @@ export default function SiteShell({ flags, pathname = '/', homeHref = '/' }: Pro
 
       <header className="sticky top-0 z-40 border-b border-line bg-paper/95 shadow-[var(--shadow-warm)] backdrop-blur">
         {/* Desktop chrome from 1020px (Laptop+): tablet/mobile use bottom nav + stacked search */}
-        <div className="mx-auto flex w-[min(100%-2rem,72rem)] min-w-0 flex-wrap items-center gap-3 py-3 min-[1020px]:flex-nowrap">
+        <div className="bv-container flex min-w-0 flex-wrap items-center gap-2 py-2.5 min-[375px]:gap-3 min-[375px]:py-3 min-[1020px]:flex-nowrap">
           <a
             href={brandHref}
-            className="font-display text-xl font-bold tracking-tight text-ink-900 no-underline"
+            className="font-display text-lg font-bold tracking-tight text-ink-900 no-underline min-[375px]:text-xl min-[1440px]:text-[1.35rem]"
           >
             BookVerse
           </a>

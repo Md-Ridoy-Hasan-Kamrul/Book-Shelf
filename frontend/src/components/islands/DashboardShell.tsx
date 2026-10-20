@@ -309,19 +309,15 @@ export default function DashboardShell<T extends string>({
             </button>
           </header>
 
-          <div className="flex-1 px-3 py-5 min-[375px]:px-4 min-[640px]:px-6 min-[640px]:py-7 min-[1020px]:px-8">
+          <div className="mx-auto w-full max-w-[90rem] flex-1 px-3 py-5 min-[375px]:px-4 min-[425px]:px-5 min-[768px]:px-6 min-[768px]:py-7 min-[1020px]:px-8 min-[1440px]:px-10">
             <div className="mb-5 flex flex-wrap items-start justify-between gap-3 min-[768px]:mb-6">
-              <div className="min-w-0">
-                <h1 className="m-0 font-display text-xl font-bold tracking-tight text-ink-900 min-[375px]:text-2xl min-[768px]:text-[1.75rem]">
-                  {title}
-                </h1>
-                <p className="m-0 mt-1.5 max-w-lg text-sm leading-relaxed text-ink-500">
-                  {subtitle}
-                </p>
+              <div className="min-w-0 max-w-2xl">
+                <h1 className="type-page m-0 text-ink-900">{title}</h1>
+                <p className="type-lead m-0 mt-1.5 text-ink-500">{subtitle}</p>
               </div>
               {headerActions ? <div className="flex flex-wrap gap-2">{headerActions}</div> : null}
             </div>
-            <div className="text-sm text-ink-900">{children}</div>
+            <div className="type-body text-ink-900">{children}</div>
           </div>
         </div>
       </div>
@@ -352,11 +348,11 @@ export function DashStat({
 
   return (
     <div
-      className={`flex min-h-[6.25rem] flex-col justify-between rounded-[var(--radius-card)] border p-4 shadow-[var(--shadow-warm)] ${shell}`}
+      className={`flex min-h-[5.75rem] flex-col justify-between rounded-[var(--radius-card)] border p-3 shadow-[var(--shadow-warm)] min-[375px]:min-h-[6.25rem] min-[375px]:p-4 min-[1440px]:p-5 ${shell}`}
     >
-      <p className={`m-0 text-xs font-semibold ${muted}`}>{label}</p>
-      <p className={`m-0 font-display text-2xl font-bold tracking-tight ${strong}`}>{value}</p>
-      {hint ? <p className={`m-0 text-[0.65rem] font-medium ${muted}`}>{hint}</p> : null}
+      <p className={`type-meta m-0 font-semibold ${muted}`}>{label}</p>
+      <p className={`type-kpi m-0 ${strong}`}>{value}</p>
+      {hint ? <p className={`type-meta m-0 font-medium ${muted}`}>{hint}</p> : null}
     </div>
   );
 }
@@ -377,7 +373,7 @@ export function DashPanel({
       className={`rounded-[var(--radius-card)] border border-line bg-paper p-4 shadow-[var(--shadow-warm)] min-[640px]:p-5 ${className}`}
     >
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="m-0 font-display text-base font-bold text-ink-900">{title}</h2>
+        <h2 className="type-section m-0 text-ink-900">{title}</h2>
         {action}
       </div>
       {children}
