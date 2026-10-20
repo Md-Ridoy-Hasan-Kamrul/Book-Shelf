@@ -49,15 +49,15 @@ export default function RecommendRail() {
   if (sections.length === 0) return null;
 
   return (
-    <div className="grid gap-8">
+    <div className="grid min-w-0 max-w-full gap-8">
       {sections.map((sec) => (
-        <section key={sec.key} aria-labelledby={`rec-${sec.key}`}>
+        <section key={sec.key} className="min-w-0 max-w-full" aria-labelledby={`rec-${sec.key}`}>
           <h2 id={`rec-${sec.key}`} className="m-0 font-display text-xl font-bold text-ink-900">
             {sec.title}
           </h2>
-          <ul className="mt-4 flex list-none gap-3 overflow-x-auto p-0 pb-2">
+          <ul className="mt-4 flex max-w-full list-none gap-3 overflow-x-auto p-0 pb-2">
             {sec.items.map((b) => (
-              <li key={b.id} className="min-w-[12rem] shrink-0">
+              <li key={b.id} className="w-48 shrink-0">
                 <a
                   href={`/books/${b.slug}`}
                   className="block rounded-[var(--radius-card)] border border-line bg-paper p-3 no-underline hover:bg-sand"

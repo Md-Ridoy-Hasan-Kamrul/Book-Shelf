@@ -5,7 +5,7 @@ export function ToastStack() {
   const dismiss = useUiStore((s) => s.dismissToast);
   if (toasts.length === 0) return null;
   return (
-    <div className="fixed bottom-20 left-1/2 z-50 flex w-[min(100%-2rem,24rem)] -translate-x-1/2 flex-col gap-2 min-[720px]:bottom-4">
+    <div className="fixed bottom-20 left-1/2 z-50 flex w-[min(100%-2rem,24rem)] -translate-x-1/2 flex-col gap-2 min-[1020px]:bottom-4">
       {toasts.map((t) => (
         <div
           key={t.id}

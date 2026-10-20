@@ -59,8 +59,8 @@ export default function SearchSuggest({ initialQ = '' }: Props) {
   }, [items]);
 
   return (
-    <div className="relative w-full">
-      <form action="/search" method="get" role="search" className="flex gap-2">
+    <div className="relative w-full min-w-0 max-w-full">
+      <form action="/search" method="get" role="search" className="flex min-w-0 gap-2">
         <label htmlFor="header-search-q" className="sr-only">
           Search books
         </label>
@@ -78,7 +78,7 @@ export default function SearchSuggest({ initialQ = '' }: Props) {
             window.setTimeout(() => setOpen(false), 150);
           }}
           placeholder="বই, লেখক, ISBN…"
-          className="min-h-11 w-full flex-1 rounded-[var(--radius-card)] border border-line bg-cream px-3 text-ink-900 placeholder:text-ink-500 focus:border-brand-600 focus:bg-paper focus:outline-none focus:ring-2 focus:ring-brand-100"
+          className="min-h-11 min-w-0 w-full flex-1 rounded-[var(--radius-card)] border border-line bg-cream px-3 text-ink-900 placeholder:text-ink-500 focus:border-brand-600 focus:bg-paper focus:outline-none focus:ring-2 focus:ring-brand-100"
           autoComplete="off"
           enterKeyHint="search"
         />

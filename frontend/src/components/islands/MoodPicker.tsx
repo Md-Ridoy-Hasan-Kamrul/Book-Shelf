@@ -91,7 +91,7 @@ export default function MoodPicker() {
   return (
     <section
       aria-labelledby="mood-picker-title"
-      className="rounded-[var(--radius-card)] border border-line bg-paper p-5 shadow-[var(--shadow-warm)]"
+      className="min-w-0 max-w-full rounded-[var(--radius-card)] border border-line bg-paper p-4 shadow-[var(--shadow-warm)] min-[425px]:p-5"
     >
       <h2 id="mood-picker-title" className="m-0 font-display text-xl font-bold text-ink-900">
         Mood discovery

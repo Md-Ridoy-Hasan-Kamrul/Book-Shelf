@@ -143,7 +143,7 @@ export default function DashboardShell<T extends string>({
             className="border-b border-line bg-paper px-3 py-2 min-[960px]:hidden"
             role="presentation"
           >
-            <div className="-mx-1 flex gap-1 overflow-x-auto pb-1">
+            <div className="-mx-1 flex max-w-full gap-1 overflow-x-auto pb-1">
               {items.map((item) => {
                 const selected = item.id === activeId;
                 return (

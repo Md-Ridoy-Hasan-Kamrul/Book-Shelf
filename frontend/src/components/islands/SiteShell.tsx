@@ -130,7 +130,8 @@ export default function SiteShell({ flags, pathname = '/' }: Props) {
       ) : null}
 
       <header className="sticky top-0 z-40 border-b border-line bg-paper/95 shadow-[var(--shadow-warm)] backdrop-blur">
-        <div className="mx-auto flex w-[min(100%-2rem,72rem)] flex-wrap items-center gap-3 py-3 min-[720px]:flex-nowrap">
+        {/* Desktop chrome from 1020px (Laptop+) — tablet/mobile use bottom nav + stacked search */}
+        <div className="mx-auto flex w-[min(100%-2rem,72rem)] min-w-0 flex-wrap items-center gap-3 py-3 min-[1020px]:flex-nowrap">
           <a
             href="/"
             className="font-display text-xl font-bold tracking-tight text-ink-900 no-underline"
@@ -138,11 +139,11 @@ export default function SiteShell({ flags, pathname = '/' }: Props) {
             BookVerse
           </a>
 
-          <div className="order-3 w-full min-[720px]:order-none min-[720px]:flex-1">
+          <div className="order-3 w-full min-w-0 min-[1020px]:order-none min-[1020px]:flex-1">
             <HeaderSearch />
           </div>
 
-          <nav className="ml-auto hidden items-center gap-1 min-[720px]:flex" aria-label="Primary">
+          <nav className="ml-auto hidden items-center gap-1 min-[1020px]:flex" aria-label="Primary">
             {DESKTOP_PRIMARY.map((item) => {
               const active = item.match(path);
               return (
@@ -204,8 +205,8 @@ export default function SiteShell({ flags, pathname = '/' }: Props) {
             </button>
           </nav>
 
-          {/* Mobile: cart + notify next to logo */}
-          <div className="ml-auto flex items-center gap-2 min-[720px]:hidden">
+          {/* Mobile / tablet: cart + notify next to logo */}
+          <div className="ml-auto flex items-center gap-2 min-[1020px]:hidden">
             <NotificationBell />
             <button
               type="button"
@@ -225,7 +226,7 @@ export default function SiteShell({ flags, pathname = '/' }: Props) {
       </header>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgb(31_42_55/0.06)] backdrop-blur min-[720px]:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgb(31_42_55/0.06)] backdrop-blur min-[1020px]:hidden"
         aria-label="Mobile"
       >
         <ul className="m-0 grid list-none grid-cols-5 gap-0 px-1 pt-1 pb-1">
