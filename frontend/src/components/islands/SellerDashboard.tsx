@@ -122,22 +122,14 @@ function SellerDashboardInner({ role, userName, userEmail }: Props) {
         </>
       }
       footer={
-        <div className="space-y-2">
-          {ui.growthLink ? (
-            <a
-              href={ui.growthLink}
-              className="block text-xs font-semibold text-brand-700 no-underline hover:underline"
-            >
-              Growth tools
-            </a>
-          ) : null}
+        ui.growthLink ? (
           <a
-            href="/account"
-            className="block text-xs font-semibold text-ink-500 no-underline hover:text-brand-700"
+            href={ui.growthLink}
+            className="relative flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-ink-700 no-underline hover:bg-sand hover:text-ink-900"
           >
-            Account settings
+            Growth tools
           </a>
-        </div>
+        ) : null
       }
     >
       {tab === 'overview' && (

@@ -133,14 +133,6 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
           </button>
         </>
       }
-      footer={
-        <a
-          href="/account"
-          className="block text-xs font-semibold text-ink-500 no-underline hover:text-brand-700"
-        >
-          Account settings
-        </a>
-      }
     >
       {tab === 'kpis' && (
         <>
