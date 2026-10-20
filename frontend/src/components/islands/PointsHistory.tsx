@@ -27,9 +27,7 @@ function PointsInner() {
   });
 
   if (q.isLoading) {
-    return (
-      <div className="h-40 animate-pulse rounded-[var(--radius-card)] bg-sand" aria-busy="true" />
-    );
+    return <div className="h-40 animate-pulse rounded-(--radius-card) bg-sand" aria-busy="true" />;
   }
   if (q.isError) {
     return (

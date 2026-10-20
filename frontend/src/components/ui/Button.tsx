@@ -19,7 +19,7 @@ export function Button({ variant = 'brand', className = '', children, ...rest }:
   return (
     <button
       type="button"
-      className={`inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[var(--radius-card)] px-4 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${styles[variant]} ${className}`}
+      className={`inline-flex min-h-11 cursor-pointer items-center justify-center rounded-(--radius-card) px-4 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${styles[variant]} ${className}`}
       {...rest}
     >
       {children}

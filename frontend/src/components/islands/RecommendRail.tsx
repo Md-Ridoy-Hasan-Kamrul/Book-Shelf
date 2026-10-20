@@ -71,10 +71,10 @@ export default function RecommendRail() {
               <li key={b.id} className="min-w-0">
                 <a
                   href={`/books/${b.slug}`}
-                  className="flex h-full min-h-[7.25rem] flex-col rounded-[var(--radius-card)] border border-line bg-paper p-3 no-underline shadow-[var(--shadow-warm)] hover:border-brand-600"
+                  className="flex h-full min-h-29 flex-col rounded-(--radius-card) border border-line bg-paper p-3 no-underline shadow-(--shadow-warm) hover:border-brand-600"
                 >
                   <p
-                    className="m-0 line-clamp-2 min-h-[2.5rem] font-display text-sm leading-snug font-bold text-ink-900"
+                    className="m-0 line-clamp-2 min-h-10 font-display text-sm leading-snug font-bold text-ink-900"
                     title={b.titleBn}
                   >
                     {b.titleBn}

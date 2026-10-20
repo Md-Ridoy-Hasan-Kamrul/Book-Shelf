@@ -142,7 +142,7 @@ export default function LiveEventRoom({ eventId, userId, userName }: Props) {
         )}
 
         {event?.pinnedBook && (
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-card)] border border-line bg-paper p-4">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-(--radius-card) border border-line bg-paper p-4">
             <div>
               <p className="m-0 text-xs font-bold text-brand-600 uppercase">Pinned book</p>
               <p className="m-0 font-display font-bold text-ink-900">{event.pinnedBook.titleBn}</p>
@@ -150,14 +150,14 @@ export default function LiveEventRoom({ eventId, userId, userName }: Props) {
             </div>
             <a
               href={`/books/${event.pinnedBook.slug}`}
-              className="inline-flex min-h-11 items-center rounded-[var(--radius-card)] bg-cta-500 px-4 text-sm font-semibold text-ink-900 no-underline"
+              className="inline-flex min-h-11 items-center rounded-(--radius-card) bg-cta-500 px-4 text-sm font-semibold text-ink-900 no-underline"
             >
               Buy
             </a>
           </div>
         )}
 
-        <div className="mt-4 rounded-[var(--radius-card)] border border-line bg-paper p-3">
+        <div className="mt-4 rounded-(--radius-card) border border-line bg-paper p-3">
           <p className="m-0 text-xs font-bold text-ink-500 uppercase">Moderated chat</p>
           <ul className="mt-2 max-h-64 list-none space-y-1 overflow-y-auto p-0 text-sm">
             {messages.map((m) => (
@@ -179,7 +179,7 @@ export default function LiveEventRoom({ eventId, userId, userName }: Props) {
             <input
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
-              className="min-h-11 flex-1 rounded-[var(--radius-card)] border border-line px-3 text-sm"
+              className="min-h-11 flex-1 rounded-(--radius-card) border border-line px-3 text-sm"
               placeholder={userId ? 'Say something…' : 'Login to chat'}
               disabled={!userId || status === 'error'}
               maxLength={400}
@@ -191,7 +191,7 @@ export default function LiveEventRoom({ eventId, userId, userName }: Props) {
         </div>
       </div>
 
-      <aside className="rounded-[var(--radius-card)] border border-line bg-sand p-4">
+      <aside className="rounded-(--radius-card) border border-line bg-sand p-4">
         <h2 className="m-0 font-display text-lg font-bold text-ink-900">Question queue</h2>
         <ul className="mt-3 list-none space-y-2 p-0 text-sm">
           {questions.map((q) => (
@@ -216,7 +216,7 @@ export default function LiveEventRoom({ eventId, userId, userName }: Props) {
             rows={2}
             maxLength={500}
             disabled={!userId}
-            className="rounded-[var(--radius-card)] border border-line bg-paper px-3 py-2 text-sm"
+            className="rounded-(--radius-card) border border-line bg-paper px-3 py-2 text-sm"
             placeholder="Ask the writer…"
           />
           <Button type="submit" disabled={!userId}>

@@ -21,7 +21,7 @@ export function Modal({ open, title, onClose, children }: Props) {
   return (
     <dialog
       ref={ref}
-      className="w-[min(100%-2rem,28rem)] rounded-[var(--radius-card)] border border-line bg-paper p-0 text-ink-900 shadow-[var(--shadow-warm)] backdrop:bg-ink-900/40"
+      className="w-[min(100%-2rem,28rem)] rounded-(--radius-card) border border-line bg-paper p-0 text-ink-900 shadow-(--shadow-warm) backdrop:bg-ink-900/40"
       onClose={onClose}
     >
       <div className="flex items-center justify-between border-b border-line px-4 py-3">

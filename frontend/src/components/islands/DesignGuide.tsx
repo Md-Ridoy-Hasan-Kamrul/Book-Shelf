@@ -70,18 +70,18 @@ export default function DesignGuide() {
           Token swatches
         </h2>
         <div className="mt-4 grid gap-2 min-[640px]:grid-cols-3">
-          <div className="rounded-[var(--radius-card)] border border-line bg-paper p-4 text-ink-900">
+          <div className="rounded-(--radius-card) border border-line bg-paper p-4 text-ink-900">
             paper
           </div>
-          <div className="rounded-[var(--radius-card)] border border-line bg-cream p-4 text-ink-900">
+          <div className="rounded-(--radius-card) border border-line bg-cream p-4 text-ink-900">
             cream
           </div>
-          <div className="rounded-[var(--radius-card)] border border-line bg-sand p-4 text-ink-900">
+          <div className="rounded-(--radius-card) border border-line bg-sand p-4 text-ink-900">
             sand
           </div>
-          <div className="rounded-[var(--radius-card)] bg-brand-600 p-4 text-paper">brand-600</div>
-          <div className="rounded-[var(--radius-card)] bg-leaf-700 p-4 text-paper">leaf-700</div>
-          <div className="rounded-[var(--radius-card)] bg-cta-500 p-4 text-ink-900">cta-500</div>
+          <div className="rounded-(--radius-card) bg-brand-600 p-4 text-paper">brand-600</div>
+          <div className="rounded-(--radius-card) bg-leaf-700 p-4 text-paper">leaf-700</div>
+          <div className="rounded-(--radius-card) bg-cta-500 p-4 text-ink-900">cta-500</div>
         </div>
       </section>
 
@@ -168,8 +168,8 @@ export default function DesignGuide() {
         <h2 id="dg-wcag" className="font-display text-2xl font-bold text-ink-900">
           WCAG AA contrast (report)
         </h2>
-        <div className="mt-4 overflow-x-auto rounded-[var(--radius-card)] border border-line bg-paper">
-          <table className="w-full min-w-[28rem] border-collapse text-left text-sm">
+        <div className="mt-4 overflow-x-auto rounded-(--radius-card) border border-line bg-paper">
+          <table className="w-full min-w-112 border-collapse text-left text-sm">
             <thead className="border-b border-line bg-sand/80">
               <tr>
                 <th className="px-3 py-2">Pair</th>

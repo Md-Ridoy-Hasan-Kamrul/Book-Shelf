@@ -48,7 +48,7 @@ function NotificationBellInner() {
         )}
       </button>
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-[min(90vw,20rem)] rounded-[var(--radius-card)] border border-line bg-paper p-3 shadow-lg">
+        <div className="absolute right-0 z-50 mt-2 w-[min(90vw,20rem)] rounded-(--radius-card) border border-line bg-paper p-3 shadow-lg">
           {list.isLoading && <p className="text-sm text-ink-500">Loading…</p>}
           {list.isError && (
             <p className="text-sm text-urgent-600">

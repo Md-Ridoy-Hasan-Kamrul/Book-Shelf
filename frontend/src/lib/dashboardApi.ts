@@ -20,13 +20,81 @@ async function authedFetch(path: string, init: RequestInit = {}) {
   });
 }
 
-const listEnvelope = <T extends z.ZodTypeAny>(item: T) =>
+const listEnvelope = <T extends z.ZodType>(item: T) =>
   apiSuccessEnvelopeSchema(
     z.object({
       items: z.array(item),
       nextCursor: z.string().nullable(),
     }),
   );
+
+const adminRoleAppSchema = z.object({
+  id: z.string(),
+  type: z.string(),
+  status: z.string(),
+  userName: z.string(),
+  userEmail: z.string(),
+  createdAt: z.string(),
+});
+const adminClaimSchema = z.object({
+  id: z.string(),
+  orderId: z.string(),
+  status: z.string(),
+  reason: z.string(),
+  images: z.array(z.string()),
+  sellerName: z.string(),
+  buyerName: z.string(),
+});
+const adminOrderSchema = z.object({
+  id: z.string(),
+  status: z.string(),
+  total: z.string(),
+  sellerName: z.string(),
+  buyerName: z.string(),
+  createdAt: z.string(),
+});
+const adminPayoutSchema = z.object({
+  id: z.string(),
+  ownerName: z.string(),
+  amount: z.string(),
+  status: z.string(),
+  createdAt: z.string(),
+});
+const adminMarginWarningSchema = z.object({
+  listingId: z.string(),
+  bookTitle: z.string(),
+  sellerName: z.string(),
+  price: z.string(),
+  commissionBps: z.number(),
+  netMarginBps: z.number(),
+  floorBdt: z.string().optional(),
+  commissionBdt: z.string().optional(),
+});
+const adminSettingSchema = z.object({
+  key: z.string(),
+  value: z.unknown(),
+  updatedAt: z.string(),
+});
+const adminReconcileSchema = z.object({
+  ok: z.boolean(),
+  issues: z.array(
+    z.object({
+      orderId: z.string(),
+      expectedPaisa: z.string(),
+      ledgerPaisa: z.string(),
+      message: z.string(),
+    }),
+  ),
+});
+
+export type AdminRoleApp = z.infer<typeof adminRoleAppSchema>;
+export type AdminClaim = z.infer<typeof adminClaimSchema>;
+export type AdminOrder = z.infer<typeof adminOrderSchema>;
+export type AdminPayout = z.infer<typeof adminPayoutSchema>;
+export type AdminMarginWarning = z.infer<typeof adminMarginWarningSchema>;
+export type AdminSetting = z.infer<typeof adminSettingSchema>;
+export type AdminReconcile = z.infer<typeof adminReconcileSchema>;
+export type AdminReconcileIssue = AdminReconcile['issues'][number];
 
 export async function fetchSellerOverview() {
   if (useMockData()) {
@@ -76,7 +144,7 @@ export async function fetchSellerOrders(filter: 'all' | 'to_pack' | 'shipped' = 
           trackingCode: null,
           createdAt: new Date().toISOString(),
         },
-      ].filter((o) => filter === 'all' || filter === 'to_pack'),
+      ].filter(() => filter === 'all' || filter === 'to_pack'),
       nextCursor: null as string | null,
     };
   }
@@ -197,7 +265,10 @@ export async function fetchAdminKpis() {
   return apiSuccessEnvelopeSchema(adminKpiSchema).parse(json).data;
 }
 
-export async function fetchAdminRoleApplications() {
+export async function fetchAdminRoleApplications(): Promise<{
+  items: AdminRoleApp[];
+  nextCursor: string | null;
+}> {
   if (useMockData()) {
     return {
       items: [
@@ -210,41 +281,30 @@ export async function fetchAdminRoleApplications() {
           createdAt: new Date().toISOString(),
         },
       ],
-      nextCursor: null as string | null,
+      nextCursor: null,
     };
   }
   const res = await authedFetch('/admin/dashboard/role-applications?status=PENDING');
   const json: unknown = await res.json();
   if (!res.ok) throw new Error('Failed');
-  const row = z.object({
-    id: z.string(),
-    type: z.string(),
-    status: z.string(),
-    userName: z.string(),
-    userEmail: z.string(),
-    createdAt: z.string(),
-  });
-  return listEnvelope(row).parse(json).data;
+  return listEnvelope(adminRoleAppSchema).parse(json).data;
 }
 
-export async function fetchAdminClaims() {
-  if (useMockData()) return { items: [], nextCursor: null as string | null };
+export async function fetchAdminClaims(): Promise<{
+  items: AdminClaim[];
+  nextCursor: string | null;
+}> {
+  if (useMockData()) return { items: [], nextCursor: null };
   const res = await authedFetch('/admin/dashboard/claims');
   const json: unknown = await res.json();
   if (!res.ok) throw new Error('Failed');
-  const row = z.object({
-    id: z.string(),
-    orderId: z.string(),
-    status: z.string(),
-    reason: z.string(),
-    images: z.array(z.string()),
-    sellerName: z.string(),
-    buyerName: z.string(),
-  });
-  return listEnvelope(row).parse(json).data;
+  return listEnvelope(adminClaimSchema).parse(json).data;
 }
 
-export async function fetchAdminOrders() {
+export async function fetchAdminOrders(): Promise<{
+  items: AdminOrder[];
+  nextCursor: string | null;
+}> {
   if (useMockData()) {
     return {
       items: [
@@ -257,24 +317,19 @@ export async function fetchAdminOrders() {
           createdAt: new Date().toISOString(),
         },
       ],
-      nextCursor: null as string | null,
+      nextCursor: null,
     };
   }
   const res = await authedFetch('/admin/dashboard/orders');
   const json: unknown = await res.json();
   if (!res.ok) throw new Error('Failed');
-  const row = z.object({
-    id: z.string(),
-    status: z.string(),
-    total: z.string(),
-    sellerName: z.string(),
-    buyerName: z.string(),
-    createdAt: z.string(),
-  });
-  return listEnvelope(row).parse(json).data;
+  return listEnvelope(adminOrderSchema).parse(json).data;
 }
 
-export async function fetchAdminPayouts() {
+export async function fetchAdminPayouts(): Promise<{
+  items: AdminPayout[];
+  nextCursor: string | null;
+}> {
   if (useMockData()) {
     return {
       items: [
@@ -286,20 +341,13 @@ export async function fetchAdminPayouts() {
           createdAt: new Date().toISOString(),
         },
       ],
-      nextCursor: null as string | null,
+      nextCursor: null,
     };
   }
   const res = await authedFetch('/admin/dashboard/payouts');
   const json: unknown = await res.json();
   if (!res.ok) throw new Error('Failed');
-  const row = z.object({
-    id: z.string(),
-    ownerName: z.string(),
-    amount: z.string(),
-    status: z.string(),
-    createdAt: z.string(),
-  });
-  return listEnvelope(row).parse(json).data;
+  return listEnvelope(adminPayoutSchema).parse(json).data;
 }
 
 export async function approveAdminPayout(id: string) {
@@ -307,25 +355,18 @@ export async function approveAdminPayout(id: string) {
   await authedFetch(`/admin/dashboard/payouts/${id}/approve`, { method: 'POST' });
 }
 
-export async function fetchAdminMarginWarnings() {
-  if (useMockData()) return { items: [], nextCursor: null as string | null };
+export async function fetchAdminMarginWarnings(): Promise<{
+  items: AdminMarginWarning[];
+  nextCursor: string | null;
+}> {
+  if (useMockData()) return { items: [], nextCursor: null };
   const res = await authedFetch('/admin/dashboard/margin-warnings');
   const json: unknown = await res.json();
   if (!res.ok) throw new Error('Failed');
-  const row = z.object({
-    listingId: z.string(),
-    bookTitle: z.string(),
-    sellerName: z.string(),
-    price: z.string(),
-    commissionBps: z.number(),
-    netMarginBps: z.number(),
-    floorBdt: z.string().optional(),
-    commissionBdt: z.string().optional(),
-  });
-  return listEnvelope(row).parse(json).data;
+  return listEnvelope(adminMarginWarningSchema).parse(json).data;
 }
 
-export async function fetchAdminSettings() {
+export async function fetchAdminSettings(): Promise<AdminSetting[]> {
   if (useMockData()) {
     return [
       { key: 'escrow_days', value: 7, updatedAt: new Date().toISOString() },
@@ -335,29 +376,15 @@ export async function fetchAdminSettings() {
   const res = await authedFetch('/admin/dashboard/system-settings');
   const json: unknown = await res.json();
   if (!res.ok) throw new Error('Failed');
-  return apiSuccessEnvelopeSchema(
-    z.array(z.object({ key: z.string(), value: z.unknown(), updatedAt: z.string() })),
-  ).parse(json).data;
+  return apiSuccessEnvelopeSchema(z.array(adminSettingSchema)).parse(json).data;
 }
 
-export async function fetchAdminReconcile() {
+export async function fetchAdminReconcile(): Promise<AdminReconcile> {
   if (useMockData()) return mockAdminReconcile();
   const res = await authedFetch('/admin/money/reconcile');
   const json: unknown = await res.json();
   if (!res.ok) throw new Error('Reconcile failed');
-  return apiSuccessEnvelopeSchema(
-    z.object({
-      ok: z.boolean(),
-      issues: z.array(
-        z.object({
-          orderId: z.string(),
-          expectedPaisa: z.string(),
-          ledgerPaisa: z.string(),
-          message: z.string(),
-        }),
-      ),
-    }),
-  ).parse(json).data;
+  return apiSuccessEnvelopeSchema(adminReconcileSchema).parse(json).data;
 }
 
 export async function runAdminPayoutBatch() {

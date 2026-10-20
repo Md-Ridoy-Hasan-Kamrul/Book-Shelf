@@ -21,7 +21,7 @@ export function Drawer({ open, title, onClose, children }: Props) {
   return (
     <dialog
       ref={ref}
-      className="fixed inset-y-0 right-0 m-0 ml-auto h-full w-[min(100%,20rem)] max-w-full rounded-none border-l border-line bg-paper p-0 text-ink-900 shadow-[var(--shadow-warm)] backdrop:bg-ink-900/40"
+      className="fixed inset-y-0 right-0 m-0 ml-auto h-full w-[min(100%,20rem)] max-w-full rounded-none border-l border-line bg-paper p-0 text-ink-900 shadow-(--shadow-warm) backdrop:bg-ink-900/40"
       onClose={onClose}
     >
       <div className="flex items-center justify-between border-b border-line px-4 py-3">

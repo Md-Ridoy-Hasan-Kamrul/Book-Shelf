@@ -55,7 +55,7 @@ export default function AdminDeadLetterPanel() {
           {items.map((j) => (
             <li
               key={`${j.queue}-${j.jobId}-${j.timestamp}`}
-              className="rounded-[var(--radius-card)] border border-line bg-paper p-3"
+              className="rounded-(--radius-card) border border-line bg-paper p-3"
             >
               <span className="font-semibold">{j.queue}</span> · {j.name} · attempts{' '}
               {j.attemptsMade}

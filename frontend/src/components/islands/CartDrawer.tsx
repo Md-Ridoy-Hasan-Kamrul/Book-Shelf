@@ -21,7 +21,7 @@ export default function CartDrawer({ open, onClose }: Props) {
           {items.map((item) => (
             <li
               key={item.listingId}
-              className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius-card)] border border-line bg-paper p-3"
+              className="flex flex-wrap items-center justify-between gap-2 rounded-(--radius-card) border border-line bg-paper p-3"
             >
               <div>
                 <p className="m-0 font-semibold text-ink-900">{item.title}</p>
@@ -53,7 +53,7 @@ export default function CartDrawer({ open, onClose }: Props) {
       <div className="mt-6 flex flex-col gap-2">
         <a
           href="/checkout"
-          className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-card)] bg-cta-500 px-4 text-center font-semibold text-ink-900 no-underline"
+          className="inline-flex min-h-11 items-center justify-center rounded-(--radius-card) bg-cta-500 px-4 text-center font-semibold text-ink-900 no-underline"
           onClick={onClose}
         >
           Checkout

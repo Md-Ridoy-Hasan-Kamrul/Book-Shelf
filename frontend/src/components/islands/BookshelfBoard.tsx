@@ -87,7 +87,7 @@ function BoardInner() {
     return (
       <div className="space-y-3" aria-busy="true">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-24 animate-pulse rounded-[var(--radius-card)] bg-sand" />
+          <div key={i} className="h-24 animate-pulse rounded-(--radius-card) bg-sand" />
         ))}
       </div>
     );
@@ -109,7 +109,7 @@ function BoardInner() {
   return (
     <div className="space-y-8">
       {g ? (
-        <section className="flex items-center gap-4 rounded-[var(--radius-card)] border border-line bg-paper p-4 shadow-sm">
+        <section className="flex items-center gap-4 rounded-(--radius-card) border border-line bg-paper p-4 shadow-sm">
           <ProgressRing value={g.completedBooks} max={g.targetBooks} />
           <div>
             <h2 className="font-semibold text-ink-900">{g.year} reading goal</h2>
@@ -126,7 +126,7 @@ function BoardInner() {
           return (
             <section
               key={status}
-              className="rounded-[var(--radius-card)] border border-line bg-cream p-3"
+              className="rounded-(--radius-card) border border-line bg-cream p-3"
             >
               <h3 className="mb-3 text-sm font-bold text-ink-900">{labels[status]}</h3>
               {col.length === 0 ? (

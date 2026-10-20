@@ -91,7 +91,7 @@ export default function MoodPicker() {
   return (
     <section
       aria-labelledby="mood-picker-title"
-      className="min-w-0 max-w-full rounded-[var(--radius-card)] border border-line bg-paper p-4 shadow-[var(--shadow-warm)] min-[425px]:p-5"
+      className="min-w-0 max-w-full rounded-(--radius-card) border border-line bg-paper p-4 shadow-(--shadow-warm) ml:p-5"
     >
       <h2 id="mood-picker-title" className="m-0 font-display text-xl font-bold text-ink-900">
         Mood discovery
@@ -135,7 +135,7 @@ export default function MoodPicker() {
             maxLength={500}
             value={freeText}
             onChange={(e) => setFreeText(e.target.value)}
-            className="mt-2 w-full rounded-[var(--radius-card)] border border-line bg-cream px-3 py-2 text-sm text-ink-900"
+            className="mt-2 w-full rounded-(--radius-card) border border-line bg-cream px-3 py-2 text-sm text-ink-900"
             placeholder="e.g. want something calm to unwind…"
           />
           <div className="mt-2">

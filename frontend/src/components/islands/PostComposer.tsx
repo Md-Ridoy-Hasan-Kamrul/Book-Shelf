@@ -32,7 +32,7 @@ function ComposerInner() {
 
   return (
     <form
-      className="rounded-[var(--radius-card)] border border-line bg-paper p-4"
+      className="rounded-(--radius-card) border border-line bg-paper p-4"
       onSubmit={(e) => {
         e.preventDefault();
         create.mutate();

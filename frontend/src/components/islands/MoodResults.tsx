@@ -60,7 +60,6 @@ export default function MoodResults({ initialMood }: Props) {
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- initial + explicit Apply
   }, [mood]);
 
   return (
@@ -83,7 +82,7 @@ export default function MoodResults({ initialMood }: Props) {
           placeholder="Min ৳"
           value={minPrice}
           onChange={(e) => setMinPrice(e.target.value)}
-          className="rounded-[var(--radius-card)] border border-line bg-paper px-3 py-2 text-sm"
+          className="rounded-(--radius-card) border border-line bg-paper px-3 py-2 text-sm"
         />
         <input
           type="number"
@@ -91,7 +90,7 @@ export default function MoodResults({ initialMood }: Props) {
           placeholder="Max ৳"
           value={maxPrice}
           onChange={(e) => setMaxPrice(e.target.value)}
-          className="rounded-[var(--radius-card)] border border-line bg-paper px-3 py-2 text-sm"
+          className="rounded-(--radius-card) border border-line bg-paper px-3 py-2 text-sm"
         />
         <input
           type="number"
@@ -99,7 +98,7 @@ export default function MoodResults({ initialMood }: Props) {
           placeholder="Min pages"
           value={minPages}
           onChange={(e) => setMinPages(e.target.value)}
-          className="rounded-[var(--radius-card)] border border-line bg-paper px-3 py-2 text-sm"
+          className="rounded-(--radius-card) border border-line bg-paper px-3 py-2 text-sm"
         />
         <input
           type="number"
@@ -107,12 +106,12 @@ export default function MoodResults({ initialMood }: Props) {
           placeholder="Max pages"
           value={maxPages}
           onChange={(e) => setMaxPages(e.target.value)}
-          className="rounded-[var(--radius-card)] border border-line bg-paper px-3 py-2 text-sm"
+          className="rounded-(--radius-card) border border-line bg-paper px-3 py-2 text-sm"
         />
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          className="rounded-[var(--radius-card)] border border-line bg-paper px-3 py-2 text-sm"
+          className="rounded-(--radius-card) border border-line bg-paper px-3 py-2 text-sm"
         >
           <option value="popularity">Popularity</option>
           <option value="newest">Newest</option>
@@ -152,7 +151,7 @@ export default function MoodResults({ initialMood }: Props) {
             <li key={b.id}>
               <a
                 href={`/books/${b.slug}`}
-                className="block rounded-[var(--radius-card)] border border-line bg-paper p-4 no-underline hover:bg-sand"
+                className="block rounded-(--radius-card) border border-line bg-paper p-4 no-underline hover:bg-sand"
               >
                 <h2 className="m-0 font-display text-lg font-bold text-ink-900">{b.titleBn}</h2>
                 <p className="m-0 mt-1 text-sm text-ink-500">{b.author}</p>

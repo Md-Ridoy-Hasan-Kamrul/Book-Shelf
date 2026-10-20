@@ -62,7 +62,7 @@ function ReviewsInner({ bookId }: Props) {
   const renderReview = (r: z.infer<typeof reviewSchema>) => {
     const hidden = r.hasSpoiler && !spoilerRevealed[r.id];
     return (
-      <li key={r.id} className="rounded-[var(--radius-card)] border border-line p-3 text-sm">
+      <li key={r.id} className="rounded-(--radius-card) border border-line p-3 text-sm">
         <div className="flex justify-between">
           <strong>
             {r.authorName}
@@ -136,7 +136,7 @@ function ReviewsInner({ bookId }: Props) {
         </>
       )}
       <form
-        className="mt-6 space-y-2 rounded-[var(--radius-card)] border border-line bg-paper p-4"
+        className="mt-6 space-y-2 rounded-(--radius-card) border border-line bg-paper p-4"
         onSubmit={(e) => {
           e.preventDefault();
           create.mutate();

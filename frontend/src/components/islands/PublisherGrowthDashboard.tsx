@@ -75,7 +75,7 @@ export default function PublisherGrowthDashboard() {
               ['ROAS', metrics.roas.toFixed(2)],
               ['Purchases', String(metrics.purchases)],
             ].map(([k, v]) => (
-              <div key={k} className="rounded-[var(--radius-card)] border border-line bg-paper p-3">
+              <div key={k} className="rounded-(--radius-card) border border-line bg-paper p-3">
                 <dt className="text-xs text-ink-500">{k}</dt>
                 <dd className="m-0 mt-1 font-display text-lg font-bold text-ink-900">{v}</dd>
               </div>
@@ -115,7 +115,7 @@ export default function PublisherGrowthDashboard() {
           {campaigns.map((c) => (
             <li
               key={c.id}
-              className="rounded-[var(--radius-card)] border border-line bg-paper p-3 text-sm"
+              className="rounded-(--radius-card) border border-line bg-paper p-3 text-sm"
             >
               <span className="font-semibold">{c.name}</span> · {c.status} · invoice{' '}
               {c.invoiceStatus}

@@ -55,7 +55,7 @@ export default function ReleaseCountdown({
   }, [releaseAt]);
 
   return (
-    <div className="mt-4 rounded-[var(--radius-card)] border border-sun-200 bg-sun-100 p-4">
+    <div className="mt-4 rounded-(--radius-card) border border-sun-200 bg-sun-100 p-4">
       <p className="m-0 text-sm font-semibold text-sun-800">
         {preorderEnabled ? 'Pre-order · ' : ''}Release countdown
       </p>

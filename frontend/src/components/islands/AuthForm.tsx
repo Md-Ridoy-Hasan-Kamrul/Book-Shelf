@@ -220,11 +220,11 @@ export default function AuthForm({ mode, resetToken }: Props) {
   const busy = status === 'loading';
 
   return (
-    <div className="mx-auto w-full max-w-md rounded-[var(--radius-card)] border border-line bg-paper p-6 shadow-[var(--shadow-warm)]">
+    <div className="mx-auto w-full max-w-md rounded-(--radius-card) border border-line bg-paper p-6 shadow-(--shadow-warm)">
       {mode === 'login' && (
         <form onSubmit={onLogin} className="space-y-4">
           {useMockData() ? (
-            <div className="space-y-3 rounded-[var(--radius-card)] border border-line bg-sand/60 p-3">
+            <div className="space-y-3 rounded-(--radius-card) border border-line bg-sand/60 p-3">
               <p className="m-0 text-xs text-ink-500">
                 Prefer the role list above, or sign in with any password using a demo email.
               </p>
