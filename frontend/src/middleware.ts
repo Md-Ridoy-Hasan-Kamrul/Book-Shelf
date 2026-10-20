@@ -16,7 +16,7 @@ function mockOn(): boolean {
 export const onRequest = defineMiddleware(async (context, next) => {
   const path = context.url.pathname;
 
-  // AGENTS rule 15 — hide optional modules when FEATURE_* is off
+  // AGENTS rule 15: hide optional modules when FEATURE_* is off
   if (
     !flagOn('FEATURE_USED_BOOKS') &&
     (path === '/used' || path.startsWith('/sell/used') || path.startsWith('/sell/scan'))
@@ -26,12 +26,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (!flagOn('FEATURE_SPONSORED') && path.startsWith('/publisher/growth')) {
     return context.redirect('/');
   }
-  // Live AMA rooms only — public writer profiles stay reachable
+  // Live AMA rooms only: public writer profiles stay reachable
   if (!flagOn('FEATURE_LIVE_EVENTS') && path.startsWith('/events')) {
     return context.redirect('/');
   }
 
-  // Mock mode: no live /me — allow private pages with fixture user
+  // Mock mode: no live /me: allow private pages with fixture user
   if (mockOn()) {
     return next();
   }

@@ -16,7 +16,7 @@ const SIZES: Record<Format, { w: number; h: number; label: string }> = {
 
 /**
  * Client-side only (html-to-image). Uses Hind Siliguri so Bangla conjuncts
- * shape in the browser — do not use server Satori without proving Bangla.
+ * shape in the browser: do not use server Satori without proving Bangla.
  */
 export default function QuoteCardGenerator({ title, author, initialQuote = '' }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -53,7 +53,7 @@ export default function QuoteCardGenerator({ title, author, initialQuote = '' }:
           a.download = `bookverse-quote-${format}.png`;
           a.click();
         } catch {
-          setError('Could not render card — try again after fonts load');
+          setError('Could not render card: try again after fonts load');
         }
       })();
     });

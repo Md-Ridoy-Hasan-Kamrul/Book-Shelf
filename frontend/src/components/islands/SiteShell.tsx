@@ -130,7 +130,7 @@ export default function SiteShell({ flags, pathname = '/' }: Props) {
       ) : null}
 
       <header className="sticky top-0 z-40 border-b border-line bg-paper/95 shadow-[var(--shadow-warm)] backdrop-blur">
-        {/* Desktop chrome from 1020px (Laptop+) — tablet/mobile use bottom nav + stacked search */}
+        {/* Desktop chrome from 1020px (Laptop+): tablet/mobile use bottom nav + stacked search */}
         <div className="mx-auto flex w-[min(100%-2rem,72rem)] min-w-0 flex-wrap items-center gap-3 py-3 min-[1020px]:flex-nowrap">
           <a
             href="/"

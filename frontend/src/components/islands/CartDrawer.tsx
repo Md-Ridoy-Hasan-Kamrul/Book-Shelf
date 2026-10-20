@@ -15,7 +15,7 @@ export default function CartDrawer({ open, onClose }: Props) {
   return (
     <Drawer open={open} onClose={onClose} title="Your cart">
       {items.length === 0 ? (
-        <p className="text-ink-500">কার্ট খালি — বই যোগ করুন।</p>
+        <p className="text-ink-500">কার্ট খালি: বই যোগ করুন।</p>
       ) : (
         <ul className="m-0 list-none space-y-3 p-0">
           {items.map((item) => (

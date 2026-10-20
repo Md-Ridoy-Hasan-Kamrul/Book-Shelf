@@ -96,7 +96,7 @@ export default function MoodPicker() {
       <h2 id="mood-picker-title" className="m-0 font-display text-xl font-bold text-ink-900">
         Mood discovery
       </h2>
-      <p className="mt-2 text-sm text-ink-500">{disclaimer} — we never diagnose emotions.</p>
+      <p className="mt-2 text-sm text-ink-500">{disclaimer}: we never diagnose emotions.</p>
 
       <ul className="mt-4 m-0 flex list-none flex-wrap gap-2 p-0">
         {list.map((m) => (

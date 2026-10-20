@@ -141,7 +141,7 @@ export default function AccountPanel({
             Apply for a seller role
           </h2>
           <p className="mt-1 text-sm text-ink-500">
-            WRITER, PUBLISHER, or VENDOR — admin reviews documents. You cannot set your own role.
+            WRITER, PUBLISHER, or VENDOR: admin reviews documents. You cannot set your own role.
           </p>
           <form className="mt-4 space-y-3" onSubmit={(e) => void submitApplication(e)}>
             <Select
@@ -176,7 +176,7 @@ export default function AccountPanel({
             {error ? <p className="m-0 text-sm text-urgent-600">{error}</p> : null}
             {status === 'done' ? (
               <p className="m-0 text-sm text-leaf-700">
-                Application received — wait for admin review.
+                Application received: wait for admin review.
               </p>
             ) : null}
           </form>

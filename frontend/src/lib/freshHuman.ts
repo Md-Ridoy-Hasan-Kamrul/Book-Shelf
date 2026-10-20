@@ -1,5 +1,5 @@
 /**
- * PDF §২ রঙ — "ফ্রেশ ও মানবিক" ভাইব
+ * PDF §২ রঙ: "ফ্রেশ ও মানবিক" ভাইব
  * Blue=trust · orange=action (max 2 CTA) · green=growth · cream/paper=calm
  * Proportion ~70% cream/white · 15% blue · 8% leaf · 5% orange
  */

@@ -39,7 +39,7 @@ function FeedInner() {
             {
               id: 'mock-post-feed-1',
               type: 'STATUS',
-              body: 'আজকের মুড: কৌতূহলী — BookVerse mock feed থেকে।',
+              body: 'আজকের মুড: কৌতূহলী: BookVerse mock feed থেকে।',
               hasSpoiler: false,
               isSponsored: false,
               likeCount: 12,
@@ -155,7 +155,7 @@ function FeedInner() {
         </p>
       )}
       {items.length === 0 && !feed.isLoading && (
-        <p className="text-ink-500">No posts yet — be the first to share.</p>
+        <p className="text-ink-500">No posts yet: be the first to share.</p>
       )}
       <ul className="list-none space-y-3 p-0">
         {items.map((post) => (
@@ -177,7 +177,7 @@ function FeedInner() {
                 className="mt-2 rounded bg-sand px-2 py-1 text-xs font-semibold text-ink-700"
                 onClick={() => setSpoilerOpen((s) => ({ ...s, [post.id]: true }))}
               >
-                Spoiler — tap to reveal
+                Spoiler: tap to reveal
               </button>
             ) : (
               <p className="mt-2 text-ink-700">{post.body}</p>

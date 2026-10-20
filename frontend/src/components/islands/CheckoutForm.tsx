@@ -121,7 +121,7 @@ export default function CheckoutForm() {
     } catch (err) {
       const e = err as Error & { code?: string; errors?: unknown[] };
       if (e.code === 'COD_UNAVAILABLE') {
-        setSubmitError(`${e.message} — অনলাইন পেমেন্ট বেছে নিন।`);
+        setSubmitError(`${e.message}: অনলাইন পেমেন্ট বেছে নিন।`);
       } else {
         setSubmitError(e.message);
       }
@@ -166,7 +166,7 @@ export default function CheckoutForm() {
                       onChange={() => setAddressId(a.id)}
                     />
                     <span>
-                      <strong>{a.label}</strong> — {a.line1}, {a.area}, {a.district}
+                      <strong>{a.label}</strong>: {a.line1}, {a.area}, {a.district}
                     </span>
                   </label>
                 </li>

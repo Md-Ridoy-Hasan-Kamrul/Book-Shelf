@@ -137,7 +137,7 @@ export default function LiveEventRoom({ eventId, userId, userName }: Props) {
             >
               Open link
             </a>
-            <span className="text-ink-500"> — we do not host video</span>
+            <span className="text-ink-500">: we do not host video</span>
           </p>
         )}
 

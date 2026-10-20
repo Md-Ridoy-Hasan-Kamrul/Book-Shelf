@@ -1,5 +1,5 @@
 /**
- * Backend is on hold — mock data is the default.
+ * Backend is on hold: mock data is the default.
  * Set PUBLIC_USE_MOCK_DATA=false only when running `pnpm dev:stack` with Docker.
  */
 export function useMockData(): boolean {

@@ -44,7 +44,7 @@ export default function AuthForm({ mode, resetToken }: Props) {
 
   function enterAs(role: MockRole) {
     setStatus('success');
-    setMessage(`Mock ${role} — redirecting…`);
+    setMessage(`Mock ${role}: redirecting…`);
     // SSR sets cookie reliably (avoids client-only cookie + 502 from Vite proxy)
     window.location.href = `/mock-login?role=${encodeURIComponent(role)}`;
   }
@@ -71,7 +71,7 @@ export default function AuthForm({ mode, resetToken }: Props) {
       return;
     }
     setStatus('success');
-    setMessage('Signed in — redirecting…');
+    setMessage('Signed in: redirecting…');
     window.location.href = '/';
   }
 
@@ -86,7 +86,7 @@ export default function AuthForm({ mode, resetToken }: Props) {
     }
     if (useMockData()) {
       setStatus('success');
-      setMessage('Mock account created — open Profile.');
+      setMessage('Mock account created: open Profile.');
       window.location.href = '/mock-login?role=USER';
       return;
     }
@@ -122,7 +122,7 @@ export default function AuthForm({ mode, resetToken }: Props) {
       return;
     }
     setStatus('success');
-    setMessage('If the email exists, reset link sent — check Mailpit.');
+    setMessage('If the email exists, reset link sent: check Mailpit.');
   }
 
   async function onReset(e: React.FormEvent) {
@@ -145,7 +145,7 @@ export default function AuthForm({ mode, resetToken }: Props) {
       return;
     }
     setStatus('success');
-    setMessage('Password updated — you can log in.');
+    setMessage('Password updated: you can log in.');
   }
 
   async function onResendVerify(e: React.FormEvent) {
@@ -166,7 +166,7 @@ export default function AuthForm({ mode, resetToken }: Props) {
       return;
     }
     setStatus('success');
-    setMessage('Verification email sent — Mailpit.');
+    setMessage('Verification email sent: Mailpit.');
   }
 
   async function onSendOtp(e: React.FormEvent) {
@@ -185,7 +185,7 @@ export default function AuthForm({ mode, resetToken }: Props) {
         body: JSON.stringify(parsed.data),
       });
       setStatus('success');
-      setMessage('OTP sent — see API terminal (console SMS).');
+      setMessage('OTP sent: see API terminal (console SMS).');
     } catch (err) {
       setStatus('error');
       setMessage(err instanceof Error ? err.message : 'Failed');
@@ -231,7 +231,7 @@ export default function AuthForm({ mode, resetToken }: Props) {
                 value={mockRole}
                 options={MOCK_PRESETS.map((p) => ({
                   value: p.role,
-                  label: `${p.label} — ${p.email}`,
+                  label: `${p.label}: ${p.email}`,
                 }))}
                 onChange={(e) => {
                   const role = e.target.value as MockRole;

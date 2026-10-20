@@ -140,7 +140,7 @@ export default function DesignGuide() {
           <div className="space-y-3">
             <EmptyState title="এখনো কিছু নেই">আপনার তালিকা খালি।</EmptyState>
             <ErrorState message="লোড করা যায়নি" onRetry={() => pushToast('Retry clicked')} />
-            <SpoilerBlur text="এটা spoiler টেক্সট — blur থাকলে পLOT ফাঁস হবে না।" />
+            <SpoilerBlur text="এটা spoiler টেক্সট: blur থাকলে পLOT ফাঁস হবে না।" />
           </div>
         </div>
         <div className="mt-6 flex flex-wrap gap-2">
@@ -193,7 +193,7 @@ export default function DesignGuide() {
       </section>
 
       <Modal open={modalOpen} title="Sample modal" onClose={() => setModalOpen(false)}>
-        <p className="text-ink-700">Native dialog — Esc বা close দিয়ে বন্ধ করুন।</p>
+        <p className="text-ink-700">Native dialog: Esc বা close দিয়ে বন্ধ করুন।</p>
       </Modal>
       <Drawer open={drawerOpen} title="Sample drawer" onClose={() => setDrawerOpen(false)}>
         <p className="text-ink-700">Mobile-friendly drawer panel.</p>

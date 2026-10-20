@@ -214,7 +214,7 @@ function SellerDashboardInner({ role }: Props) {
           <h2 className="m-0 mb-3 font-display text-lg font-bold text-ink-900">{ui.ordersLabel}</h2>
           {role === 'WRITER' ? (
             <p className="mb-3 text-sm text-ink-500">
-              Writers do not pack shipments — these are sales attributed to your titles.
+              Writers do not pack shipments: these are sales attributed to your titles.
             </p>
           ) : null}
           {orders.isLoading && <SkeletonRows />}
@@ -308,7 +308,7 @@ function SellerDashboardInner({ role }: Props) {
                 key={c.orderId}
                 className="rounded-[var(--radius-card)] border border-line p-3 text-sm"
               >
-                <strong>{c.status}</strong> — {c.reason.slice(0, 120)}
+                <strong>{c.status}</strong>: {c.reason.slice(0, 120)}
               </li>
             ))}
           </ul>

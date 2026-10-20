@@ -100,7 +100,7 @@ function AdminDashboardInner() {
   return (
     <DashboardShell
       title="Platform operations"
-      subtitle="Nationwide marketplace control — GMV, escrow, claims, and seller approvals."
+      subtitle="Nationwide marketplace control: GMV, escrow, claims, and seller approvals."
       badge="Admin"
       badgeClassName="bg-brand-100 text-brand-700"
       items={ADMIN_NAV}
@@ -164,7 +164,7 @@ function AdminDashboardInner() {
                       key={w.listingId}
                       className="rounded-[var(--radius-card)] border border-sun-200 bg-sun-100 px-3 py-2 text-sm text-sun-800"
                     >
-                      {w.bookTitle} — commission {w.commissionBps} bps
+                      {w.bookTitle}: commission {w.commissionBps} bps
                       {w.commissionBdt && w.floorBdt
                         ? ` (৳${w.commissionBdt} < floor ৳${w.floorBdt})`
                         : ''}{' '}
@@ -189,7 +189,7 @@ function AdminDashboardInner() {
                 <strong className="text-ink-900">{a.type}</strong>
                 <span className="text-ink-700">
                   {' '}
-                  — {a.userName} ({a.userEmail})
+                  : {a.userName} ({a.userEmail})
                 </span>
                 <div className="text-ink-500">{a.status}</div>
               </li>
@@ -389,7 +389,7 @@ function AdminDashboardInner() {
       {tab === 'jobs' && (
         <div className="space-y-3">
           <p className="m-0 text-ink-500">
-            BullMQ dead-letter queue — failed background jobs across Bangladesh ops.
+            BullMQ dead-letter queue: failed background jobs across Bangladesh ops.
           </p>
           <AdminDeadLetterPanel />
         </div>

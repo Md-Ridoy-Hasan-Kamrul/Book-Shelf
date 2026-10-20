@@ -1,4 +1,4 @@
-/** Lightweight inline icons — no icon-package dependency (AGENTS: prefer free/OSS). */
+/** Lightweight inline icons: no icon-package dependency (AGENTS: prefer free/OSS). */
 import type { ReactNode } from 'react';
 
 type IconProps = { className?: string; title?: string };

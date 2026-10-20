@@ -55,7 +55,7 @@ function ReviewsInner({ bookId }: Props) {
     mutationFn: (id: string) =>
       apiFetch(`/reviews/${id}/report`, z.object({ reported: z.boolean() }), {
         method: 'POST',
-        body: JSON.stringify({ reason: 'Reported from book page — needs moderation review.' }),
+        body: JSON.stringify({ reason: 'Reported from book page: needs moderation review.' }),
       }),
   });
 
@@ -80,7 +80,7 @@ function ReviewsInner({ bookId }: Props) {
             className="mt-2 rounded bg-sand px-2 py-1 text-xs font-semibold blur-sm"
             onClick={() => setSpoilerRevealed((s) => ({ ...s, [r.id]: true }))}
           >
-            Spoiler — tap to reveal
+            Spoiler: tap to reveal
           </button>
         ) : (
           <p className="mt-2 text-ink-700">{r.body}</p>

@@ -84,7 +84,7 @@ export function resolveMockApi(pathWithQuery: string, method = 'GET', body?: unk
         {
           id: 'n1',
           title: 'Welcome to BookVerse',
-          body: 'Mock notification — backend on hold.',
+          body: 'Mock notification: backend on hold.',
           createdAt: new Date().toISOString(),
         },
         {
@@ -317,7 +317,7 @@ export function resolveMockApi(pathWithQuery: string, method = 'GET', body?: unk
         {
           id: 'r1',
           rating: 5,
-          body: 'দারুণ বই — mock review.',
+          body: 'দারুণ বই: mock review.',
           authorName: 'Mock Reader',
           createdAt: new Date().toISOString(),
           isVerifiedBuyer: true,

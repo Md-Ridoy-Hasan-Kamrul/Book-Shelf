@@ -17,6 +17,10 @@ type Section = {
   }>;
 };
 
+/** Responsive card grid: no horizontal scroll (320 → 1440). */
+const CARD_GRID =
+  'mt-4 m-0 grid list-none grid-cols-1 gap-3 p-0 min-[375px]:grid-cols-2 min-[768px]:grid-cols-3 min-[1020px]:grid-cols-4';
+
 export default function RecommendRail() {
   const [sections, setSections] = useState<Section[]>([]);
   const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading');
@@ -37,9 +41,13 @@ export default function RecommendRail() {
 
   if (status === 'loading') {
     return (
-      <div className="grid gap-3">
+      <div className="grid gap-3" aria-busy="true">
         <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-28" />
+        <div className={CARD_GRID}>
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-28" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -55,20 +63,22 @@ export default function RecommendRail() {
           <h2 id={`rec-${sec.key}`} className="m-0 font-display text-xl font-bold text-ink-900">
             {sec.title}
           </h2>
-          <ul className="mt-4 flex max-w-full list-none gap-3 overflow-x-auto p-0 pb-2">
+          <ul className={CARD_GRID}>
             {sec.items.map((b) => (
-              <li key={b.id} className="w-48 shrink-0">
+              <li key={b.id} className="min-w-0">
                 <a
                   href={`/books/${b.slug}`}
-                  className="block rounded-[var(--radius-card)] border border-line bg-paper p-3 no-underline hover:bg-sand"
+                  className="flex h-full min-h-[7.5rem] flex-col rounded-[var(--radius-card)] border border-line bg-paper p-3 no-underline hover:bg-sand"
                 >
-                  <p className="m-0 font-display text-sm font-bold text-ink-900">{b.titleBn}</p>
-                  <p className="m-0 mt-1 text-xs text-ink-500">{b.author}</p>
-                  <div className="mt-2 flex items-center gap-2">
-                    {b.minPrice && (
+                  <p className="m-0 line-clamp-2 min-h-[2.5rem] font-display text-sm leading-snug font-bold text-ink-900">
+                    {b.titleBn}
+                  </p>
+                  <p className="m-0 mt-1 truncate text-xs text-ink-500">{b.author}</p>
+                  <div className="mt-auto flex flex-wrap items-center gap-2 pt-3">
+                    {b.minPrice ? (
                       <span className="text-xs font-semibold text-ink-900">৳{b.minPrice}</span>
-                    )}
-                    {b.why && <WhyThisBook why={b.why} />}
+                    ) : null}
+                    {b.why ? <WhyThisBook why={b.why} /> : null}
                   </div>
                 </a>
               </li>

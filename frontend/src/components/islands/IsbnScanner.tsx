@@ -53,7 +53,7 @@ function ScannerInner() {
     }
 
     void start().catch((e) => {
-      setError(e instanceof Error ? e.message : 'Camera unavailable — use manual ISBN');
+      setError(e instanceof Error ? e.message : 'Camera unavailable: use manual ISBN');
     });
 
     return () => {

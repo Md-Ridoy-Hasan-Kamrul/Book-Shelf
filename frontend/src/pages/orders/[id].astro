@@ -49,7 +49,7 @@ Astro.response.headers.set('Cache-Control', 'private, no-store');
             {order.tracking.timeline.map((e) => (
               <li>
                 <strong>{e.status}</strong>
-                {e.message ? ` — ${e.message}` : ''}
+                {e.message ? `: ${e.message}` : ''}
                 <div class="text-ink-500">{e.at}</div>
               </li>
             ))}
@@ -64,7 +64,7 @@ Astro.response.headers.set('Cache-Control', 'private, no-store');
           order.statusHistory.map((h) => (
             <li>
               <strong>{h.status}</strong>
-              {h.note ? ` — ${h.note}` : ''}
+              {h.note ? `: ${h.note}` : ''}
               <div class="text-ink-500">{h.createdAt}</div>
             </li>
           ))

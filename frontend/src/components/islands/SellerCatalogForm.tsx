@@ -75,7 +75,7 @@ export default function SellerCatalogForm() {
       setMsg(
         useMockData()
           ? `Mock created “${data.book.title}” (no backend). Cover/look-inside are no-ops.`
-          : `Created “${data.book.title}” — you can upload cover / look-inside below.`,
+          : `Created “${data.book.title}”: you can upload cover / look-inside below.`,
       );
       setErr(null);
       void qc.invalidateQueries({ queryKey: ['seller', 'listings'] });

@@ -23,7 +23,7 @@ export type SellerRoleUi = {
   growthLink?: string;
 };
 
-/** Mock-first role skins — Vendor / Publisher / Writer are not the same product surface. */
+/** Mock-first role skins: Vendor / Publisher / Writer are not the same product surface. */
 export const SELLER_ROLE_UI: Record<SellerRole, SellerRoleUi> = {
   VENDOR: {
     heading: 'Vendor dashboard',
@@ -80,7 +80,7 @@ export const SELLER_ROLE_UI: Record<SellerRole, SellerRoleUi> = {
       balanceAvailableBdt: '112000.00',
     },
     sampleListings: [
-      { title: 'শেষের কবিতা — hardback', price: '450.00', stock: 240 },
+      { title: 'শেষের কবিতা: hardback', price: '450.00', stock: 240 },
       { title: 'পদ্মানদীর মাঝি', price: '380.00', stock: 180 },
       { title: 'DevOps Handbook (BN)', price: '720.00', stock: 95 },
     ],
@@ -88,7 +88,7 @@ export const SELLER_ROLE_UI: Record<SellerRole, SellerRoleUi> = {
   },
   WRITER: {
     heading: 'Writer dashboard',
-    blurb: 'Your titles, royalties, and reprint signals — not a shop floor.',
+    blurb: 'Your titles, royalties, and reprint signals: not a shop floor.',
     badge: 'Writer',
     badgeClass: 'bg-brand-50 text-brand-700', // calm trust
     inventoryLabel: 'My titles',

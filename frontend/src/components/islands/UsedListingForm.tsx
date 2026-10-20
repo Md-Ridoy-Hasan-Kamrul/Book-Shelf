@@ -70,7 +70,7 @@ function FormInner({ initialIsbn = '' }: Props) {
     onSuccess: (data) => {
       setMsg(
         data.needsModeration
-          ? 'Listed — awaiting admin moderation (first listing).'
+          ? 'Listed: awaiting admin moderation (first listing).'
           : 'Listed and live!',
       );
     },
