@@ -82,6 +82,10 @@ Mood chips (bg/text):
 
 Proportion ~70% cream/white, ~15% blue, ~8% leaf green, ~5% orange CTA. Max 2 orange CTAs per screen. Radius 12px, soft warm shadow. Fonts: Hind Siliguri (Bangla) + Inter (English), self-hosted, swap.
 
+## UX COPY: no decorative dashes
+
+User-facing UI must **not** use em dash (`—`), en dash (`–`), or spaced hyphen (`-`) as separators. Prefer `:` / `,` / `.` / Bangla `।` / middot `·`. Compound words and code (`look-inside`, `qty - 1`) are fine. Cursor rule: `.cursor/rules/no-em-dash-ui.mdc`.
+
 ## OUT OF SCOPE (do NOT build unless asked)
 
 Own Rider app, video streaming, native mobile app, subscription billing, ML recommendations, smooth-scroll libraries, 3D hero, any hosting setup.

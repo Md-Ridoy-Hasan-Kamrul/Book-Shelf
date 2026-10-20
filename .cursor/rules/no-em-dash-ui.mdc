@@ -1,0 +1,37 @@
+---
+description: Ban decorative em/en dashes and hyphen separators in user-facing UI copy
+alwaysApply: true
+---
+
+# No hyphen / em-dash separators in UI
+
+User-facing copy must **not** use decorative dashes as separators.
+
+## Forbidden in UI strings (labels, headings, toasts, empty states, meta descriptions shown to users)
+
+- Em dash: `—` (U+2014)
+- En dash: `–` (U+2013)
+- Spaced hyphen as a sentence break: ` - ` between clauses (e.g. `Cart empty - add books`)
+
+## Allowed
+
+- Hyphen **inside** compound words or codes: `look-inside`, `ISBN-13`, CSS `min-h-11`, `qty - 1` arithmetic
+- Middot separators when needed: `·` (e.g. footer `Terms · শর্তাবলি`)
+- Bangla danda / period: `।` or English `.` / `,` / `:`
+
+## Prefer
+
+```text
+❌ বাংলাদেশের বইয়ের ঘর — পড়ুন
+✅ বাংলাদেশের বইয়ের ঘর: পড়ুন
+
+❌ BookVerse — Home
+✅ BookVerse: Home
+
+❌ Spoiler — tap to reveal
+✅ Spoiler: tap to reveal
+```
+
+## Scope
+
+Applies to `frontend/` Astro pages, React islands, UI components, and user-visible mock strings. Code comments may use plain ASCII `-` for lists; still avoid em/en dash in comments that mirror UI copy.
