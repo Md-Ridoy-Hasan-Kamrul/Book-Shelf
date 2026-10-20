@@ -1,4 +1,4 @@
-import { useId, useState, type ReactNode } from 'react';
+import { useEffect, useId, useState, type ReactNode, type TransitionEvent } from 'react';
 import { authClient } from '../../lib/authClient';
 import { useMockData } from '../../lib/mockMode';
 
@@ -21,7 +21,6 @@ type Props<T extends string> = {
   activeId: T;
   onNavigate: (id: T) => void;
   headerActions?: ReactNode;
-  /** Extra links under General (e.g. Growth tools). */
   footer?: ReactNode;
   children: ReactNode;
 };
@@ -41,8 +40,8 @@ const navIdle = 'text-ink-700 hover:bg-sand hover:text-ink-900';
 const navActive = 'bg-brand-50 font-semibold text-brand-700';
 
 /**
- * Ops shell: compact sidebar (brand · menu · account · general).
- * No storefront top navbar.
+ * Docked sidebar ≥1280px.
+ * Below that (Laptop 1020 · Tablet 768 · Mobile 425/375/320): slide-over sidebar modal.
  */
 export default function DashboardShell<T extends string>({
   title,
@@ -60,7 +59,9 @@ export default function DashboardShell<T extends string>({
   children,
 }: Props<T>) {
   const navId = useId();
-  const [mobileOpen, setMobileOpen] = useState(false);
+  /** Keep in DOM while animating out. */
+  const [drawerMounted, setDrawerMounted] = useState(false);
+  const [drawerShown, setDrawerShown] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const displayName = userName ?? badge;
   const initials = displayName
@@ -68,6 +69,23 @@ export default function DashboardShell<T extends string>({
     .slice(0, 2)
     .map((w) => w[0]?.toUpperCase() ?? '')
     .join('');
+
+  function openDrawer() {
+    setDrawerMounted(true);
+    // Double rAF so the browser paints the closed state before transitioning.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setDrawerShown(true));
+    });
+  }
+
+  function closeDrawer() {
+    setDrawerShown(false);
+  }
+
+  function onDrawerTransitionEnd(e: TransitionEvent<HTMLElement>) {
+    if (e.propertyName !== 'transform') return;
+    if (!drawerShown) setDrawerMounted(false);
+  }
 
   function onLogout() {
     setLoggingOut(true);
@@ -77,8 +95,48 @@ export default function DashboardShell<T extends string>({
     });
   }
 
+  useEffect(() => {
+    if (!drawerMounted) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeDrawer();
+    };
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    if (drawerShown) document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [drawerMounted, drawerShown]);
+
+  const brandBlock = (
+    <a
+      href="/"
+      className="flex items-center gap-3 border-b border-line px-4 py-4 no-underline hover:bg-sand/60"
+      title="Open storefront"
+    >
+      <span
+        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-600 font-display text-sm font-bold text-paper"
+        aria-hidden
+      >
+        BV
+      </span>
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <p className="m-0 font-display text-[0.95rem] font-bold text-ink-900">BookVerse</p>
+          <span
+            className={`inline-flex rounded-md px-1.5 py-0.5 text-[0.6rem] font-bold tracking-wide uppercase ${badgeClassName}`}
+          >
+            {badge}
+          </span>
+        </div>
+        <p className="m-0 mt-0.5 truncate text-[0.65rem] text-ink-500">{regionLabel}</p>
+      </div>
+    </a>
+  );
+
   const menuNav = (
-    <nav id={navId} className="flex flex-col gap-0.5" aria-label="Dashboard sections">
+    <nav className="flex flex-col gap-0.5" aria-label="Dashboard sections">
       {items.map((item) => {
         const selected = item.id === activeId;
         return (
@@ -87,7 +145,7 @@ export default function DashboardShell<T extends string>({
             type="button"
             onClick={() => {
               onNavigate(item.id);
-              setMobileOpen(false);
+              closeDrawer();
             }}
             className={`${navBtn} ${selected ? navActive : navIdle}`}
             aria-current={selected ? 'page' : undefined}
@@ -111,7 +169,7 @@ export default function DashboardShell<T extends string>({
   );
 
   const bottomBlock = (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <div className="flex items-center gap-2.5 px-1">
         <span
           className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600 text-[0.7rem] font-bold text-paper"
@@ -126,142 +184,135 @@ export default function DashboardShell<T extends string>({
           ) : null}
         </div>
       </div>
-
-      <div>
-        <p className="m-0 mb-1 px-1 text-[0.65rem] font-semibold tracking-wider text-ink-300 uppercase">
-          General
-        </p>
-        <div className="flex flex-col gap-0.5">
-          <a href="/" className={`${navBtn} ${navIdle} no-underline`}>
-            Storefront
-          </a>
-          {footer}
-          <button
-            type="button"
-            onClick={onLogout}
-            disabled={loggingOut}
-            className={`${navBtn} text-urgent-600 hover:bg-urgent-50 disabled:cursor-not-allowed disabled:opacity-60`}
-          >
-            {loggingOut ? 'Logging out…' : 'Logout'}
-          </button>
-        </div>
-      </div>
+      {footer ? <div className="flex flex-col gap-0.5">{footer}</div> : null}
+      <button
+        type="button"
+        onClick={onLogout}
+        disabled={loggingOut}
+        className={`${navBtn} text-urgent-600 hover:bg-urgent-50 disabled:cursor-not-allowed disabled:opacity-60`}
+      >
+        {loggingOut ? 'Logging out…' : 'Logout'}
+      </button>
     </div>
+  );
+
+  const sidebarInner = (
+    <>
+      {brandBlock}
+      <div className="motion-safe:scroll-smooth flex-1 overflow-y-auto overscroll-contain px-2.5 py-4">
+        <p className="m-0 mb-1.5 px-2 text-[0.65rem] font-semibold tracking-wider text-ink-300 uppercase">
+          Menu
+        </p>
+        {menuNav}
+      </div>
+      <div className="border-t border-line px-2.5 py-3">{bottomBlock}</div>
+    </>
   );
 
   return (
     <div className="min-h-dvh bg-sand">
-      <div className="flex min-h-dvh flex-col min-[960px]:flex-row">
+      <div className="flex min-h-dvh flex-col min-[1280px]:flex-row">
+        {/* Docked sidebar: wide desktop only */}
         <aside
-          className="hidden w-[15.5rem] shrink-0 flex-col border-r border-line bg-paper min-[960px]:flex"
+          className="hidden w-[15.5rem] shrink-0 flex-col border-r border-line bg-paper min-[1280px]:flex"
           aria-label="Dashboard"
         >
-          {/* Brand */}
-          <div className="flex items-center gap-3 border-b border-line px-4 py-4">
-            <span
-              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-600 font-display text-sm font-bold text-paper"
-              aria-hidden
+          {sidebarInner}
+        </aside>
+
+        {/* Drawer modal: ≤1279px. CSS-only motion (no animation libs). */}
+        {drawerMounted ? (
+          <div className="fixed inset-0 z-50 min-[1280px]:hidden" role="presentation">
+            <button
+              type="button"
+              className={`absolute inset-0 cursor-pointer border-0 bg-ink-900/40 transition-opacity duration-200 ease-out motion-reduce:transition-none ${
+                drawerShown ? 'opacity-100' : 'opacity-0'
+              }`}
+              aria-label="Close menu"
+              onClick={closeDrawer}
+            />
+            <aside
+              id={navId}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Dashboard menu"
+              onTransitionEnd={onDrawerTransitionEnd}
+              className={`absolute top-0 left-0 flex h-full w-[min(100%-2.5rem,17.5rem)] max-w-[17.5rem] flex-col bg-paper shadow-[var(--shadow-warm)] will-change-transform transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none min-[375px]:w-[min(100%-3rem,18rem)] min-[768px]:w-[18rem] ${
+                drawerShown ? 'translate-x-0' : '-translate-x-full'
+              }`}
             >
-              BV
-            </span>
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <p className="m-0 font-display text-[0.95rem] font-bold text-ink-900">BookVerse</p>
+              <div className="flex items-center justify-end border-b border-line px-2 py-2">
+                <button
+                  type="button"
+                  className="inline-flex min-h-10 min-w-10 cursor-pointer items-center justify-center rounded-lg border border-line bg-sand text-ink-900 hover:bg-brand-50"
+                  onClick={closeDrawer}
+                  aria-label="Close menu"
+                >
+                  <svg
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    aria-hidden
+                  >
+                    <path d="M6 6l12 12M18 6L6 18" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex min-h-0 flex-1 flex-col">{sidebarInner}</div>
+            </aside>
+          </div>
+        ) : null}
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          {/* Compact top bar when drawer mode */}
+          <header className="sticky top-0 z-40 flex items-center justify-between gap-2 border-b border-line bg-paper px-3 py-3 min-[425px]:px-4 min-[1280px]:hidden">
+            <div className="flex min-w-0 items-center gap-2">
+              <span
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-xs font-bold text-paper"
+                aria-hidden
+              >
+                BV
+              </span>
+              <div className="min-w-0">
+                <p className="m-0 truncate font-display text-sm font-bold text-ink-900">
+                  BookVerse
+                </p>
                 <span
-                  className={`inline-flex rounded-md px-1.5 py-0.5 text-[0.6rem] font-bold tracking-wide uppercase ${badgeClassName}`}
+                  className={`inline-flex rounded-md px-1.5 py-0.5 text-[0.6rem] font-bold uppercase ${badgeClassName}`}
                 >
                   {badge}
                 </span>
               </div>
-              <p className="m-0 mt-0.5 truncate text-[0.65rem] text-ink-500">{regionLabel}</p>
             </div>
-          </div>
-
-          {/* Menu */}
-          <div className="flex-1 overflow-y-auto px-2.5 py-4">
-            <p className="m-0 mb-1.5 px-2 text-[0.65rem] font-semibold tracking-wider text-ink-300 uppercase">
-              Menu
-            </p>
-            {menuNav}
-          </div>
-
-          {/* Account + General */}
-          <div className="border-t border-line px-2.5 py-3">{bottomBlock}</div>
-        </aside>
-
-        <div className="flex min-w-0 flex-1 flex-col">
-          <div className="border-b border-line bg-paper px-3 py-3 min-[960px]:hidden">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex min-w-0 items-center gap-2">
-                <span
-                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-xs font-bold text-paper"
-                  aria-hidden
-                >
-                  BV
-                </span>
-                <div className="min-w-0">
-                  <p className="m-0 truncate font-display text-sm font-bold text-ink-900">
-                    BookVerse
-                  </p>
-                  <span
-                    className={`inline-flex rounded-md px-1.5 py-0.5 text-[0.6rem] font-bold uppercase ${badgeClassName}`}
-                  >
-                    {badge}
-                  </span>
-                </div>
-              </div>
-              <button
-                type="button"
-                className="cursor-pointer rounded-lg border border-line bg-sand px-3 py-2 text-sm font-semibold text-ink-900"
-                onClick={() => setMobileOpen((v) => !v)}
-                aria-expanded={mobileOpen}
-                aria-controls={`${navId}-mobile`}
+            <button
+              type="button"
+              className="inline-flex min-h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-line bg-sand text-ink-900 hover:bg-brand-50"
+              onClick={openDrawer}
+              aria-expanded={drawerShown}
+              aria-controls={navId}
+              aria-label="Open menu"
+            >
+              <svg
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                aria-hidden
               >
-                {mobileOpen ? 'Close' : 'Menu'}
-              </button>
-            </div>
-          </div>
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            </button>
+          </header>
 
-          <div
-            id={`${navId}-mobile`}
-            className={`${mobileOpen ? 'block' : 'hidden'} border-b border-line bg-paper px-2.5 py-3 min-[960px]:hidden`}
-          >
-            <p className="m-0 mb-1.5 px-2 text-[0.65rem] font-semibold tracking-wider text-ink-300 uppercase">
-              Menu
-            </p>
-            {menuNav}
-            <div className="mt-4 border-t border-line pt-3">{bottomBlock}</div>
-          </div>
-
-          <div
-            className="border-b border-line bg-paper px-3 py-2 min-[960px]:hidden"
-            role="presentation"
-          >
-            <div className="-mx-1 flex max-w-full gap-1 overflow-x-auto pb-0.5">
-              {items.map((item) => {
-                const selected = item.id === activeId;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => onNavigate(item.id)}
-                    className={`shrink-0 cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap ${
-                      selected
-                        ? 'bg-brand-600 text-paper'
-                        : 'bg-sand text-ink-700 hover:bg-brand-50'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="flex-1 px-4 py-6 min-[640px]:px-6 min-[640px]:py-7">
-            <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+          <div className="flex-1 px-3 py-5 min-[375px]:px-4 min-[640px]:px-6 min-[640px]:py-7 min-[1020px]:px-8">
+            <div className="mb-5 flex flex-wrap items-start justify-between gap-3 min-[768px]:mb-6">
               <div className="min-w-0">
-                <h1 className="m-0 font-display text-2xl font-bold tracking-tight text-ink-900 min-[640px]:text-[1.75rem]">
+                <h1 className="m-0 font-display text-xl font-bold tracking-tight text-ink-900 min-[375px]:text-2xl min-[768px]:text-[1.75rem]">
                   {title}
                 </h1>
                 <p className="m-0 mt-1.5 max-w-lg text-sm leading-relaxed text-ink-500">
