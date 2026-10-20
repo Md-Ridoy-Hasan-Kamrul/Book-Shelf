@@ -18,10 +18,11 @@ type Section = {
 };
 
 /**
- * Each card: w-max from its own content (long title → only that card wider).
- * Same row height via items-stretch. Wrap; no forced equal columns, no x-scroll.
+ * Compact equal cards (fixed width, auto-fill). No stretch-to-full-row.
+ * Long titles clamp; height matches within each row.
  */
-const CARD_ROW = 'mt-4 m-0 flex list-none flex-wrap items-stretch gap-3 p-0';
+const CARD_GRID =
+  'mt-4 m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(9.75rem,9.75rem))] justify-start gap-3 p-0 min-[480px]:grid-cols-[repeat(auto-fill,minmax(10.5rem,10.5rem))] min-[900px]:grid-cols-[repeat(auto-fill,minmax(11rem,11rem))]';
 
 export default function RecommendRail() {
   const [sections, setSections] = useState<Section[]>([]);
@@ -45,9 +46,9 @@ export default function RecommendRail() {
     return (
       <div className="grid gap-3" aria-busy="true">
         <Skeleton className="h-8 w-48" />
-        <div className={CARD_ROW}>
+        <div className={CARD_GRID}>
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-28 w-40" />
+            <Skeleton key={i} className="h-28" />
           ))}
         </div>
       </div>
@@ -65,20 +66,23 @@ export default function RecommendRail() {
           <h2 id={`rec-${sec.key}`} className="m-0 font-display text-xl font-bold text-ink-900">
             {sec.title}
           </h2>
-          <ul className={CARD_ROW}>
+          <ul className={CARD_GRID}>
             {sec.items.map((b) => (
-              <li key={b.id} className="w-max max-w-full">
+              <li key={b.id} className="min-w-0">
                 <a
                   href={`/books/${b.slug}`}
-                  className="flex h-full min-h-[7rem] w-max max-w-full flex-col rounded-[var(--radius-card)] border border-line bg-paper p-3 no-underline hover:bg-sand"
+                  className="flex h-full min-h-[7.25rem] flex-col rounded-[var(--radius-card)] border border-line bg-paper p-3 no-underline shadow-[var(--shadow-warm)] hover:border-brand-600"
                 >
-                  <p className="m-0 w-max max-w-[min(100%,22rem)] font-display text-sm leading-snug font-bold text-ink-900">
+                  <p
+                    className="m-0 line-clamp-2 min-h-[2.5rem] font-display text-sm leading-snug font-bold text-ink-900"
+                    title={b.titleBn}
+                  >
                     {b.titleBn}
                   </p>
-                  <p className="m-0 mt-1 w-max max-w-[min(100%,22rem)] text-xs text-ink-500">
+                  <p className="m-0 mt-1 truncate text-xs text-ink-500" title={b.author}>
                     {b.author}
                   </p>
-                  <div className="mt-auto flex w-max max-w-[min(100%,22rem)] flex-wrap items-center gap-2 pt-3">
+                  <div className="mt-auto flex flex-wrap items-center gap-2 pt-2.5">
                     {b.minPrice ? (
                       <span className="text-xs font-semibold text-ink-900">৳{b.minPrice}</span>
                     ) : null}
