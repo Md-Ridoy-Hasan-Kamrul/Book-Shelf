@@ -1,0 +1,16 @@
+---
+/**
+ * After real Better Auth sign-in: resolve role server-side, then redirect.
+ * Mock flows use /mock-login instead.
+ */
+import { fetchMe } from '../lib/session';
+import { resolvePostLogin } from '../lib/postLogin';
+
+const u = await fetchMe(Astro.request.headers.get('cookie') ?? '');
+if (!u) {
+  return Astro.redirect('/login');
+}
+
+const next = Astro.url.searchParams.get('next');
+return Astro.redirect(resolvePostLogin(u.role, next));
+---

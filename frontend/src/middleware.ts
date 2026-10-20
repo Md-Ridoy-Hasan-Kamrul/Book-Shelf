@@ -1,6 +1,13 @@
 import { defineMiddleware } from 'astro:middleware';
 
-const PRIVATE_PREFIXES = ['/verify-phone', '/account', '/seller/dashboard', '/admin/dashboard'];
+const PRIVATE_PREFIXES = [
+  '/verify-phone',
+  '/account',
+  '/home',
+  '/post-login',
+  '/seller/dashboard',
+  '/admin/dashboard',
+];
 
 function flagOn(name: string): boolean {
   const v = import.meta.env[name];

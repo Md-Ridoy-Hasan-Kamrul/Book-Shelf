@@ -14,8 +14,13 @@ const ui = SELLER_ROLE_UI[me.role];
 <Base title={ui.heading} description={ui.blurb}>
   <main
     id="main"
-    class="mx-auto w-[min(100%-1rem,80rem)] px-2 py-6 min-[640px]:px-4 min-[640px]:py-8"
+    class="mx-auto w-[min(100%-0.5rem,90rem)] px-1 py-4 min-[640px]:px-3 min-[640px]:py-6"
   >
-    <SellerDashboard client:load role={me.role} />
+    <SellerDashboard
+      client:load
+      role={me.role}
+      userName={me.displayName ?? me.name}
+      userEmail={me.email}
+    />
   </main>
 </Base>

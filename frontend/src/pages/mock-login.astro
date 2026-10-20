@@ -4,25 +4,17 @@
  * Works without React/JS: fixes "login buttons do nothing" when island fails.
  */
 import { useMockData } from '../lib/mockMode';
+import { postLoginPath, safeNextPath } from '../lib/postLogin';
 
 if (!useMockData()) {
   return Astro.redirect('/login');
 }
 
-const DEST: Record<string, string> = {
-  ADMIN: '/admin/dashboard',
-  VENDOR: '/seller/dashboard',
-  PUBLISHER: '/seller/dashboard',
-  WRITER: '/seller/dashboard',
-  USER: '/account',
-  MODERATOR: '/account',
-};
-
 const raw = (Astro.url.searchParams.get('role') ?? 'USER').toUpperCase();
-const role = raw in DEST ? raw : 'USER';
-const next = Astro.url.searchParams.get('next');
-const go =
-  next && next.startsWith('/') && !next.startsWith('//') ? next : (DEST[role] ?? '/account');
+const role = ['ADMIN', 'VENDOR', 'PUBLISHER', 'WRITER', 'USER', 'MODERATOR'].includes(raw)
+  ? raw
+  : 'USER';
+const go = safeNextPath(Astro.url.searchParams.get('next')) ?? postLoginPath(role);
 
 Astro.cookies.set('bv_mock_role', role, {
   path: '/',

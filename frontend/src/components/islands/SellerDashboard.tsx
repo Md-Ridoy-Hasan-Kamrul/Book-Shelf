@@ -13,7 +13,7 @@ import {
 import { fh } from '../../lib/freshHuman';
 import { useMockData } from '../../lib/mockMode';
 import { SELLER_ROLE_UI, type SellerRole, type SellerTab } from '../../lib/sellerRoleUi';
-import DashboardShell from './DashboardShell';
+import DashboardShell, { DashPanel, DashStat } from './DashboardShell';
 import SellerCatalogForm from './SellerCatalogForm';
 
 function SkeletonRows() {
@@ -28,9 +28,11 @@ function SkeletonRows() {
 
 type Props = {
   role: SellerRole;
+  userName?: string;
+  userEmail?: string;
 };
 
-function SellerDashboardInner({ role }: Props) {
+function SellerDashboardInner({ role, userName, userEmail }: Props) {
   const ui = SELLER_ROLE_UI[role];
   const [tab, setTab] = useState<SellerTab>('overview');
   const qc = useQueryClient();
@@ -100,13 +102,25 @@ function SellerDashboardInner({ role }: Props) {
 
   return (
     <DashboardShell
-      title={ui.heading}
+      title="Dashboard"
       subtitle={`${ui.blurb} Serving buyers across Bangladesh.`}
       badge={ui.badge}
       badgeClassName={ui.badgeClass}
+      userName={userName}
+      userEmail={userEmail}
       items={navItems}
       activeId={tab}
       onNavigate={setTab}
+      headerActions={
+        <>
+          <button type="button" className={fh.btnCta} onClick={() => setTab('inventory')}>
+            {role === 'WRITER' ? 'Titles' : 'Add stock'}
+          </button>
+          <button type="button" className={fh.btnGhost} onClick={() => setTab('orders')}>
+            {ui.ordersLabel}
+          </button>
+        </>
+      }
       footer={
         <div className="space-y-2">
           {ui.growthLink ? (
@@ -114,14 +128,14 @@ function SellerDashboardInner({ role }: Props) {
               href={ui.growthLink}
               className="block text-xs font-semibold text-brand-700 no-underline hover:underline"
             >
-              Growth tools →
+              Growth tools
             </a>
           ) : null}
           <a
-            href="/"
+            href="/account"
             className="block text-xs font-semibold text-ink-500 no-underline hover:text-brand-700"
           >
-            ← Storefront
+            Account settings
           </a>
         </div>
       }
@@ -138,37 +152,95 @@ function SellerDashboardInner({ role }: Props) {
             </p>
           )}
           {overview.data && (
-            <dl className="grid grid-cols-2 gap-3 text-sm min-[720px]:grid-cols-3">
-              <div className={fh.cardBrand}>
-                <dt className="text-ink-500">{role === 'WRITER' ? 'Title sales' : 'Orders'}</dt>
-                <dd className="text-xl font-bold text-brand-700">{overview.data.ordersTotal}</dd>
+            <div className="grid gap-4">
+              <div className="grid grid-cols-2 gap-3 min-[720px]:grid-cols-4">
+                <DashStat
+                  label={role === 'WRITER' ? 'Title sales' : 'Orders'}
+                  value={overview.data.ordersTotal}
+                  tone="brand"
+                />
+                <DashStat label={ui.ordersLabel} value={overview.data.ordersToPack} />
+                <DashStat
+                  label={role === 'WRITER' ? 'Royalties (30d)' : 'Sales (30d)'}
+                  value={`৳${overview.data.salesLast30DaysBdt}`}
+                  tone="leaf"
+                />
+                <DashStat label="Open claims" value={overview.data.openClaims} />
               </div>
-              <div className={fh.card}>
-                <dt className="text-ink-500">{ui.ordersLabel}</dt>
-                <dd className="text-xl font-bold text-ink-900">{overview.data.ordersToPack}</dd>
+
+              <div className="grid gap-4 min-[720px]:grid-cols-2">
+                <DashPanel title={role === 'WRITER' ? 'Royalty balance' : 'Wallet'}>
+                  <dl className="m-0 grid gap-2">
+                    <div className="flex justify-between gap-2 rounded-[var(--radius-card)] bg-sand px-3 py-2">
+                      <dt className="text-ink-500">Pending</dt>
+                      <dd className="m-0 font-bold text-ink-900">
+                        ৳{overview.data.balancePendingBdt}
+                      </dd>
+                    </div>
+                    <div className="flex justify-between gap-2 rounded-[var(--radius-card)] bg-leaf-50 px-3 py-2">
+                      <dt className="text-ink-500">Available</dt>
+                      <dd className="m-0 font-bold text-leaf-700">
+                        ৳{overview.data.balanceAvailableBdt}
+                      </dd>
+                    </div>
+                  </dl>
+                  <button
+                    type="button"
+                    className={`mt-3 ${fh.btnGhost}`}
+                    onClick={() => setTab('payouts')}
+                  >
+                    Payouts
+                  </button>
+                </DashPanel>
+
+                <DashPanel
+                  title="Next steps"
+                  action={
+                    <button
+                      type="button"
+                      className="text-xs font-semibold text-brand-700"
+                      onClick={() => setTab('orders')}
+                    >
+                      Open queue
+                    </button>
+                  }
+                >
+                  <ul className="m-0 list-none space-y-2 p-0 text-sm">
+                    <li className="flex gap-2">
+                      <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-cta-500" aria-hidden />
+                      <span>
+                        <span className="font-semibold text-ink-900">{ui.ordersLabel}</span>
+                        <span className="block text-xs text-ink-500">
+                          {overview.data.ordersToPack} waiting
+                        </span>
+                      </span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span
+                        className="mt-1 h-2 w-2 shrink-0 rounded-full bg-brand-600"
+                        aria-hidden
+                      />
+                      <span>
+                        <span className="font-semibold text-ink-900">{ui.inventoryLabel}</span>
+                        <span className="block text-xs text-ink-500">Keep stock fresh</span>
+                      </span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span
+                        className="mt-1 h-2 w-2 shrink-0 rounded-full bg-leaf-600"
+                        aria-hidden
+                      />
+                      <span>
+                        <span className="font-semibold text-ink-900">Claims</span>
+                        <span className="block text-xs text-ink-500">
+                          {overview.data.openClaims} open
+                        </span>
+                      </span>
+                    </li>
+                  </ul>
+                </DashPanel>
               </div>
-              <div className={fh.cardLeaf}>
-                <dt className="text-ink-500">
-                  {role === 'WRITER' ? 'Royalties (30d)' : 'Sales (30d)'}
-                </dt>
-                <dd className="text-xl font-bold text-leaf-700">
-                  ৳{overview.data.salesLast30DaysBdt}
-                </dd>
-              </div>
-              <div className={fh.card}>
-                <dt className="text-ink-500">Open claims</dt>
-                <dd className="text-xl font-bold text-ink-900">{overview.data.openClaims}</dd>
-              </div>
-              <div className={`col-span-2 ${fh.cardLeaf}`}>
-                <dt className="text-ink-500">
-                  {role === 'WRITER' ? 'Royalty balance' : 'Balance'}
-                </dt>
-                <dd className="font-semibold text-leaf-700">
-                  Pending ৳{overview.data.balancePendingBdt} · Available ৳
-                  {overview.data.balanceAvailableBdt}
-                </dd>
-              </div>
-            </dl>
+            </div>
           )}
         </>
       )}
@@ -318,10 +390,10 @@ function SellerDashboardInner({ role }: Props) {
   );
 }
 
-export default function SellerDashboard({ role }: Props) {
+export default function SellerDashboard(props: Props) {
   return (
     <Island>
-      <SellerDashboardInner role={role} />
+      <SellerDashboardInner {...props} />
     </Island>
   );
 }

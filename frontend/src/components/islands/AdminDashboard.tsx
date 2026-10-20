@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { fh } from '../../lib/freshHuman';
 import AdminDeadLetterPanel from './AdminDeadLetterPanel';
-import DashboardShell, { type DashboardNavItem } from './DashboardShell';
+import DashboardShell, { DashPanel, DashStat, type DashboardNavItem } from './DashboardShell';
 import Island from './Island';
 import {
   approveAdminPayout,
@@ -20,6 +20,11 @@ import {
 
 type Tab = 'kpis' | 'approvals' | 'orders' | 'claims' | 'payouts' | 'money' | 'jobs' | 'settings';
 
+type Props = {
+  userName?: string;
+  userEmail?: string;
+};
+
 const ADMIN_NAV: DashboardNavItem<Tab>[] = [
   { id: 'kpis', label: 'Overview', hint: 'GMV & health' },
   { id: 'approvals', label: 'Approvals', hint: 'Seller roles' },
@@ -31,7 +36,10 @@ const ADMIN_NAV: DashboardNavItem<Tab>[] = [
   { id: 'settings', label: 'Settings', hint: 'System keys' },
 ];
 
-function AdminDashboardInner() {
+/** Decorative weekly pulse heights (UI only; real series later). */
+const WEEK_BARS = [42, 68, 55, 80, 48, 72, 90];
+
+function AdminDashboardInner({ userName, userEmail }: Props) {
   const [tab, setTab] = useState<Tab>('kpis');
   const [codOrderId, setCodOrderId] = useState('');
   const [moneyMsg, setMoneyMsg] = useState<string | null>(null);
@@ -46,17 +54,17 @@ function AdminDashboardInner() {
   const apps = useQuery({
     queryKey: ['admin', 'role-apps'],
     queryFn: fetchAdminRoleApplications,
-    enabled: tab === 'approvals',
+    enabled: tab === 'approvals' || tab === 'kpis',
   });
   const orders = useQuery({
     queryKey: ['admin', 'orders'],
     queryFn: fetchAdminOrders,
-    enabled: tab === 'orders',
+    enabled: tab === 'orders' || tab === 'kpis',
   });
   const claims = useQuery({
     queryKey: ['admin', 'claims'],
     queryFn: fetchAdminClaims,
-    enabled: tab === 'claims',
+    enabled: tab === 'claims' || tab === 'kpis',
   });
   const payouts = useQuery({
     queryKey: ['admin', 'payouts'],
@@ -73,6 +81,13 @@ function AdminDashboardInner() {
     queryFn: fetchAdminReconcile,
     enabled: tab === 'money',
   });
+
+  const pendingApps = apps.data?.items.filter((a) => a.status === 'PENDING').length ?? 0;
+  const nav = ADMIN_NAV.map((item) =>
+    item.id === 'approvals' && pendingApps > 0
+      ? { ...item, badge: pendingApps > 9 ? '9+' : String(pendingApps) }
+      : item,
+  );
 
   const approvePayout = useMutation({
     mutationFn: approveAdminPayout,
@@ -99,16 +114,31 @@ function AdminDashboardInner() {
 
   return (
     <DashboardShell
-      title="Platform operations"
-      subtitle="Nationwide marketplace control: GMV, escrow, claims, and seller approvals."
+      title="Dashboard"
+      subtitle="Plan payouts, clear claims, and keep Bangladesh GMV healthy."
       badge="Admin"
       badgeClassName="bg-brand-100 text-brand-700"
-      items={ADMIN_NAV}
+      userName={userName}
+      userEmail={userEmail}
+      items={nav}
       activeId={tab}
       onNavigate={setTab}
+      headerActions={
+        <>
+          <button type="button" className={fh.btnLeaf} onClick={() => setTab('money')}>
+            Money desk
+          </button>
+          <button type="button" className={fh.btnGhost} onClick={() => setTab('approvals')}>
+            Approvals
+          </button>
+        </>
+      }
       footer={
-        <a href="/" className="text-xs font-semibold text-brand-700 no-underline hover:underline">
-          ← Back to storefront
+        <a
+          href="/account"
+          className="block text-xs font-semibold text-ink-500 no-underline hover:text-brand-700"
+        >
+          Account settings
         </a>
       }
     >
@@ -124,56 +154,157 @@ function AdminDashboardInner() {
             </p>
           )}
           {kpis.data && (
-            <>
-              <dl className="grid grid-cols-2 gap-3 min-[720px]:grid-cols-3">
-                <div className={fh.cardBrand}>
-                  <dt className="text-ink-500">GMV</dt>
-                  <dd className="text-lg font-bold text-brand-700">৳{kpis.data.gmvBdt}</dd>
-                </div>
-                <div className={fh.card}>
-                  <dt className="text-ink-500">Orders</dt>
-                  <dd className="text-lg font-bold text-ink-900">{kpis.data.orderCount}</dd>
-                </div>
-                <div className={fh.card}>
-                  <dt className="text-ink-500">AOV</dt>
-                  <dd className="text-lg font-bold text-ink-900">৳{kpis.data.aovBdt}</dd>
-                </div>
-                <div className={fh.cardLeaf}>
-                  <dt className="text-ink-500">Take rate</dt>
-                  <dd className="text-lg font-bold text-leaf-700">{kpis.data.takeRatePct}%</dd>
-                </div>
-                <div className={fh.card}>
-                  <dt className="text-ink-500">RTO rate</dt>
-                  <dd className="font-semibold text-ink-900">{kpis.data.rtoRatePct}%</dd>
-                </div>
-                <div className={fh.card}>
-                  <dt className="text-ink-500">Claim rate</dt>
-                  <dd className="font-semibold text-ink-900">{kpis.data.claimRatePct}%</dd>
-                </div>
-              </dl>
-              <section className="mt-6">
-                <h2 className="m-0 font-display text-base font-bold text-ink-900">
-                  Margin-guard warnings
-                </h2>
-                {margin.data?.items.length === 0 && (
-                  <p className="mt-2 text-ink-500">No low-margin listings flagged.</p>
-                )}
-                <ul className="mt-2 list-none space-y-2 p-0">
-                  {margin.data?.items.slice(0, 5).map((w) => (
-                    <li
-                      key={w.listingId}
-                      className="rounded-[var(--radius-card)] border border-sun-200 bg-sun-100 px-3 py-2 text-sm text-sun-800"
+            <div className="grid gap-4">
+              <div className="grid grid-cols-2 gap-3 min-[720px]:grid-cols-4">
+                <DashStat
+                  label="GMV"
+                  value={`৳${kpis.data.gmvBdt}`}
+                  hint="Platform volume"
+                  tone="brand"
+                />
+                <DashStat label="Orders" value={kpis.data.orderCount} hint="All statuses" />
+                <DashStat label="AOV" value={`৳${kpis.data.aovBdt}`} hint="Avg order" />
+                <DashStat
+                  label="Take rate"
+                  value={`${kpis.data.takeRatePct}%`}
+                  hint="Commission share"
+                  tone="leaf"
+                />
+              </div>
+
+              <div className="grid gap-4 min-[900px]:grid-cols-[1.2fr_0.9fr_0.9fr]">
+                <DashPanel title="Order pulse">
+                  <p className="m-0 mb-3 text-xs text-ink-500">
+                    Illustrative weekly activity (live series later).
+                  </p>
+                  <div
+                    className="flex h-36 items-end gap-2"
+                    role="img"
+                    aria-label="Weekly order pulse chart"
+                  >
+                    {WEEK_BARS.map((h, i) => (
+                      <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                        <div
+                          className={`w-full rounded-t-[6px] ${i === 6 ? 'bg-brand-600' : i % 2 === 0 ? 'bg-brand-100' : 'bg-leaf-100'}`}
+                          style={{ height: `${h}%` }}
+                        />
+                        <span className="text-[0.6rem] font-semibold text-ink-300">
+                          {'SMTWTFS'[i]}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </DashPanel>
+
+                <DashPanel title="Needs attention">
+                  <div className="space-y-3">
+                    <div className="rounded-[var(--radius-card)] bg-sand p-3">
+                      <p className="m-0 text-xs font-semibold text-ink-500">Open claims</p>
+                      <p className="m-0 mt-1 font-display text-xl font-bold text-ink-900">
+                        {claims.data?.items.length ?? '…'}
+                      </p>
+                      <button
+                        type="button"
+                        className={`mt-2 ${fh.btnGhost}`}
+                        onClick={() => setTab('claims')}
+                      >
+                        Review claims
+                      </button>
+                    </div>
+                    <div className="rounded-[var(--radius-card)] border border-line p-3">
+                      <p className="m-0 text-xs font-semibold text-ink-500">RTO · Claim rate</p>
+                      <p className="m-0 mt-1 text-sm font-bold text-ink-900">
+                        {kpis.data.rtoRatePct}% · {kpis.data.claimRatePct}%
+                      </p>
+                    </div>
+                  </div>
+                </DashPanel>
+
+                <DashPanel
+                  title="Queue"
+                  action={
+                    <button
+                      type="button"
+                      className="text-xs font-semibold text-brand-700"
+                      onClick={() => setTab('approvals')}
                     >
-                      {w.bookTitle}: commission {w.commissionBps} bps
-                      {w.commissionBdt && w.floorBdt
-                        ? ` (৳${w.commissionBdt} < floor ৳${w.floorBdt})`
-                        : ''}{' '}
-                      · ৳{w.price}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            </>
+                      + New
+                    </button>
+                  }
+                >
+                  <ul className="m-0 list-none space-y-2 p-0">
+                    {(apps.data?.items.slice(0, 4) ?? []).map((a) => (
+                      <li key={a.id} className="flex gap-2 text-sm">
+                        <span
+                          className="mt-1 h-2 w-2 shrink-0 rounded-full bg-brand-600"
+                          aria-hidden
+                        />
+                        <span className="min-w-0">
+                          <span className="block truncate font-semibold text-ink-900">
+                            {a.type}: {a.userName}
+                          </span>
+                          <span className="block text-xs text-ink-500">{a.status}</span>
+                        </span>
+                      </li>
+                    ))}
+                    {(apps.data?.items.length ?? 0) === 0 ? (
+                      <li className="text-ink-500">No pending applications.</li>
+                    ) : null}
+                  </ul>
+                </DashPanel>
+              </div>
+
+              <div className="grid gap-4 min-[900px]:grid-cols-[1.2fr_1fr]">
+                <DashPanel title="Recent orders">
+                  <ul className="m-0 list-none divide-y divide-line p-0">
+                    {(orders.data?.items.slice(0, 5) ?? []).map((o) => (
+                      <li
+                        key={o.id}
+                        className="flex flex-wrap items-center justify-between gap-2 py-2.5 first:pt-0 last:pb-0"
+                      >
+                        <span className="min-w-0">
+                          <span className="block truncate font-semibold text-ink-900">
+                            {o.sellerName}
+                          </span>
+                          <span className="block text-xs text-ink-500">{o.status}</span>
+                        </span>
+                        <span className="text-sm font-bold text-ink-900">৳{o.total}</span>
+                      </li>
+                    ))}
+                    {(orders.data?.items.length ?? 0) === 0 ? (
+                      <li className="text-ink-500">No orders yet.</li>
+                    ) : null}
+                  </ul>
+                  <button
+                    type="button"
+                    className={`mt-3 ${fh.btnGhost}`}
+                    onClick={() => setTab('orders')}
+                  >
+                    All orders
+                  </button>
+                </DashPanel>
+
+                <DashPanel title="Margin guard">
+                  {(margin.data?.items.length ?? 0) === 0 ? (
+                    <p className="m-0 text-ink-500">No low-margin listings flagged.</p>
+                  ) : (
+                    <ul className="m-0 list-none space-y-2 p-0">
+                      {margin.data?.items.slice(0, 5).map((w) => (
+                        <li
+                          key={w.listingId}
+                          className="rounded-[var(--radius-card)] border border-sun-200 bg-sun-100 px-3 py-2 text-sm text-sun-800"
+                        >
+                          <span className="font-semibold">{w.bookTitle}</span>
+                          <span className="block text-xs">
+                            {w.commissionBps} bps · ৳{w.price}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </DashPanel>
+              </div>
+            </div>
           )}
         </>
       )}
@@ -409,10 +540,10 @@ function AdminDashboardInner() {
   );
 }
 
-export default function AdminDashboard() {
+export default function AdminDashboard(props: Props) {
   return (
     <Island>
-      <AdminDashboardInner />
+      <AdminDashboardInner {...props} />
     </Island>
   );
 }

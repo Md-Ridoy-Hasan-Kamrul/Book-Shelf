@@ -11,8 +11,8 @@ if (me.role !== 'ADMIN') return Astro.redirect('/');
 <Base title="Admin dashboard" description="Platform operations and KPIs">
   <main
     id="main"
-    class="mx-auto w-[min(100%-1rem,80rem)] px-2 py-6 min-[640px]:px-4 min-[640px]:py-8"
+    class="mx-auto w-[min(100%-0.5rem,90rem)] px-1 py-4 min-[640px]:px-3 min-[640px]:py-6"
   >
-    <AdminDashboard client:load />
+    <AdminDashboard client:load userName={me.displayName ?? me.name} userEmail={me.email} />
   </main>
 </Base>

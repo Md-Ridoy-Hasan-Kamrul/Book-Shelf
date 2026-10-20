@@ -16,6 +16,9 @@ import hindSiliguri600 from '@fontsource/hind-siliguri/files/hind-siliguri-benga
 import Island from '../components/islands/Island.tsx';
 import SiteShell from '../components/islands/SiteShell.tsx';
 import SiteFooter from '../components/shell/SiteFooter.astro';
+import { fetchMe } from '../lib/session';
+import { postLoginPath } from '../lib/postLogin';
+import { useMockData } from '../lib/mockMode';
 
 interface Props {
   title?: string;
@@ -34,6 +37,11 @@ const {
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
 const fullTitle = title === 'BookVerse' ? title : `${title} · BookVerse`;
 const pathname = Astro.url.pathname;
+
+const me = await fetchMe(Astro.request.headers.get('cookie') ?? '');
+const mockSignedIn = useMockData() && Boolean(Astro.cookies.get('bv_mock_role')?.value);
+const signedIn = useMockData() ? mockSignedIn : Boolean(me);
+const homeHref = signedIn && me && postLoginPath(me.role) === '/home' ? '/home' : '/';
 ---
 
 <!doctype html>
@@ -68,7 +76,7 @@ const pathname = Astro.url.pathname;
       Skip to content
     </a>
     <Island client:load>
-      <SiteShell flags={{ usedBooks: flags.usedBooks }} pathname={pathname} />
+      <SiteShell flags={{ usedBooks: flags.usedBooks }} pathname={pathname} homeHref={homeHref} />
     </Island>
     <div class="flex-1">
       <slot />

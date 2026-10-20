@@ -1,0 +1,34 @@
+---
+import Base from '../layouts/Base.astro';
+import ReaderHome from '../components/islands/ReaderHome.tsx';
+import { getFeatureFlags } from '../env';
+import { useMockData } from '../lib/mockMode';
+import { fetchMe } from '../lib/session';
+import { postLoginPath } from '../lib/postLogin';
+
+const flags = getFeatureFlags();
+const loginNext = `/login?next=${encodeURIComponent('/home')}`;
+
+if (useMockData() && !Astro.cookies.get('bv_mock_role')?.value) {
+  return Astro.redirect(loginNext);
+}
+
+const u = await fetchMe(Astro.request.headers.get('cookie') ?? '');
+if (!u) {
+  return Astro.redirect(loginNext);
+}
+
+// Ops roles land on their dashboards after login; /home is the reader hub.
+const dest = postLoginPath(u.role);
+if (dest !== '/home') {
+  return Astro.redirect(dest);
+}
+---
+
+<Base title="Home" description="আপনার BookVerse: অর্ডার, পড়া, পয়েন্ট">
+  <main id="main" class="py-8 min-[640px]:py-10">
+    <div class="mx-auto w-[min(100%-2rem,40rem)] min-w-0">
+      <ReaderHome client:load name={u.displayName ?? u.name} usedBooks={flags.usedBooks} />
+    </div>
+  </main>
+</Base>

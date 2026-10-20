@@ -72,7 +72,9 @@ export default function AuthForm({ mode, resetToken }: Props) {
     }
     setStatus('success');
     setMessage('Signed in: redirecting…');
-    window.location.href = '/';
+    const next = new URLSearchParams(window.location.search).get('next');
+    const q = next ? `?next=${encodeURIComponent(next)}` : '';
+    window.location.href = `/post-login${q}`;
   }
 
   async function onRegister(e: React.FormEvent) {

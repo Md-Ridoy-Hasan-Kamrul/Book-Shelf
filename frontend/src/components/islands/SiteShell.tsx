@@ -21,6 +21,8 @@ export type SiteShellFlags = {
 type Props = {
   flags?: SiteShellFlags;
   pathname?: string;
+  /** Signed-in reader hub; guests keep storefront `/`. */
+  homeHref?: string;
 };
 
 type NavItem = {
@@ -66,7 +68,7 @@ const BOTTOM_NAV: {
     href: '/',
     label: 'Home',
     labelBn: 'হোম',
-    match: (p) => p === '/',
+    match: (p) => p === '/' || p === '/home',
     Icon: IconHome,
   },
   {
@@ -108,12 +110,16 @@ function linkClass(active: boolean) {
     : 'text-sm font-semibold text-ink-700 no-underline hover:text-brand-700';
 }
 
-export default function SiteShell({ flags, pathname = '/' }: Props) {
+export default function SiteShell({ flags, pathname = '/', homeHref = '/' }: Props) {
   const usedBooks = Boolean(flags?.usedBooks);
   const count = useCartStore((s) => s.count());
   const [cartOpen, setCartOpen] = useState(false);
   const mock = useMockData();
   const path = pathname || '/';
+  const brandHref = homeHref;
+  const bottomNav = BOTTOM_NAV.map((item) =>
+    item.id === 'home' ? { ...item, href: homeHref } : item,
+  );
 
   return (
     <>
@@ -133,7 +139,7 @@ export default function SiteShell({ flags, pathname = '/' }: Props) {
         {/* Desktop chrome from 1020px (Laptop+): tablet/mobile use bottom nav + stacked search */}
         <div className="mx-auto flex w-[min(100%-2rem,72rem)] min-w-0 flex-wrap items-center gap-3 py-3 min-[1020px]:flex-nowrap">
           <a
-            href="/"
+            href={brandHref}
             className="font-display text-xl font-bold tracking-tight text-ink-900 no-underline"
           >
             BookVerse
@@ -230,7 +236,7 @@ export default function SiteShell({ flags, pathname = '/' }: Props) {
         aria-label="Mobile"
       >
         <ul className="m-0 grid list-none grid-cols-5 gap-0 px-1 pt-1 pb-1">
-          {BOTTOM_NAV.map((item) => {
+          {bottomNav.map((item) => {
             const active = item.cart ? cartOpen : Boolean(item.match?.(path));
             const base =
               'flex min-h-12 w-full flex-col items-center justify-center gap-0.5 rounded-[var(--radius-card)] px-1 py-1 text-[0.65rem] font-semibold no-underline';

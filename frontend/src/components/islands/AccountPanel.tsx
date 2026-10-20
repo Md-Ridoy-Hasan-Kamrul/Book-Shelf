@@ -82,6 +82,13 @@ export default function AccountPanel({
           </div>
         </dl>
         <ul className="mt-4 flex list-none flex-wrap gap-3 p-0 text-sm font-semibold">
+          {role === 'USER' || role === 'MODERATOR' ? (
+            <li>
+              <a href="/home" className="text-brand-700 no-underline hover:underline">
+                Home hub
+              </a>
+            </li>
+          ) : null}
           <li>
             <a href="/bookshelf" className="text-brand-700 no-underline hover:underline">
               Bookshelf

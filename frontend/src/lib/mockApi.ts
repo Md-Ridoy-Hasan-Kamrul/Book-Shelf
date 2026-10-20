@@ -329,12 +329,15 @@ export function resolveMockApi(pathWithQuery: string, method = 'GET', body?: unk
 
   if (path.startsWith('/points') || path.includes('point')) {
     return {
+      pointsBalance: 120,
       balance: 120,
       items: [
         {
           id: 'p1',
           delta: 10,
+          kind: 'EARN',
           reason: 'READ_LOG',
+          note: null,
           createdAt: new Date().toISOString(),
         },
       ],
