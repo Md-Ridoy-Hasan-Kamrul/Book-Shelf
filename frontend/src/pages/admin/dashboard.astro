@@ -1,5 +1,5 @@
 ---
-import Base from '../../layouts/Base.astro';
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
 import AdminDashboard from '../../components/islands/AdminDashboard.tsx';
 import { fetchMe } from '../../lib/session';
 
@@ -8,11 +8,8 @@ if (!me) return Astro.redirect('/login?next=/admin/dashboard');
 if (me.role !== 'ADMIN') return Astro.redirect('/');
 ---
 
-<Base title="Admin dashboard" description="Platform operations and KPIs">
-  <main
-    id="main"
-    class="mx-auto w-[min(100%-0.5rem,90rem)] px-1 py-4 min-[640px]:px-3 min-[640px]:py-6"
-  >
+<DashboardLayout title="Admin dashboard" description="Platform operations and KPIs">
+  <main id="main" class="min-h-full">
     <AdminDashboard client:load userName={me.displayName ?? me.name} userEmail={me.email} />
   </main>
-</Base>
+</DashboardLayout>

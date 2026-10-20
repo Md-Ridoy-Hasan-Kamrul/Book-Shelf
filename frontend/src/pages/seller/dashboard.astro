@@ -1,5 +1,5 @@
 ---
-import Base from '../../layouts/Base.astro';
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
 import SellerDashboard from '../../components/islands/SellerDashboard.tsx';
 import { fetchMe } from '../../lib/session';
 import { isSellerRole, SELLER_ROLE_UI } from '../../lib/sellerRoleUi';
@@ -11,11 +11,8 @@ if (!isSellerRole(me.role)) return Astro.redirect('/');
 const ui = SELLER_ROLE_UI[me.role];
 ---
 
-<Base title={ui.heading} description={ui.blurb}>
-  <main
-    id="main"
-    class="mx-auto w-[min(100%-0.5rem,90rem)] px-1 py-4 min-[640px]:px-3 min-[640px]:py-6"
-  >
+<DashboardLayout title={ui.heading} description={ui.blurb}>
+  <main id="main" class="min-h-full">
     <SellerDashboard
       client:load
       role={me.role}
@@ -23,4 +20,4 @@ const ui = SELLER_ROLE_UI[me.role];
       userEmail={me.email}
     />
   </main>
-</Base>
+</DashboardLayout>

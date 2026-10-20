@@ -1,4 +1,6 @@
 import { useId, useState, type ReactNode } from 'react';
+import { authClient } from '../../lib/authClient';
+import { useMockData } from '../../lib/mockMode';
 
 export type DashboardNavItem<T extends string> = {
   id: T;
@@ -23,9 +25,18 @@ type Props<T extends string> = {
   children: ReactNode;
 };
 
+async function logout() {
+  if (useMockData()) {
+    window.location.href = '/mock-logout';
+    return;
+  }
+  await authClient.signOut();
+  window.location.href = '/login';
+}
+
 /**
- * Ops shell inspired by dense SaaS dashboards (sidebar · top bar · widget canvas).
- * Tokens stay Fresh & Human (cream / brand / leaf), not copy-paste green themes.
+ * Ops shell: left sidebar only (no top navbar).
+ * Account role + Logout live in the sidebar.
  */
 export default function DashboardShell<T extends string>({
   title,
@@ -44,23 +55,73 @@ export default function DashboardShell<T extends string>({
 }: Props<T>) {
   const navId = useId();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [query, setQuery] = useState('');
+  const [loggingOut, setLoggingOut] = useState(false);
   const initials = (userName ?? badge)
     .split(/\s+/)
     .slice(0, 2)
     .map((w) => w[0]?.toUpperCase() ?? '')
     .join('');
 
-  const filtered = query.trim()
-    ? items.filter((i) => i.label.toLowerCase().includes(query.trim().toLowerCase()))
-    : items;
+  function onLogout() {
+    setLoggingOut(true);
+    void logout().catch(() => {
+      setLoggingOut(false);
+      window.location.href = '/login';
+    });
+  }
+
+  const accountBlock = (
+    <div className="rounded-[var(--radius-card)] border border-line bg-cream p-3">
+      <div className="flex items-center gap-2.5">
+        <span
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-paper"
+          aria-hidden
+        >
+          {initials || 'BV'}
+        </span>
+        <div className="min-w-0">
+          <p className="m-0 truncate text-sm font-semibold text-ink-900">{userName ?? badge}</p>
+          {userEmail ? (
+            <p className="m-0 truncate text-[0.65rem] text-ink-500">{userEmail}</p>
+          ) : null}
+        </div>
+      </div>
+      <span
+        className={`mt-2 inline-flex rounded-[var(--radius-card)] px-2 py-0.5 text-[0.65rem] font-bold tracking-wide uppercase ${badgeClassName}`}
+      >
+        {badge}
+      </span>
+    </div>
+  );
+
+  const generalNav = (
+    <div className="space-y-1">
+      <p className="m-0 px-1 pb-1 text-[0.65rem] font-bold tracking-wide text-ink-300 uppercase">
+        General
+      </p>
+      <a
+        href="/"
+        className="flex cursor-pointer items-center rounded-[var(--radius-card)] px-3 py-2.5 text-sm font-semibold text-ink-700 no-underline hover:bg-sand hover:text-ink-900"
+      >
+        Storefront
+      </a>
+      <button
+        type="button"
+        onClick={onLogout}
+        disabled={loggingOut}
+        className="flex w-full cursor-pointer items-center rounded-[var(--radius-card)] px-3 py-2.5 text-left text-sm font-semibold text-urgent-600 hover:bg-urgent-50 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {loggingOut ? 'Logging out…' : 'Logout'}
+      </button>
+      {footer}
+    </div>
+  );
 
   return (
-    <div className="overflow-hidden rounded-[var(--radius-card)] border border-line bg-sand shadow-[var(--shadow-warm)]">
-      <div className="flex min-h-[min(80vh,52rem)] flex-col min-[960px]:flex-row">
-        {/* Sidebar */}
+    <div className="min-h-dvh bg-sand">
+      <div className="flex min-h-dvh flex-col min-[960px]:flex-row">
         <aside
-          className="hidden w-56 shrink-0 flex-col bg-paper min-[960px]:flex min-[1100px]:w-60"
+          className="hidden w-56 shrink-0 flex-col border-r border-line bg-paper min-[960px]:flex min-[1100px]:w-60"
           aria-label="Dashboard sections"
         >
           <div className="px-4 pt-5 pb-4">
@@ -76,27 +137,21 @@ export default function DashboardShell<T extends string>({
                 <p className="m-0 truncate text-[0.65rem] text-ink-500">{regionLabel}</p>
               </div>
             </div>
-            <span
-              className={`mt-3 inline-flex rounded-[var(--radius-card)] px-2 py-0.5 text-[0.65rem] font-bold tracking-wide uppercase ${badgeClassName}`}
-            >
-              {badge}
-            </span>
           </div>
+
+          <div className="px-3 pb-3">{accountBlock}</div>
 
           <p className="m-0 px-4 pb-1 text-[0.65rem] font-bold tracking-wide text-ink-300 uppercase">
             Menu
           </p>
           <nav id={navId} className="flex flex-1 flex-col gap-0.5 px-2 pb-3">
-            {filtered.map((item) => {
+            {items.map((item) => {
               const selected = item.id === activeId;
               return (
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => {
-                    onNavigate(item.id);
-                    setQuery('');
-                  }}
+                  onClick={() => onNavigate(item.id)}
                   className={`relative flex cursor-pointer items-center gap-2 rounded-[var(--radius-card)] px-3 py-2.5 text-left text-sm font-semibold transition ${
                     selected
                       ? 'bg-brand-50 text-brand-700'
@@ -119,94 +174,44 @@ export default function DashboardShell<T extends string>({
                 </button>
               );
             })}
-            {filtered.length === 0 ? (
-              <p className="m-0 px-3 py-2 text-xs text-ink-500">No matching section.</p>
-            ) : null}
           </nav>
 
-          <div className="mt-auto space-y-3 border-t border-line p-3">
-            <div className="rounded-[var(--radius-card)] bg-ink-900 p-3 text-paper">
-              <p className="m-0 text-xs font-bold">Storefront</p>
-              <p className="m-0 mt-1 text-[0.65rem] text-ink-300">
-                Buyers browse Mood, catalog, and feed here.
-              </p>
-              <a
-                href="/"
-                className="mt-3 inline-flex rounded-[var(--radius-card)] bg-leaf-600 px-3 py-1.5 text-xs font-bold text-paper no-underline hover:bg-leaf-700"
-              >
-                Open shop
-              </a>
-            </div>
-            {footer}
-          </div>
+          <div className="mt-auto border-t border-line p-3">{generalNav}</div>
         </aside>
 
-        {/* Main column */}
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex flex-wrap items-center gap-3 border-b border-line bg-paper px-3 py-3 min-[640px]:px-5">
-            <label className="relative min-w-0 flex-1">
-              <span className="sr-only">Search sections</span>
-              <span
-                className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-300"
-                aria-hidden
-              >
-                ⌕
-              </span>
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search sections…"
-                className="min-h-11 w-full rounded-full border border-line bg-sand py-2 pr-3 pl-9 text-sm text-ink-900 placeholder:text-ink-300 focus:border-brand-600 focus:bg-paper focus:outline-none focus:ring-2 focus:ring-brand-100"
-              />
-            </label>
-
-            <button
-              type="button"
-              className="cursor-pointer rounded-[var(--radius-card)] border border-line bg-sand px-3 py-2 text-sm font-semibold text-ink-900 min-[960px]:hidden"
-              onClick={() => setMobileOpen((v) => !v)}
-              aria-expanded={mobileOpen}
-              aria-controls={`${navId}-mobile`}
-            >
-              {mobileOpen ? 'Hide' : 'Menu'}
-            </button>
-
-            <div className="hidden items-center gap-2 min-[640px]:flex">
-              <span
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-cream text-ink-500"
-                title="Notifications"
-                aria-hidden
-              >
-                ⌂
-              </span>
-            </div>
-
-            {(userName || userEmail) && (
-              <div className="flex items-center gap-2.5 rounded-full border border-line bg-cream py-1 pr-3 pl-1">
+          {/* Mobile-only: menu toggle + chips (no desktop top navbar) */}
+          <div className="border-b border-line bg-paper px-3 py-3 min-[960px]:hidden">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="m-0 truncate font-display text-base font-bold text-ink-900">
+                  BookVerse
+                </p>
                 <span
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-paper"
-                  aria-hidden
+                  className={`inline-flex rounded-[var(--radius-card)] px-2 py-0.5 text-[0.65rem] font-bold uppercase ${badgeClassName}`}
                 >
-                  {initials || 'BV'}
+                  {badge}
                 </span>
-                <div className="hidden min-w-0 min-[520px]:block">
-                  <p className="m-0 truncate text-sm font-semibold text-ink-900">
-                    {userName ?? badge}
-                  </p>
-                  {userEmail ? (
-                    <p className="m-0 truncate text-[0.65rem] text-ink-500">{userEmail}</p>
-                  ) : null}
-                </div>
               </div>
-            )}
-          </header>
+              <button
+                type="button"
+                className="cursor-pointer rounded-[var(--radius-card)] border border-line bg-sand px-3 py-2 text-sm font-semibold text-ink-900"
+                onClick={() => setMobileOpen((v) => !v)}
+                aria-expanded={mobileOpen}
+                aria-controls={`${navId}-mobile`}
+              >
+                {mobileOpen ? 'Hide' : 'Menu'}
+              </button>
+            </div>
+          </div>
 
           <div
             id={`${navId}-mobile`}
             className={`${mobileOpen ? 'block' : 'hidden'} border-b border-line bg-paper p-3 min-[960px]:hidden`}
           >
+            <div className="mb-3">{accountBlock}</div>
             <nav className="flex flex-col gap-1" aria-label="Dashboard sections">
-              {(query.trim() ? filtered : items).map((item) => {
+              {items.map((item) => {
                 const selected = item.id === activeId;
                 return (
                   <button
@@ -215,7 +220,6 @@ export default function DashboardShell<T extends string>({
                     onClick={() => {
                       onNavigate(item.id);
                       setMobileOpen(false);
-                      setQuery('');
                     }}
                     className={`cursor-pointer rounded-[var(--radius-card)] px-3 py-2.5 text-left text-sm font-semibold ${
                       selected ? 'bg-brand-600 text-paper' : 'bg-sand text-ink-700'
@@ -226,6 +230,7 @@ export default function DashboardShell<T extends string>({
                 );
               })}
             </nav>
+            <div className="mt-3 border-t border-line pt-3">{generalNav}</div>
           </div>
 
           <div
@@ -271,7 +276,7 @@ export default function DashboardShell<T extends string>({
   );
 }
 
-/** Highlight + secondary KPI tiles (Donezo-style row). */
+/** Highlight + secondary KPI tiles. */
 export function DashStat({
   label,
   value,

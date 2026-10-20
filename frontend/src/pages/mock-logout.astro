@@ -1,0 +1,13 @@
+---
+/**
+ * Mock-only: clear bv_mock_role cookie, then go to login.
+ */
+import { useMockData } from '../lib/mockMode';
+
+if (!useMockData()) {
+  return Astro.redirect('/login');
+}
+
+Astro.cookies.delete('bv_mock_role', { path: '/' });
+return Astro.redirect('/login');
+---

@@ -45,4 +45,5 @@ Check off after each prompt’s ACCEPTANCE passes.
 - [x] Audit gaps fixed — SiteShell PDF nav (Home/Discover/Community/Cart/Profile) + search→`/search`; FEATURE_* UI/route hide; `/account` + role-apply; Follow/Block on writer profiles; projectFiles AGENTS synced to React/`frontend`
 - [x] Reader post-login hub — `/home` (orders · reading · points); role redirects via `postLogin` / `mock-login` / `/post-login`; guest `/` storefront kept
 - [x] Ops dashboard polish — Donezo-like shell (sidebar · search · user chip · KPI grid · widgets) on Admin/Seller, Fresh & Human tokens
+- [x] Ops dashboards use `DashboardLayout` (no storefront navbar / footer / bottom nav)
 - [x] P2 shell production polish — sticky header + suggest search + active states; mobile bottom nav icons (BN labels) + cart drawer; `SiteFooter` columns (Explore / Account / Legal P17) + Fresh & Human tokens
