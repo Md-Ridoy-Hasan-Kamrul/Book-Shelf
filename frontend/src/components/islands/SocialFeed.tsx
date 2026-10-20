@@ -142,7 +142,7 @@ function FeedInner() {
       {feed.isLoading && (
         <div className="space-y-3" aria-busy="true">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded-[var(--radius-card)] bg-sand" />
+            <div key={i} className="h-28 animate-pulse rounded-(--radius-card) bg-sand" />
           ))}
         </div>
       )}
@@ -161,7 +161,7 @@ function FeedInner() {
         {items.map((post) => (
           <li
             key={post.id}
-            className="rounded-[var(--radius-card)] border border-line bg-paper p-4 text-sm shadow-sm"
+            className="rounded-(--radius-card) border border-line bg-paper p-4 text-sm shadow-sm"
           >
             <div className="flex justify-between gap-2">
               <strong className="text-ink-900">{post.authorName}</strong>

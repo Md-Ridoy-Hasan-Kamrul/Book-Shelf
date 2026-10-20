@@ -78,20 +78,20 @@ export default function SearchSuggest({ initialQ = '' }: Props) {
             window.setTimeout(() => setOpen(false), 150);
           }}
           placeholder="বই, লেখক, ISBN…"
-          className="min-h-11 min-w-0 w-full flex-1 rounded-[var(--radius-card)] border border-line bg-cream px-3 text-ink-900 placeholder:text-ink-500 focus:border-brand-600 focus:bg-paper focus:outline-none focus:ring-2 focus:ring-brand-100"
+          className="min-h-11 min-w-0 w-full flex-1 rounded-(--radius-card) border border-line bg-cream px-3 text-ink-900 placeholder:text-ink-500 focus:border-brand-600 focus:bg-paper focus:outline-none focus:ring-2 focus:ring-brand-100"
           autoComplete="off"
           enterKeyHint="search"
         />
         <button
           type="submit"
-          className="min-h-11 shrink-0 cursor-pointer rounded-[var(--radius-card)] bg-brand-600 px-4 text-sm font-semibold text-paper hover:bg-brand-700"
+          className="min-h-11 shrink-0 cursor-pointer rounded-(--radius-card) bg-brand-600 px-4 text-sm font-semibold text-paper hover:bg-brand-700"
         >
           Search
         </button>
       </form>
       {open && debounced.length >= 2 && (
         <ul
-          className="absolute z-50 mt-1 max-h-72 w-full overflow-auto rounded-[var(--radius-card)] border border-line bg-paper p-2 shadow-[var(--shadow-warm)]"
+          className="absolute z-50 mt-1 max-h-72 w-full overflow-auto rounded-(--radius-card) border border-line bg-paper p-2 shadow-(--shadow-warm)"
           role="listbox"
         >
           {loading && <li className="px-2 py-2 text-sm text-ink-500">Loading…</li>}
@@ -102,7 +102,7 @@ export default function SearchSuggest({ initialQ = '' }: Props) {
             <li key={`${row.kind}-${row.href}`} role="option">
               <a
                 href={row.href}
-                className="block rounded-[var(--radius-card)] px-2 py-2 text-sm no-underline hover:bg-brand-50"
+                className="block rounded-(--radius-card) px-2 py-2 text-sm no-underline hover:bg-brand-50"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setOpen(false)}
               >

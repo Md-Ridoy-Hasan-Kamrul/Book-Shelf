@@ -66,12 +66,10 @@ const homeHref = signedIn && me && postLoginPath(me.role) === '/home' ? '/home' 
     <title>{fullTitle}</title>
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
-  <body
-    class="flex min-h-full flex-col overflow-x-clip bg-cream pb-20 text-ink-900 min-[1020px]:pb-0"
-  >
+  <body class="flex min-h-full flex-col overflow-x-clip bg-cream pb-20 text-ink-900 lap:pb-0">
     <a
       href="#main"
-      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-[var(--radius-card)] focus:bg-brand-600 focus:px-3 focus:py-2 focus:text-paper"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-(--radius-card) focus:bg-brand-600 focus:px-3 focus:py-2 focus:text-paper"
     >
       Skip to content
     </a>

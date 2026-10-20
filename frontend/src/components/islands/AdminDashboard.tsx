@@ -16,6 +16,13 @@ import {
   fetchAdminRoleApplications,
   fetchAdminSettings,
   runAdminPayoutBatch,
+  type AdminClaim,
+  type AdminMarginWarning,
+  type AdminOrder,
+  type AdminPayout,
+  type AdminReconcileIssue,
+  type AdminRoleApp,
+  type AdminSetting,
 } from '../../lib/dashboardApi';
 
 type Tab = 'kpis' | 'approvals' | 'orders' | 'claims' | 'payouts' | 'money' | 'jobs' | 'settings';
@@ -82,7 +89,8 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
     enabled: tab === 'money',
   });
 
-  const pendingApps = apps.data?.items.filter((a) => a.status === 'PENDING').length ?? 0;
+  const pendingApps =
+    apps.data?.items.filter((a: AdminRoleApp) => a.status === 'PENDING').length ?? 0;
   const nav = ADMIN_NAV.map((item) =>
     item.id === 'approvals' && pendingApps > 0
       ? { ...item, badge: pendingApps > 9 ? '9+' : String(pendingApps) }
@@ -147,7 +155,7 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
           )}
           {kpis.data && (
             <div className="grid gap-4">
-              <div className="grid grid-cols-2 gap-2 min-[375px]:gap-3 min-[768px]:grid-cols-4 min-[1440px]:gap-4">
+              <div className="grid grid-cols-2 gap-2 mm:gap-3 tab:grid-cols-4 lapl:gap-4">
                 <DashStat
                   label="GMV"
                   value={`৳${kpis.data.gmvBdt}`}
@@ -177,7 +185,7 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
                     {WEEK_BARS.map((h, i) => (
                       <div key={i} className="flex flex-1 flex-col items-center gap-1">
                         <div
-                          className={`w-full rounded-t-[6px] ${i === 6 ? 'bg-brand-600' : i % 2 === 0 ? 'bg-brand-100' : 'bg-leaf-100'}`}
+                          className={`w-full rounded-t-md ${i === 6 ? 'bg-brand-600' : i % 2 === 0 ? 'bg-brand-100' : 'bg-leaf-100'}`}
                           style={{ height: `${h}%` }}
                         />
                         <span className="text-[0.6rem] font-semibold text-ink-300">
@@ -190,7 +198,7 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
 
                 <DashPanel title="Needs attention">
                   <div className="space-y-3">
-                    <div className="rounded-[var(--radius-card)] bg-sand p-3">
+                    <div className="rounded-(--radius-card) bg-sand p-3">
                       <p className="m-0 text-xs font-semibold text-ink-500">Open claims</p>
                       <p className="m-0 mt-1 font-display text-xl font-bold text-ink-900">
                         {claims.data?.items.length ?? '…'}
@@ -203,7 +211,7 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
                         Review claims
                       </button>
                     </div>
-                    <div className="rounded-[var(--radius-card)] border border-line p-3">
+                    <div className="rounded-(--radius-card) border border-line p-3">
                       <p className="m-0 text-xs font-semibold text-ink-500">RTO · Claim rate</p>
                       <p className="m-0 mt-1 text-sm font-bold text-ink-900">
                         {kpis.data.rtoRatePct}% · {kpis.data.claimRatePct}%
@@ -225,7 +233,7 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
                   }
                 >
                   <ul className="m-0 list-none space-y-2 p-0">
-                    {(apps.data?.items.slice(0, 4) ?? []).map((a) => (
+                    {(apps.data?.items.slice(0, 4) ?? []).map((a: AdminRoleApp) => (
                       <li key={a.id} className="flex gap-2 text-sm">
                         <span
                           className="mt-1 h-2 w-2 shrink-0 rounded-full bg-brand-600"
@@ -249,7 +257,7 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
               <div className="grid gap-4 min-[900px]:grid-cols-[1.2fr_1fr]">
                 <DashPanel title="Recent orders">
                   <ul className="m-0 list-none divide-y divide-line p-0">
-                    {(orders.data?.items.slice(0, 5) ?? []).map((o) => (
+                    {(orders.data?.items.slice(0, 5) ?? []).map((o: AdminOrder) => (
                       <li
                         key={o.id}
                         className="flex flex-wrap items-center justify-between gap-2 py-2.5 first:pt-0 last:pb-0"
@@ -281,10 +289,10 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
                     <p className="m-0 text-ink-500">No low-margin listings flagged.</p>
                   ) : (
                     <ul className="m-0 list-none space-y-2 p-0">
-                      {margin.data?.items.slice(0, 5).map((w) => (
+                      {margin.data?.items.slice(0, 5).map((w: AdminMarginWarning) => (
                         <li
                           key={w.listingId}
-                          className="rounded-[var(--radius-card)] border border-sun-200 bg-sun-100 px-3 py-2 text-sm text-sun-800"
+                          className="rounded-(--radius-card) border border-sun-200 bg-sun-100 px-3 py-2 text-sm text-sun-800"
                         >
                           <span className="font-semibold">{w.bookTitle}</span>
                           <span className="block text-xs">
@@ -307,7 +315,7 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
             <p className="text-ink-500">No pending role applications.</p>
           )}
           <ul className="list-none space-y-2 p-0">
-            {apps.data?.items.map((a) => (
+            {apps.data?.items.map((a: AdminRoleApp) => (
               <li key={a.id} className={fh.listRow}>
                 <strong className="text-ink-900">{a.type}</strong>
                 <span className="text-ink-700">
@@ -323,7 +331,7 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
 
       {tab === 'orders' && (
         <ul className="list-none space-y-2 p-0">
-          {orders.data?.items.map((o) => (
+          {orders.data?.items.map((o: AdminOrder) => (
             <li key={o.id} className={`flex justify-between gap-2 ${fh.listRow}`}>
               <span className="text-ink-900">{o.sellerName}</span>
               <span className="text-ink-700">
@@ -336,7 +344,7 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
 
       {tab === 'claims' && (
         <ul className="list-none space-y-3 p-0">
-          {claims.data?.items.map((c) => (
+          {claims.data?.items.map((c: AdminClaim) => (
             <li key={c.id} className={fh.listRow}>
               <div className="font-semibold text-ink-900">
                 {c.status} · {c.buyerName} → {c.sellerName}
@@ -344,7 +352,7 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
               <p className="m-0 mt-1 text-ink-700">{c.reason}</p>
               {c.images.length > 0 && (
                 <ul className="mt-2 flex flex-wrap gap-2 p-0">
-                  {c.images.map((url) => (
+                  {c.images.map((url: string) => (
                     <li key={url}>
                       <a
                         href={url}
@@ -365,7 +373,7 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
 
       {tab === 'payouts' && (
         <ul className="list-none space-y-2 p-0">
-          {payouts.data?.items.map((p) => (
+          {payouts.data?.items.map((p: AdminPayout) => (
             <li
               key={p.id}
               className={`flex flex-wrap items-center justify-between gap-2 ${fh.listRow}`}
@@ -429,10 +437,10 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
                     : `${reconcile.data.issues.length} issue(s) found.`}
                 </p>
                 <ul className="mt-2 list-none space-y-2 p-0">
-                  {reconcile.data.issues.map((i) => (
+                  {reconcile.data.issues.map((i: AdminReconcileIssue) => (
                     <li
                       key={i.orderId}
-                      className="rounded-[var(--radius-card)] border border-urgent-600/20 bg-urgent-50 p-3 font-mono text-xs"
+                      className="rounded-(--radius-card) border border-urgent-600/20 bg-urgent-50 p-3 font-mono text-xs"
                     >
                       <div className="font-semibold text-ink-900">{i.orderId}</div>
                       <div className="text-ink-500">{i.message}</div>
@@ -478,7 +486,7 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
             <p className="mt-1 text-ink-500">Mark courier COD remittance received for an order.</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <input
-                className="min-h-11 min-w-[16rem] flex-1 rounded-[var(--radius-card)] border border-line bg-paper px-3 text-sm text-ink-900 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100"
+                className="min-h-11 min-w-64 flex-1 rounded-(--radius-card) border border-line bg-paper px-3 text-sm text-ink-900 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100"
                 placeholder="Order id"
                 value={codOrderId}
                 onChange={(e) => setCodOrderId(e.target.value)}
@@ -500,7 +508,7 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
 
           {moneyMsg ? (
             <p
-              className="m-0 rounded-[var(--radius-card)] bg-leaf-50 px-3 py-2 text-sm font-semibold text-leaf-700"
+              className="m-0 rounded-(--radius-card) bg-leaf-50 px-3 py-2 text-sm font-semibold text-leaf-700"
               role="status"
             >
               {moneyMsg}
@@ -520,7 +528,7 @@ function AdminDashboardInner({ userName, userEmail }: Props) {
 
       {tab === 'settings' && (
         <ul className="list-none space-y-2 p-0 font-mono text-xs">
-          {settings.data?.map((s) => (
+          {settings.data?.map((s: AdminSetting) => (
             <li key={s.key} className={fh.listRow}>
               <span className="text-brand-700">{s.key}</span>
               <span className="text-ink-700">: {JSON.stringify(s.value)}</span>

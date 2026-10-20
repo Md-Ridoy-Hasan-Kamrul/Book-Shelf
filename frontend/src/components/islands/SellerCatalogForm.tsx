@@ -28,7 +28,7 @@ const createdSchema = z.object({
 });
 
 const field =
-  'mt-1 w-full min-h-10 rounded-[var(--radius-card)] border border-line bg-paper px-3 text-sm text-ink-900';
+  'mt-1 w-full min-h-10 rounded-(--radius-card) border border-line bg-paper px-3 text-sm text-ink-900';
 
 export default function SellerCatalogForm() {
   const qc = useQueryClient();
@@ -128,7 +128,7 @@ export default function SellerCatalogForm() {
   });
 
   return (
-    <div className="mb-6 space-y-4 rounded-[var(--radius-card)] border border-line bg-paper p-4">
+    <div className="mb-6 space-y-4 rounded-(--radius-card) border border-line bg-paper p-4">
       <h3 className="m-0 font-display text-lg font-bold text-ink-900">Add book listing</h3>
       <form
         className="grid gap-3 min-[720px]:grid-cols-2"

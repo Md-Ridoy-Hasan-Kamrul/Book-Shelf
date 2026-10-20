@@ -132,7 +132,7 @@ export default function CheckoutForm() {
 
   if (successOrderId) {
     return (
-      <div className="rounded-[var(--radius-card)] border border-leaf-100 bg-leaf-50 p-6">
+      <div className="rounded-(--radius-card) border border-leaf-100 bg-leaf-50 p-6">
         <h2 className="mt-0 text-lg font-bold text-leaf-700">অর্ডার হয়েছে</h2>
         <p className="text-ink-700">
           <a href={`/orders/${successOrderId}`} className="font-semibold text-brand-700">
@@ -158,7 +158,7 @@ export default function CheckoutForm() {
             <ul className="mt-2 list-none space-y-2 p-0">
               {addresses.map((a) => (
                 <li key={a.id}>
-                  <label className="flex cursor-pointer gap-2 rounded-[var(--radius-card)] border border-line p-3">
+                  <label className="flex cursor-pointer gap-2 rounded-(--radius-card) border border-line p-3">
                     <input
                       type="radio"
                       name="address"
@@ -231,7 +231,7 @@ export default function CheckoutForm() {
         />
       </section>
 
-      <aside className="h-fit rounded-[var(--radius-card)] border border-line bg-paper p-4 shadow-sm">
+      <aside className="h-fit rounded-(--radius-card) border border-line bg-paper p-4 shadow-sm">
         <h2 className="mt-0 text-lg font-bold">Summary</h2>
         {quoteLoading && !quote ? (
           <Skeleton className="h-32 w-full" />

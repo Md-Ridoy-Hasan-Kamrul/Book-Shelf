@@ -11,8 +11,8 @@ type Props = {
 
 export function BookCard({ title, author, price, inStock = true }: Props) {
   return (
-    <article className="rounded-[var(--radius-card)] border border-line bg-paper p-4 shadow-[var(--shadow-warm)]">
-      <div className="mb-3 aspect-[3/4] rounded-[var(--radius-card)] bg-sand" aria-hidden />
+    <article className="rounded-(--radius-card) border border-line bg-paper p-4 shadow-(--shadow-warm)">
+      <div className="mb-3 aspect-3/4 rounded-(--radius-card) bg-sand" aria-hidden />
       <h3 className="m-0 font-display text-base font-bold text-ink-900">{title}</h3>
       <p className="m-0 mt-1 text-sm text-ink-500">{author}</p>
       <div className="mt-3 flex flex-wrap items-center gap-2">

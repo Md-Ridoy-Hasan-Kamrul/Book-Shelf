@@ -152,7 +152,7 @@ export default function DashboardShell<T extends string>({
           >
             {selected ? (
               <span
-                className="absolute top-1/2 left-0 h-4 w-[3px] -translate-y-1/2 rounded-r-full bg-brand-600"
+                className="absolute top-1/2 left-0 h-4 w-0.75 -translate-y-1/2 rounded-r-full bg-brand-600"
                 aria-hidden
               />
             ) : null}
@@ -214,7 +214,7 @@ export default function DashboardShell<T extends string>({
       <div className="flex min-h-dvh flex-col min-[1280px]:flex-row">
         {/* Docked sidebar: wide desktop only */}
         <aside
-          className="hidden w-[15.5rem] shrink-0 flex-col border-r border-line bg-paper min-[1280px]:flex"
+          className="hidden w-62 shrink-0 flex-col border-r border-line bg-paper min-[1280px]:flex"
           aria-label="Dashboard"
         >
           {sidebarInner}
@@ -237,7 +237,7 @@ export default function DashboardShell<T extends string>({
               aria-modal="true"
               aria-label="Dashboard menu"
               onTransitionEnd={onDrawerTransitionEnd}
-              className={`absolute top-0 left-0 flex h-full w-[min(100%-2.5rem,17.5rem)] max-w-[17.5rem] flex-col bg-paper shadow-[var(--shadow-warm)] will-change-transform transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none min-[375px]:w-[min(100%-3rem,18rem)] min-[768px]:w-[18rem] ${
+              className={`absolute top-0 left-0 flex h-full w-[min(100%-2.5rem,17.5rem)] max-w-70 flex-col bg-paper shadow-(--shadow-warm) will-change-transform transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none mm:w-[min(100%-3rem,18rem)] tab:w-72 ${
                 drawerShown ? 'translate-x-0' : '-translate-x-full'
               }`}
             >
@@ -268,7 +268,7 @@ export default function DashboardShell<T extends string>({
 
         <div className="flex min-w-0 flex-1 flex-col">
           {/* Compact top bar when drawer mode */}
-          <header className="sticky top-0 z-40 flex items-center justify-between gap-2 border-b border-line bg-paper px-3 py-3 min-[425px]:px-4 min-[1280px]:hidden">
+          <header className="sticky top-0 z-40 flex items-center justify-between gap-2 border-b border-line bg-paper px-3 py-3 ml:px-4 min-[1280px]:hidden">
             <div className="flex min-w-0 items-center gap-2">
               <span
                 className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-xs font-bold text-paper"
@@ -309,8 +309,8 @@ export default function DashboardShell<T extends string>({
             </button>
           </header>
 
-          <div className="mx-auto w-full max-w-[90rem] flex-1 px-3 py-5 min-[375px]:px-4 min-[425px]:px-5 min-[768px]:px-6 min-[768px]:py-7 min-[1020px]:px-8 min-[1440px]:px-10">
-            <div className="mb-5 flex flex-wrap items-start justify-between gap-3 min-[768px]:mb-6">
+          <div className="mx-auto w-full max-w-360 flex-1 px-3 py-5 mm:px-4 ml:px-5 tab:px-6 tab:py-7 lap:px-8 lapl:px-10">
+            <div className="mb-5 flex flex-wrap items-start justify-between gap-3 tab:mb-6">
               <div className="min-w-0 max-w-2xl">
                 <h1 className="type-page m-0 text-ink-900">{title}</h1>
                 <p className="type-lead m-0 mt-1.5 text-ink-500">{subtitle}</p>
@@ -348,7 +348,7 @@ export function DashStat({
 
   return (
     <div
-      className={`flex min-h-[5.75rem] flex-col justify-between rounded-[var(--radius-card)] border p-3 shadow-[var(--shadow-warm)] min-[375px]:min-h-[6.25rem] min-[375px]:p-4 min-[1440px]:p-5 ${shell}`}
+      className={`flex min-h-23 flex-col justify-between rounded-(--radius-card) border p-3 shadow-(--shadow-warm) mm:min-h-25 mm:p-4 lapl:p-5 ${shell}`}
     >
       <p className={`type-meta m-0 font-semibold ${muted}`}>{label}</p>
       <p className={`type-kpi m-0 ${strong}`}>{value}</p>
@@ -370,7 +370,7 @@ export function DashPanel({
 }) {
   return (
     <section
-      className={`rounded-[var(--radius-card)] border border-line bg-paper p-4 shadow-[var(--shadow-warm)] min-[640px]:p-5 ${className}`}
+      className={`rounded-(--radius-card) border border-line bg-paper p-4 shadow-(--shadow-warm) min-[640px]:p-5 ${className}`}
     >
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h2 className="type-section m-0 text-ink-900">{title}</h2>

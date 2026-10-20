@@ -81,7 +81,7 @@ if (!profile) {
               <li>
                 <a
                   href={`/books/${b.slug}`}
-                  class="block rounded-[var(--radius-card)] border border-line bg-paper p-3 no-underline hover:bg-sand"
+                  class="block rounded-(--radius-card) border border-line bg-paper p-3 no-underline hover:bg-sand"
                 >
                   <p class="m-0 font-display font-bold text-ink-900">{b.titleBn}</p>
                   <p class="m-0 text-sm text-ink-500">{b.title}</p>
@@ -99,7 +99,7 @@ if (!profile) {
         <ul class="mt-4 list-none space-y-3 p-0">
           {
             profile.posts.map((p) => (
-              <li class="rounded-[var(--radius-card)] border border-line bg-paper p-4">
+              <li class="rounded-(--radius-card) border border-line bg-paper p-4">
                 <p class="m-0 text-xs font-bold text-ink-500 uppercase">{p.type}</p>
                 <p class="mt-2 whitespace-pre-wrap text-ink-900">{p.body}</p>
               </li>

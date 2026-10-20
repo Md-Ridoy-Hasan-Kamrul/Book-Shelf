@@ -26,8 +26,8 @@ if (dest !== '/home') {
 ---
 
 <Base title="Home" description="আপনার BookVerse: অর্ডার, পড়া, পয়েন্ট">
-  <main id="main" class="py-6 min-[768px]:py-10">
-    <div class="mx-auto w-[min(100%-1.5rem,40rem)] min-w-0 min-[375px]:w-[min(100%-2rem,40rem)]">
+  <main id="main" class="py-6 tab:py-10">
+    <div class="mx-auto w-[min(100%-1.5rem,40rem)] min-w-0 mm:w-[min(100%-2rem,40rem)]">
       <ReaderHome client:load name={u.displayName ?? u.name} usedBooks={flags.usedBooks} />
     </div>
   </main>

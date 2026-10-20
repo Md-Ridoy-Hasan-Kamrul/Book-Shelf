@@ -43,7 +43,7 @@ export default function SponsoredPlacement({ genreId }: { genreId?: string }) {
 
   return (
     <aside
-      className="mt-6 rounded-[var(--radius-card)] border border-line bg-brand-100/40 p-4"
+      className="mt-6 rounded-(--radius-card) border border-line bg-brand-100/40 p-4"
       aria-label="Sponsored"
     >
       <p className="m-0 text-xs font-bold tracking-wide text-brand-700 uppercase">Sponsored</p>

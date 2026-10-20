@@ -16,7 +16,7 @@ const MOCK_LINKS = [
 
 <Base title="Log in" description="BookVerse login">
   <main id="main" class="py-12">
-    <div class="mx-auto w-[min(100%-1.5rem,28rem)] min-[375px]:w-[min(100%-2rem,28rem)]">
+    <div class="mx-auto w-[min(100%-1.5rem,28rem)] mm:w-[min(100%-2rem,28rem)]">
       <h1 class="type-page m-0 text-center text-ink-900">Log in</h1>
       <p class="type-ui mt-2 text-center text-ink-500">
         <a href="/register" class="text-brand-700">Create account</a>
@@ -25,7 +25,7 @@ const MOCK_LINKS = [
       </p>
       {
         mock ? (
-          <div class="mt-6 rounded-[var(--radius-card)] border border-line bg-paper p-4 shadow-[var(--shadow-warm)]">
+          <div class="mt-6 rounded-(--radius-card) border border-line bg-paper p-4 shadow-(--shadow-warm)">
             <p class="m-0 text-sm font-semibold text-ink-900">Demo roles</p>
             <p class="m-0 mt-1 text-xs text-ink-500">
               ফ্রেশ ও মানবিক · mock only: pick a role (no password).
@@ -35,7 +35,7 @@ const MOCK_LINKS = [
                 <li>
                   <a
                     href={`/mock-login?role=${p.role}`}
-                    class="flex min-h-11 items-center justify-between rounded-[var(--radius-card)] border border-line px-3 text-sm font-semibold text-ink-900 no-underline transition hover:border-brand-600 hover:bg-brand-50"
+                    class="flex min-h-11 items-center justify-between rounded-(--radius-card) border border-line px-3 text-sm font-semibold text-ink-900 no-underline transition hover:border-brand-600 hover:bg-brand-50"
                   >
                     <span>{p.label}</span>
                     <span class="text-xs font-medium text-ink-500">{p.dest}</span>

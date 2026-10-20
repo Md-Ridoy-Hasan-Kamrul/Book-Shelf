@@ -18,7 +18,7 @@ const data = await fetchBooks({ author, limit: '24' });
             <li>
               <a
                 href={`/books/${b.slug}`}
-                class="block rounded-[var(--radius-card)] border border-line bg-paper p-4 no-underline"
+                class="block rounded-(--radius-card) border border-line bg-paper p-4 no-underline"
               >
                 <h2 class="m-0 font-display text-lg font-bold text-ink-900">{b.titleBn}</h2>
               </a>

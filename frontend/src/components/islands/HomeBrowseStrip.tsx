@@ -69,10 +69,10 @@ export default function HomeBrowseStrip() {
               <li key={b.id}>
                 <a
                   href={`/books/${b.slug}`}
-                  className="block h-full rounded-[var(--radius-card)] border border-line bg-paper p-4 no-underline shadow-[var(--shadow-warm)] hover:border-brand-600"
+                  className="block h-full rounded-(--radius-card) border border-line bg-paper p-4 no-underline shadow-(--shadow-warm) hover:border-brand-600"
                 >
                   <div
-                    className="mb-3 aspect-[3/4] overflow-hidden rounded-[var(--radius-card)] bg-sand"
+                    className="mb-3 aspect-3/4 overflow-hidden rounded-(--radius-card) bg-sand"
                     aria-hidden
                   >
                     {b.coverUrl ? (

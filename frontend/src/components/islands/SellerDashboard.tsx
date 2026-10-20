@@ -20,7 +20,7 @@ function SkeletonRows() {
   return (
     <div className="space-y-2" aria-busy="true">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="h-12 animate-pulse rounded-[var(--radius-card)] bg-sand" />
+        <div key={i} className="h-12 animate-pulse rounded-(--radius-card) bg-sand" />
       ))}
     </div>
   );
@@ -145,7 +145,7 @@ function SellerDashboardInner({ role, userName, userEmail }: Props) {
           )}
           {overview.data && (
             <div className="grid gap-4">
-              <div className="grid grid-cols-2 gap-2 min-[375px]:gap-3 min-[768px]:grid-cols-4 min-[1440px]:gap-4">
+              <div className="grid grid-cols-2 gap-2 mm:gap-3 tab:grid-cols-4 lapl:gap-4">
                 <DashStat
                   label={role === 'WRITER' ? 'Title sales' : 'Orders'}
                   value={overview.data.ordersTotal}
@@ -163,13 +163,13 @@ function SellerDashboardInner({ role, userName, userEmail }: Props) {
               <div className="grid gap-4 min-[720px]:grid-cols-2">
                 <DashPanel title={role === 'WRITER' ? 'Royalty balance' : 'Wallet'}>
                   <dl className="m-0 grid gap-2">
-                    <div className="flex justify-between gap-2 rounded-[var(--radius-card)] bg-sand px-3 py-2">
+                    <div className="flex justify-between gap-2 rounded-(--radius-card) bg-sand px-3 py-2">
                       <dt className="text-ink-500">Pending</dt>
                       <dd className="m-0 font-bold text-ink-900">
                         ৳{overview.data.balancePendingBdt}
                       </dd>
                     </div>
-                    <div className="flex justify-between gap-2 rounded-[var(--radius-card)] bg-leaf-50 px-3 py-2">
+                    <div className="flex justify-between gap-2 rounded-(--radius-card) bg-leaf-50 px-3 py-2">
                       <dt className="text-ink-500">Available</dt>
                       <dd className="m-0 font-bold text-leaf-700">
                         ৳{overview.data.balanceAvailableBdt}
@@ -291,7 +291,7 @@ function SellerDashboardInner({ role, userName, userEmail }: Props) {
             {orders.data?.items.map((o) => (
               <li
                 key={o.id}
-                className="rounded-[var(--radius-card)] border border-line bg-paper px-3 py-2 text-sm"
+                className="rounded-(--radius-card) border border-line bg-paper px-3 py-2 text-sm"
               >
                 <div className="flex justify-between">
                   <span className="font-semibold">{o.status}</span>
@@ -325,7 +325,7 @@ function SellerDashboardInner({ role, userName, userEmail }: Props) {
             {earnings.data?.items.map((e) => (
               <li
                 key={e.orderId}
-                className="rounded-[var(--radius-card)] border border-line p-3 text-sm"
+                className="rounded-(--radius-card) border border-line p-3 text-sm"
               >
                 <div className="font-semibold">
                   Order {e.orderId.slice(0, 8)} · ৳{e.orderTotal}
@@ -350,7 +350,7 @@ function SellerDashboardInner({ role, userName, userEmail }: Props) {
             {payouts.data?.items.map((p) => (
               <li
                 key={p.id}
-                className="flex justify-between rounded-[var(--radius-card)] border border-line p-3 text-sm"
+                className="flex justify-between rounded-(--radius-card) border border-line p-3 text-sm"
               >
                 <span>{p.status}</span>
                 <span className="font-semibold">৳{p.amount}</span>
@@ -370,7 +370,7 @@ function SellerDashboardInner({ role, userName, userEmail }: Props) {
             {claims.data?.items.map((c) => (
               <li
                 key={c.orderId}
-                className="rounded-[var(--radius-card)] border border-line p-3 text-sm"
+                className="rounded-(--radius-card) border border-line p-3 text-sm"
               >
                 <strong>{c.status}</strong>: {c.reason.slice(0, 120)}
               </li>

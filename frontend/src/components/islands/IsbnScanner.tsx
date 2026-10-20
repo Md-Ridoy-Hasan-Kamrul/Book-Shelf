@@ -90,7 +90,7 @@ function ScannerInner() {
           <div
             id="isbn-scanner-host"
             ref={host}
-            className="overflow-hidden rounded-[var(--radius-card)] border border-line bg-ink-900"
+            className="overflow-hidden rounded-(--radius-card) border border-line bg-ink-900"
           />
           {error ? <p className="text-sm text-urgent-600">{error}</p> : null}
           <div className="flex gap-2">
@@ -110,7 +110,7 @@ function ScannerInner() {
           </div>
         </>
       ) : (
-        <div className="rounded-[var(--radius-card)] border border-line bg-paper p-4">
+        <div className="rounded-(--radius-card) border border-line bg-paper p-4">
           <p className="text-xs text-ink-500">Source: {book.source}</p>
           <h2 className="text-lg font-bold text-ink-900">{book.title}</h2>
           <p className="text-sm text-ink-500">{book.authors.join(', ') || 'Unknown author'}</p>
@@ -118,7 +118,7 @@ function ScannerInner() {
           <div className="mt-4 flex flex-wrap gap-2">
             <a
               href={`/sell/used?isbn=${encodeURIComponent(book.isbn)}`}
-              className="inline-flex min-h-11 items-center rounded-[var(--radius-card)] bg-cta-500 px-4 text-sm font-semibold text-ink-900"
+              className="inline-flex min-h-11 items-center rounded-(--radius-card) bg-cta-500 px-4 text-sm font-semibold text-ink-900"
             >
               Confirm & list
             </a>

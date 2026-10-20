@@ -79,7 +79,7 @@ export default function QuoteCardGenerator({ title, author, initialQuote = '' }:
         rows={3}
         value={quote}
         onChange={(e) => setQuote(e.target.value)}
-        className="mt-1 w-full rounded-[var(--radius-card)] border border-line bg-paper px-3 py-2 font-[family-name:var(--font-bangla,Hind_Siliguri),Inter,sans-serif] text-sm text-ink-900"
+        className="mt-1 w-full rounded-(--radius-card) border border-line bg-paper px-3 py-2 font-body text-sm text-ink-900"
         placeholder="একটি ছোট উদ্ধৃতি…"
         lang="bn"
       />
@@ -103,7 +103,7 @@ export default function QuoteCardGenerator({ title, author, initialQuote = '' }:
         <div
           ref={cardRef}
           style={{ width: 360, height: previewH }}
-          className="relative flex flex-col justify-between overflow-hidden rounded-xl bg-cream p-6 text-ink-900 shadow-[var(--shadow-warm)]"
+          className="relative flex flex-col justify-between overflow-hidden rounded-xl bg-cream p-6 text-ink-900 shadow-(--shadow-warm)"
           lang="bn"
         >
           <p
@@ -131,7 +131,7 @@ export default function QuoteCardGenerator({ title, author, initialQuote = '' }:
         type="button"
         disabled={pending || quote.trim().length < 1}
         onClick={download}
-        className="mt-4 inline-flex min-h-11 items-center rounded-[var(--radius-card)] bg-cta-500 px-4 text-sm font-semibold text-ink-900 disabled:opacity-60"
+        className="mt-4 inline-flex min-h-11 items-center rounded-(--radius-card) bg-cta-500 px-4 text-sm font-semibold text-ink-900 disabled:opacity-60"
       >
         {pending ? 'Rendering…' : 'Download PNG'}
       </button>

@@ -9,7 +9,7 @@ export default function CatalogFilters({ genre, language, type, sort }: Props) {
   return (
     <form
       method="get"
-      className="flex flex-wrap gap-3 rounded-[var(--radius-card)] border border-line bg-paper p-4"
+      className="flex flex-wrap gap-3 rounded-(--radius-card) border border-line bg-paper p-4"
     >
       <label className="text-sm font-semibold text-ink-900">
         Language
