@@ -23,6 +23,8 @@ type Props = {
   pathname?: string;
   /** Signed-in reader hub; guests keep storefront `/`. */
   homeHref?: string;
+  /** Show Profile when true, Log in when false (not both). */
+  signedIn?: boolean;
 };
 
 type NavItem = {
@@ -110,7 +112,15 @@ function linkClass(active: boolean) {
     : 'text-sm font-semibold text-ink-700 no-underline hover:text-brand-700';
 }
 
-export default function SiteShell({ flags, pathname = '/', homeHref = '/' }: Props) {
+const navLink =
+  'inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-(--radius-card) px-3';
+
+export default function SiteShell({
+  flags,
+  pathname = '/',
+  homeHref = '/',
+  signedIn = false,
+}: Props) {
   const usedBooks = Boolean(flags?.usedBooks);
   const count = useCartStore((s) => s.count());
   const [cartOpen, setCartOpen] = useState(false);
@@ -149,33 +159,34 @@ export default function SiteShell({ flags, pathname = '/', homeHref = '/' }: Pro
             <HeaderSearch />
           </div>
 
-          <nav className="ml-auto hidden items-center gap-1 lap:flex" aria-label="Primary">
+          <nav
+            className="ml-auto hidden items-center gap-1 lap:flex lapl:gap-2"
+            aria-label="Primary"
+          >
             {DESKTOP_PRIMARY.map((item) => {
               const active = item.match(path);
               return (
                 <a
                   key={item.href}
                   href={item.href}
-                  className={`rounded-(--radius-card) px-2.5 py-2 ${linkClass(active)}`}
+                  className={`${navLink} ${linkClass(active)}`}
                   aria-current={active ? 'page' : undefined}
                 >
-                  <span className="inline-flex items-center gap-1.5">
-                    {item.href === '/bookshelf' ? (
-                      <IconShelf className="h-4 w-4" />
-                    ) : item.href === '/mood' ? (
-                      <IconDiscover className="h-4 w-4" />
-                    ) : (
-                      <IconCommunity className="h-4 w-4" />
-                    )}
-                    {item.label}
-                  </span>
+                  {item.href === '/bookshelf' ? (
+                    <IconShelf className="h-4 w-4 shrink-0" aria-hidden />
+                  ) : item.href === '/mood' ? (
+                    <IconDiscover className="h-4 w-4 shrink-0" aria-hidden />
+                  ) : (
+                    <IconCommunity className="h-4 w-4 shrink-0" aria-hidden />
+                  )}
+                  {item.label}
                 </a>
               );
             })}
             {usedBooks ? (
               <a
                 href="/used"
-                className={`rounded-(--radius-card) px-2.5 py-2 ${linkClass(path.startsWith('/used') || path.startsWith('/sell'))}`}
+                className={`${navLink} ${linkClass(path.startsWith('/used') || path.startsWith('/sell'))}`}
                 aria-current={
                   path.startsWith('/used') || path.startsWith('/sell') ? 'page' : undefined
                 }
@@ -183,27 +194,31 @@ export default function SiteShell({ flags, pathname = '/', homeHref = '/' }: Pro
                 Used
               </a>
             ) : null}
-            <a
-              href="/login"
-              className={`rounded-(--radius-card) px-2.5 py-2 ${linkClass(path.startsWith('/login'))}`}
-            >
-              Log in
-            </a>
-            <a
-              href="/account"
-              className={`rounded-(--radius-card) px-2.5 py-2 ${linkClass(path.startsWith('/account'))}`}
-              aria-current={path.startsWith('/account') ? 'page' : undefined}
-            >
-              Profile
-            </a>
+
+            <span className="mx-1 hidden h-6 w-px shrink-0 bg-line lapl:block" aria-hidden />
+
+            {signedIn ? (
+              <a
+                href="/account"
+                className={`${navLink} ${linkClass(path.startsWith('/account'))}`}
+                aria-current={path.startsWith('/account') ? 'page' : undefined}
+              >
+                <IconProfile className="h-4 w-4 shrink-0" aria-hidden />
+                Profile
+              </a>
+            ) : (
+              <a href="/login" className={`${navLink} ${linkClass(path.startsWith('/login'))}`}>
+                Log in
+              </a>
+            )}
             <NotificationBell />
             <button
               type="button"
-              className="relative inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-(--radius-card) border border-line bg-cream px-3 text-sm font-semibold text-ink-900 hover:border-brand-600 hover:bg-brand-50"
+              className="relative inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-(--radius-card) border border-line bg-cream px-3 text-sm font-semibold text-ink-900 hover:border-brand-600 hover:bg-brand-50"
               onClick={() => setCartOpen(true)}
               aria-label={`Cart, ${count} items`}
             >
-              <IconCart className="h-4 w-4" />
+              <IconCart className="h-4 w-4 shrink-0" aria-hidden />
               Cart
               <span className="inline-flex min-w-5 justify-center rounded-(--radius-card) bg-brand-600 px-1.5 text-xs font-bold text-paper">
                 {count}

@@ -74,7 +74,12 @@ const homeHref = signedIn && me && postLoginPath(me.role) === '/home' ? '/home' 
       Skip to content
     </a>
     <Island client:load>
-      <SiteShell flags={{ usedBooks: flags.usedBooks }} pathname={pathname} homeHref={homeHref} />
+      <SiteShell
+        flags={{ usedBooks: flags.usedBooks }}
+        pathname={pathname}
+        homeHref={homeHref}
+        signedIn={signedIn}
+      />
     </Island>
     <div class="flex-1">
       <slot />

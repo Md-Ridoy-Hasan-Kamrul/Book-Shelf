@@ -27,7 +27,7 @@ packages/shared/   # Zod schemas, env, HTTP envelopes
 - `pnpm dev` → Astro web only; `PUBLIC_USE_MOCK_DATA` defaults **on** (set `false` only for live API).
 - Fixtures: `frontend/src/data/mock-books.json` + `frontend/src/lib/mockApi.ts`.
 - **Full stack later:** Docker + `PUBLIC_USE_MOCK_DATA=false` + `pnpm dev:stack`.
-- **PDF read-online (no download):** put files in `content/pdfs/<book-slug>.pdf` (see that folder’s README). Demo: `/books/padma-nodir-majhi` → **Read online**.
+- **PDF read-online (no download):** Cloudinary URLs via `BOOK_PDF_REMOTE_URLS` / built-in map, or local `content/pdfs/<slug>.pdf`. Demo: `/books/golpe-golpe-vocabulary/read`.
 
 ## Setup
 

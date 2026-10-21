@@ -18,9 +18,7 @@ Only `https://res.cloudinary.com/...` hosts are allowed (SSRF guard). The app st
 content/pdfs/<book-slug>.pdf
 ```
 
-| Book slug           | File                                 |
-| ------------------- | ------------------------------------ |
-| `padma-nodir-majhi` | `content/pdfs/padma-nodir-majhi.pdf` |
+Prefer Cloudinary remote URLs for real books. Keep this folder empty or use tiny samples only.
 
 Local is tried first; if missing, remote URL is fetched.
 

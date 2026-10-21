@@ -36,7 +36,7 @@ function NotificationBellInner() {
     <div className="relative">
       <button
         type="button"
-        className="relative rounded-full border border-line bg-cream px-3 py-2 text-sm font-semibold"
+        className="relative inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-(--radius-card) border border-line bg-cream px-3 text-sm font-semibold text-ink-900 hover:border-brand-600 hover:bg-brand-50"
         aria-label="Notifications"
         onClick={() => setOpen((v) => !v)}
       >

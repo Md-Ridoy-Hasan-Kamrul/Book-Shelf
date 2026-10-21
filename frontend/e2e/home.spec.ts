@@ -7,17 +7,19 @@ test.describe('Home page', () => {
     await expect(page).toHaveTitle(/BookVerse/);
     await expect(page.getByRole('banner')).toBeVisible();
     await expect(page.getByRole('search')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /বইয়ের পাতা/i })).toBeVisible();
-    await expect(page.locator('#features')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /বাংলাদেশের বইয়ের ঘর/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /অনলাইনে পড়ুন/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Mood discovery/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /নতুন বই/i })).toBeVisible();
     await expect(page.getByRole('contentinfo')).toBeVisible();
   });
 
-  test('hydrates the buy button', async ({ page }) => {
+  test('hydrates the mood picker', async ({ page }) => {
     await page.goto('/');
-    const button = page.getByRole('button', { name: /Buy · starter-kit/i });
-    await expect(button).toBeVisible();
-    await button.click();
-    await expect(page.getByRole('button', { name: /Added · starter-kit/i })).toBeVisible();
+    const happy = page.getByRole('button', { name: /খুশি \(Happy\)/i });
+    await expect(happy).toBeVisible();
+    await happy.click();
+    await expect(page).toHaveURL(/\/mood/);
   });
 
   test('design guide in dev', async ({ page }) => {
