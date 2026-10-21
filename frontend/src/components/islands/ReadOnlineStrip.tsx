@@ -17,6 +17,12 @@ const FALLBACK: Item[] = [
     author: 'Morgan Housel',
   },
   {
+    slug: 'ai-prompt-engineering',
+    titleBn: 'AI Prompt Engineering',
+    title: 'AI Prompt Engineering',
+    author: 'Kamrul Hossain',
+  },
+  {
     slug: 'padma-nodir-majhi',
     titleBn: 'পদ্মা নদীর মাঝি',
     title: 'Padma Nadir Majhi',

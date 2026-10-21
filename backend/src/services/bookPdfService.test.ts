@@ -27,5 +27,6 @@ describe('remote Cloudinary PDF URLs', () => {
     expect(remoteBookPdfUrl('psychology-of-money')).toMatch(
       /^https:\/\/res\.cloudinary\.com\/djiedtnex\//,
     );
+    expect(remoteBookPdfUrl('ai-prompt-engineering')).toMatch(/AI_Prompt_Engineering\.pdf$/);
   });
 });

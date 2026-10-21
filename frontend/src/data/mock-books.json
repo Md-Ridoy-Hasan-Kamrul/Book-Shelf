@@ -390,5 +390,45 @@
     ],
     "lookInsidePages": [],
     "outOfStock": false
+  },
+  {
+    "id": "mock-book-11",
+    "slug": "ai-prompt-engineering",
+    "title": "AI Prompt Engineering",
+    "titleBn": "AI Prompt Engineering",
+    "author": "Kamrul Hossain",
+    "coverUrl": null,
+    "minPrice": "299.00",
+    "hasStock": true,
+    "hasReadablePdf": true,
+    "language": "bn",
+    "genreSlug": "science",
+    "moodTags": ["curious", "focused", "motivated"],
+    "pageCount": null,
+    "description": "Learn prompt engineering in Bangla: structures, styles, and practical tips.",
+    "descriptionBn": "নিজের ভাষায় প্রম্পট ইঞ্জিনিয়ারিং: কাঠামো, স্টাইল ও ব্যবহারিক টিপস।",
+    "authorBn": "কামরুল হোসেন",
+    "isbn": null,
+    "publishedYear": 2024,
+    "genreName": "Science",
+    "genreNameBn": "বিজ্ঞান",
+    "publisherSlug": "pathak-samabesh",
+    "publisherName": "Pathak Samabesh",
+    "publisherUserId": "mock-pub-user-1",
+    "writerPenName": null,
+    "writerSlug": null,
+    "writerUserId": null,
+    "listings": [
+      {
+        "id": "mock-listing-11",
+        "price": "299.00",
+        "stock": 18,
+        "condition": "NEW",
+        "sellerType": "PUBLISHER",
+        "sellerName": "Pathak Samabesh"
+      }
+    ],
+    "lookInsidePages": [],
+    "outOfStock": false
   }
 ]
