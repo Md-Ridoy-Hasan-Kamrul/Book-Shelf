@@ -42,10 +42,11 @@ function PdfBookReaderInner({ slug, title }: Props) {
   const [page, setPage] = useState(1);
   const [pageCount, setPageCount] = useState(0);
   const [zoom, setZoom] = useState(1);
-  const [fitMode, setFitMode] = useState<'width' | 'page' | 'manual'>('width');
+  const [fitMode, setFitMode] = useState<'width' | 'page' | 'manual'>('page');
   const [rotation, setRotation] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [pageInput, setPageInput] = useState('1');
+  const wheelLockUntil = useRef(0);
 
   const paintPage = useEffectEvent(async (pageNum: number, scale: number, rot: number) => {
     const doc = docRef.current;
@@ -73,8 +74,20 @@ function PdfBookReaderInner({ slug, title }: Props) {
     const dpr = window.devicePixelRatio || 1;
     canvas.width = Math.floor(viewport.width * dpr);
     canvas.height = Math.floor(viewport.height * dpr);
-    canvas.style.width = `${viewport.width}px`;
-    canvas.style.height = `${viewport.height}px`;
+    // Always fit inside the stage so no scrollbar appears; wheel flips pages instead.
+    let cssW = viewport.width;
+    let cssH = viewport.height;
+    if (scroll) {
+      const maxW = Math.max(40, scroll.clientWidth - 24);
+      const maxH = Math.max(40, scroll.clientHeight - 24);
+      if (cssW > maxW || cssH > maxH) {
+        const s = Math.min(maxW / cssW, maxH / cssH);
+        cssW *= s;
+        cssH *= s;
+      }
+    }
+    canvas.style.width = `${cssW}px`;
+    canvas.style.height = `${cssH}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, viewport.width, viewport.height);
     await pdfPage.render({ canvasContext: ctx, viewport, canvas }).promise;
@@ -209,6 +222,28 @@ function PdfBookReaderInner({ slug, title }: Props) {
     return () => window.removeEventListener('keydown', onKey);
   }, [goNext, goPrev, zoomIn, zoomOut, toggleFullscreen]);
 
+  /** Mouse / trackpad wheel flips pages (no scrollbars). */
+  useEffect(() => {
+    const el = shellRef.current;
+    if (!el || status !== 'ok') return;
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const now = Date.now();
+      if (now < wheelLockUntil.current) return;
+      // Ignore tiny trackpad jitter
+      if (Math.abs(e.deltaY) < 8 && Math.abs(e.deltaX) < 8) return;
+      wheelLockUntil.current = now + 280;
+      const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      if (delta > 0) goNext();
+      else if (delta < 0) goPrev();
+    };
+
+    el.addEventListener('wheel', onWheel, { passive: false, capture: true });
+    return () => el.removeEventListener('wheel', onWheel, { capture: true });
+  }, [status, goNext, goPrev]);
+
   const jumpToPage = () => {
     const n = Number.parseInt(pageInput, 10);
     if (!Number.isFinite(n)) {
@@ -227,8 +262,10 @@ function PdfBookReaderInner({ slug, title }: Props) {
   return (
     <div
       ref={shellRef}
-      className={`flex flex-col overflow-hidden rounded-(--radius-card) border border-line bg-sand shadow-(--shadow-warm) ${
-        isFullscreen ? 'h-dvh rounded-none border-0' : 'min-h-[70vh]'
+      className={`flex flex-col overflow-hidden overscroll-none rounded-(--radius-card) border border-line bg-sand shadow-(--shadow-warm) ${
+        isFullscreen
+          ? 'h-dvh rounded-none border-0'
+          : 'h-[calc(100dvh-11rem)] max-h-[calc(100dvh-11rem)]'
       }`}
       onContextMenu={(e) => e.preventDefault()}
     >
@@ -261,7 +298,7 @@ function PdfBookReaderInner({ slug, title }: Props) {
             inputMode="numeric"
             aria-label="Page number"
           />
-          <span className="text-ink-500">/ {pageCount || '—'}</span>
+          <span className="text-ink-500">/ {pageCount || '…'}</span>
         </label>
         <button
           type="button"
@@ -334,7 +371,7 @@ function PdfBookReaderInner({ slug, title }: Props) {
         </button>
 
         <p className="m-0 ml-auto hidden text-xs text-ink-500 lap:block">
-          ← → pages · ± zoom · F fullscreen · no download
+          Scroll / ← → pages · ± zoom · F fullscreen
         </p>
       </div>
 
@@ -356,11 +393,12 @@ function PdfBookReaderInner({ slug, title }: Props) {
       {status === 'ok' ? (
         <div
           ref={scrollRef}
-          className={`flex flex-1 justify-center overflow-auto bg-ink-900/90 p-3 ${isFullscreen ? 'min-h-0' : 'min-h-[60vh]'}`}
+          className="bv-pdf-stage flex min-h-0 flex-1 items-center justify-center overflow-hidden overscroll-none bg-ink-900/90 p-3"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           <canvas
             ref={canvasRef}
-            className="max-w-none bg-paper shadow-(--shadow-warm)"
+            className="max-h-full max-w-full object-contain bg-paper shadow-(--shadow-warm)"
             role="img"
             aria-label={`${title}, page ${page} of ${pageCount}`}
           />

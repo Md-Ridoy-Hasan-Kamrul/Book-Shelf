@@ -236,3 +236,14 @@
     }
   }
 }
+
+/* PDF reader: no visible scrollbars; wheel flips pages in JS */
+.bv-pdf-stage {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.bv-pdf-stage::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
