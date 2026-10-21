@@ -1,20 +1,20 @@
 import type { APIRoute } from 'astro';
 import { readdir } from 'node:fs/promises';
 import { mockAllBooks } from '../../lib/mockCatalog';
-import { pdfContentRoot } from '../../lib/bookPdf';
+import { pdfContentRoot, remoteBookPdfSlugs } from '../../lib/bookPdf';
 
 export const prerender = false;
 
-/** Lists books that have a PDF in `content/pdfs/` for the homepage strip. */
+/** Lists books with a local or remote (Cloudinary) PDF for the homepage strip. */
 export const GET: APIRoute = async () => {
-  let pdfSlugs = new Set<string>();
+  let pdfSlugs = new Set<string>(remoteBookPdfSlugs());
   try {
     const files = await readdir(pdfContentRoot());
-    pdfSlugs = new Set(
-      files.filter((f) => f.endsWith('.pdf')).map((f) => f.replace(/\.pdf$/i, '')),
-    );
+    for (const f of files) {
+      if (f.endsWith('.pdf')) pdfSlugs.add(f.replace(/\.pdf$/i, ''));
+    }
   } catch {
-    pdfSlugs = new Set();
+    /* remote-only is fine */
   }
 
   const books = mockAllBooks()

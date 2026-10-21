@@ -23,14 +23,18 @@ const heading = book.titleBn || book.title;
 ---
 
 <Base title={`Read: ${heading}`} description={`Read online: ${heading} (download disabled).`}>
-  <main id="main" class="bv-container py-4 tab:py-6">
-    <header class="mb-4 flex flex-wrap items-end justify-between gap-3">
+  <main id="main" class="bv-container py-2 tab:py-6">
+    <header class="mb-2 flex min-w-0 items-baseline justify-between gap-2 tab:mb-4">
       <div class="min-w-0">
         <p class="type-meta m-0 font-semibold text-brand-700">Read online</p>
-        <h1 class="type-section m-0 mt-1 truncate text-ink-900">{heading}</h1>
-        <p class="m-0 mt-0.5 text-sm text-ink-500">{book.author}</p>
+        <h1
+          class="type-section m-0 mt-0.5 truncate text-base text-ink-900 tab:mt-1 tab:text-[length:inherit]"
+        >
+          {heading}
+        </h1>
+        <p class="m-0 hidden text-sm text-ink-500 tab:mt-0.5 tab:block">{book.author}</p>
       </div>
-      <p class="m-0 text-xs text-ink-500">Fullscreen · zoom · pages · no download</p>
+      <p class="m-0 hidden shrink-0 text-xs text-ink-500 tab:block">Zoom · pages · no download</p>
     </header>
     <PdfBookReader client:load slug={book.slug} title={heading} />
   </main>

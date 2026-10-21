@@ -47,5 +47,5 @@ Check off after each prompt’s ACCEPTANCE passes.
 - [x] Ops dashboard polish — Donezo-like shell (sidebar · search · user chip · KPI grid · widgets) on Admin/Seller, Fresh & Human tokens
 - [x] Ops dashboards use `DashboardLayout` (no storefront navbar / footer / bottom nav)
 - [x] Site-wide fluid type + `bv-container` gutters (320→375→425→768→1020→1440)
-- [x] PDF read-online — `content/pdfs/<slug>.pdf`; `/books/:slug/read` viewer (no download UI); stream via `/api/book-pdf/:slug` + API `GET /books/:slug/pdf`
+- [x] PDF read-online — local `content/pdfs/<slug>.pdf` and/or Cloudinary via `BOOK_PDF_REMOTE_URLS`; `/books/:slug/read` viewer (no download UI); stream via `/api/book-pdf/:slug` + API `GET /books/:slug/pdf`
 - [x] P2 shell production polish — sticky header + suggest search + active states; mobile bottom nav icons (BN labels) + cart drawer; `SiteFooter` columns (Explore / Account / Legal P17) + Fresh & Human tokens

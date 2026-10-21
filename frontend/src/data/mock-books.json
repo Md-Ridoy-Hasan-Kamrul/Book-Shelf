@@ -320,6 +320,7 @@
     "coverUrl": null,
     "minPrice": "250.00",
     "hasStock": true,
+    "hasReadablePdf": true,
     "language": "bn",
     "genreSlug": "children",
     "moodTags": ["curious", "happy", "focused"],

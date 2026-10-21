@@ -1,23 +1,30 @@
 # Read-online PDFs (no download)
 
-Put a book’s PDF here using the **book slug** as the filename.
+Prefer **remote CDN** (Cloudinary) so large PDFs stay out of git. Tiny samples may live here for offline demo.
+
+## Remote (recommended)
+
+Set public delivery URLs (no API secret) via env, or use the built-in map in `bookPdf` / `bookPdfService`:
+
+```bash
+BOOK_PDF_REMOTE_URLS={"my-book-slug":"https://res.cloudinary.com/CLOUD/image/upload/v1/file.pdf"}
+```
+
+Only `https://res.cloudinary.com/...` hosts are allowed (SSRF guard). The app streams bytes through `/api/book-pdf/<slug>` so the browser does not use a direct download URL in the reader.
+
+## Local (optional / small demos)
 
 ```text
 content/pdfs/<book-slug>.pdf
 ```
 
-Examples:
-
 | Book slug           | File                                 |
 | ------------------- | ------------------------------------ |
 | `padma-nodir-majhi` | `content/pdfs/padma-nodir-majhi.pdf` |
 
+Local is tried first; if missing, remote URL is fetched.
+
 ## Rules
 
-- Files stay **outside** `public/` and `uploads/` so browsers cannot open a direct download URL.
-- The site streams pages through `/api/book-pdf/<slug>` (and API `GET /books/:slug/pdf` when the stack is live).
-- The reader UI has **no download button**. True DRM is not possible in a browser; this blocks casual Save / download only.
-
-## Demo file
-
-`padma-nodir-majhi.pdf` ships as a one-page sample so `/books/padma-nodir-majhi/read` works in mock mode.
+- Keep PDFs **outside** `public/` and `uploads/`.
+- Reader UI has **no download button**. True DRM is not possible in a browser.
