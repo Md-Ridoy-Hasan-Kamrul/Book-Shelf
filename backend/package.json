@@ -7,11 +7,11 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "node api.js && tsx watch --env-file-if-exists=../.env src/index.ts",
+    "dev": "tsx watch --env-file-if-exists=../.env src/index.ts",
     "worker": "tsx watch --env-file-if-exists=../.env src/worker.ts",
     "worker:once": "tsx --env-file-if-exists=../.env src/worker.ts",
-    "build": "node api.js && prisma generate && tsup",
-    "start": "node api.js && node --env-file-if-exists=../.env dist/index.js",
+    "build": "prisma generate && tsup",
+    "start": "node --env-file-if-exists=../.env dist/index.js",
     "typecheck": "prisma generate && tsc --noEmit",
     "lint": "eslint src",
     "test": "vitest run",

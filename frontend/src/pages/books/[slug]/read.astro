@@ -1,0 +1,35 @@
+---
+import Base from '../../../layouts/Base.astro';
+import PdfBookReader from '../../../components/islands/PdfBookReader.tsx';
+import { fetchBookBySlug } from '../../../lib/catalogApi';
+import { bookPdfExists } from '../../../lib/bookPdf';
+
+const { slug } = Astro.params;
+if (!slug) {
+  return Astro.redirect('/');
+}
+
+const book = await fetchBookBySlug(slug);
+if (!book) {
+  return Astro.redirect('/search');
+}
+
+const canReadOnline = Boolean(book.hasReadablePdf) || (await bookPdfExists(book.slug));
+if (!canReadOnline) {
+  return Astro.redirect(`/books/${slug}`);
+}
+---
+
+<Base
+  title={`Read: ${book.titleBn || book.title}`}
+  description={`Read online: ${book.titleBn || book.title} (download disabled).`}
+>
+  <main id="main" class="bv-container py-6 tab:py-8">
+    <p class="type-meta m-0 font-semibold text-brand-700">Read online</p>
+    <h1 class="type-page m-0 mt-1 text-ink-900">{book.titleBn || book.title}</h1>
+    <p class="type-lead m-0 mt-1 text-ink-500">{book.author}</p>
+    <div class="mt-6">
+      <PdfBookReader client:load slug={book.slug} title={book.titleBn || book.title} />
+    </div>
+  </main>
+</Base>

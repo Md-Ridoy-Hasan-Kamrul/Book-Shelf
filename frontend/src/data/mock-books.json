@@ -310,5 +310,44 @@
     ],
     "lookInsidePages": [],
     "outOfStock": false
+  },
+  {
+    "id": "mock-book-9",
+    "slug": "golpe-golpe-vocabulary",
+    "title": "Golpe Golpe Vocabulary",
+    "titleBn": "গল্পে গল্পে Vocabulary",
+    "author": "Various",
+    "coverUrl": null,
+    "minPrice": "250.00",
+    "hasStock": true,
+    "language": "bn",
+    "genreSlug": "children",
+    "moodTags": ["curious", "happy", "focused"],
+    "pageCount": null,
+    "description": "Learn vocabulary through short Bangla stories.",
+    "descriptionBn": "গল্পের মাধ্যমে vocabulary শেখা।",
+    "authorBn": "বিভিন্ন",
+    "isbn": null,
+    "publishedYear": 2024,
+    "genreName": "Children",
+    "genreNameBn": "শিশু",
+    "publisherSlug": "pathak-samabesh",
+    "publisherName": "Pathak Samabesh",
+    "publisherUserId": "mock-pub-user-1",
+    "writerPenName": null,
+    "writerSlug": null,
+    "writerUserId": null,
+    "listings": [
+      {
+        "id": "mock-listing-9",
+        "price": "250.00",
+        "stock": 20,
+        "condition": "NEW",
+        "sellerType": "PUBLISHER",
+        "sellerName": "Pathak Samabesh"
+      }
+    ],
+    "lookInsidePages": [],
+    "outOfStock": false
   }
 ]

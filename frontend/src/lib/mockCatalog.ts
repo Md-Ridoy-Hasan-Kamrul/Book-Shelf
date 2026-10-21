@@ -36,6 +36,8 @@ export type MockBook = {
     sellerName: string;
   }>;
   lookInsidePages: string[];
+  /** Optional; inferred from `content/pdfs/<slug>.pdf` when omitted. */
+  hasReadablePdf?: boolean;
   outOfStock: boolean;
 };
 

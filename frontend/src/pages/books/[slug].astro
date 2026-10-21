@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { fetchBookBySlug } from '../../lib/catalogApi';
+import { bookPdfExists } from '../../lib/bookPdf';
 import AddToCartButton from '../../components/islands/AddToCartButton.tsx';
 import WishlistButton from '../../components/islands/WishlistButton.tsx';
 import BookReviews from '../../components/islands/BookReviews.tsx';
@@ -17,6 +18,7 @@ const book = await fetchBookBySlug(slug);
 if (!book) {
   return Astro.redirect('/search');
 }
+const canReadOnline = Boolean(book.hasReadablePdf) || (await bookPdfExists(book.slug));
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
 const jsonLd = {
@@ -99,6 +101,16 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=120, stale-while-re
           }
         </p>
         <div class="mt-4 flex flex-wrap gap-2">
+          {
+            canReadOnline ? (
+              <a
+                href={`/books/${book.slug}/read`}
+                class="inline-flex min-h-11 items-center justify-center rounded-(--radius-card) bg-cta-500 px-5 text-sm font-semibold text-ink-900 no-underline hover:bg-cta-600"
+              >
+                Read online · অনলাইনে পড়ুন
+              </a>
+            ) : null
+          }
           <WishlistButton client:load bookId={book.id} />
         </div>
         <ReprintRequestButton client:load bookId={book.id} outOfStock={Boolean(book.outOfStock)} />

@@ -50,8 +50,9 @@ export default defineConfig({
         '/role-applications': toApi(),
         '/phone': toApi(),
         '/posts': toApi(),
-        '/books': toApi(),
-        '/search': toApi(),
+        // Do NOT proxy /books or /search: those are Astro HTML pages.
+        // Mock-first `pnpm dev` has no API on :4000; proxy caused 502 and hid Read online.
+        // catalogApi talks to PUBLIC_API_URL directly when live.
         '/wishlist': toApi(),
         '/uploads': toApi(),
         '/checkout': toApi(),

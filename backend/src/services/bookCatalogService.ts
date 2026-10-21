@@ -4,6 +4,7 @@ import type { booksListQuerySchema } from '@bookverse/shared';
 import { AppError } from '../lib/appError.js';
 import { prisma } from '../lib/prisma.js';
 import type { StorageProvider } from '../providers/storage/types.js';
+import { bookPdfExists } from './bookPdfService.js';
 
 type ListQuery = z.infer<typeof booksListQuerySchema>;
 
@@ -195,6 +196,7 @@ export async function getBookBySlug(env: ApiEnv, storage: StorageProvider, slug:
       book.lookInside?.status === 'APPROVED'
         ? book.lookInside.pageKeys.map((k) => storage.resolvePublicUrl(k))
         : undefined,
+    hasReadablePdf: await bookPdfExists(book.slug),
     release,
   };
 }

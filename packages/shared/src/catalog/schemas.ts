@@ -44,6 +44,8 @@ export const bookCardSchema = z.object({
   hasStock: z.boolean(),
   language: z.string(),
   genreSlug: z.string(),
+  /** Present when a read-online PDF exists for this slug. */
+  hasReadablePdf: z.boolean().optional(),
 });
 
 export const bookListingSchema = z.object({
@@ -71,6 +73,8 @@ export const bookDetailSchema = bookCardSchema.extend({
   writerPenName: z.string().nullable(),
   listings: z.array(bookListingSchema),
   lookInsidePages: z.array(z.string()).optional(),
+  /** True when `content/pdfs/<slug>.pdf` exists (read-online, no download). */
+  hasReadablePdf: z.boolean().optional(),
   release: z
     .object({
       releaseAt: z.string(),

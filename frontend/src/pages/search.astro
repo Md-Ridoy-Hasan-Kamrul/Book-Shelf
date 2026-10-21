@@ -3,9 +3,19 @@ import Base from '../layouts/Base.astro';
 import SearchSuggest from '../components/islands/SearchSuggest.tsx';
 import CatalogFilters from '../components/islands/CatalogFilters.tsx';
 import { searchBooks } from '../lib/catalogApi';
+import { bookPdfExists } from '../lib/bookPdf';
 
 const q = Astro.url.searchParams.get('q') ?? '';
-const results = q ? await searchBooks(q) : { items: [], nextCursor: null };
+const raw = q ? await searchBooks(q) : { items: [], nextCursor: null };
+const results = {
+  ...raw,
+  items: await Promise.all(
+    raw.items.map(async (b) => ({
+      ...b,
+      hasReadablePdf: Boolean(b.hasReadablePdf) || (await bookPdfExists(b.slug)),
+    })),
+  ),
+};
 ---
 
 <Base title={q ? `Search: ${q}` : 'Search'}>
@@ -26,17 +36,30 @@ const results = q ? await searchBooks(q) : { items: [], nextCursor: null };
             </p>
             <ul class="mt-4 grid list-none gap-4 p-0 min-[720px]:grid-cols-3">
               {results.items.map((b) => (
-                <li>
-                  <a
-                    href={`/books/${b.slug}`}
-                    class="block rounded-(--radius-card) border border-line bg-paper p-4 no-underline hover:bg-sand"
-                  >
+                <li class="flex flex-col rounded-(--radius-card) border border-line bg-paper p-4 shadow-(--shadow-warm)">
+                  <a href={`/books/${b.slug}`} class="min-w-0 no-underline hover:opacity-90">
                     <h2 class="m-0 font-display text-lg font-bold text-ink-900">{b.titleBn}</h2>
                     <p class="m-0 mt-1 text-sm text-ink-500">{b.author}</p>
                     {b.minPrice && (
                       <p class="mt-2 text-sm font-semibold text-ink-900">৳{b.minPrice}</p>
                     )}
                   </a>
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    <a
+                      href={`/books/${b.slug}`}
+                      class="inline-flex min-h-10 items-center rounded-(--radius-card) border border-line bg-paper px-3 text-sm font-semibold text-ink-900 no-underline hover:bg-sand"
+                    >
+                      Book details
+                    </a>
+                    {b.hasReadablePdf ? (
+                      <a
+                        href={`/books/${b.slug}/read`}
+                        class="inline-flex min-h-10 items-center rounded-(--radius-card) bg-cta-500 px-3 text-sm font-semibold text-ink-900 no-underline hover:bg-cta-600"
+                      >
+                        Read online · পড়ুন
+                      </a>
+                    ) : null}
+                  </div>
                 </li>
               ))}
             </ul>

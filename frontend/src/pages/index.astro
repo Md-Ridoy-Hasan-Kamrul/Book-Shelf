@@ -5,12 +5,14 @@ import ScrollReveal from '../components/islands/ScrollReveal.tsx';
 import MoodPicker from '../components/islands/MoodPicker.tsx';
 import RecommendRail from '../components/islands/RecommendRail.tsx';
 import HomeBrowseStrip from '../components/islands/HomeBrowseStrip.tsx';
+import ReadOnlineStrip from '../components/islands/ReadOnlineStrip.tsx';
 ---
 
 <Base title="BookVerse: Home">
   <ScrollReveal client:load />
   <main id="main">
     <Hero />
+    <ReadOnlineStrip client:load />
     <section class="py-10" aria-label="Mood discovery">
       <div class="bv-container grid min-w-0 max-w-full gap-6 tab:gap-8">
         <MoodPicker client:load />

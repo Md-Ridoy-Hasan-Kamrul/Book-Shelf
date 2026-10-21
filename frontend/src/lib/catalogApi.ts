@@ -18,6 +18,19 @@ function apiBase() {
   return (import.meta.env.API_INTERNAL_URL ?? getWebEnv().PUBLIC_API_URL).replace(/\/$/, '');
 }
 
+async function withPdfFlags<T extends { slug: string; hasReadablePdf?: boolean }>(
+  items: T[],
+): Promise<Array<T & { hasReadablePdf: boolean }>> {
+  const { bookPdfExists } = await import('./bookPdf');
+  return Promise.all(
+    items.map(async (b) => ({
+      ...b,
+      // Always prefer disk: `false ?? x` would skip the file check.
+      hasReadablePdf: (await bookPdfExists(b.slug)) || b.hasReadablePdf === true,
+    })),
+  );
+}
+
 export async function fetchBooks(query: Record<string, string | undefined>) {
   if (useMockData()) {
     const limit = Number(query.limit ?? 24) || 24;
@@ -39,32 +52,34 @@ export async function fetchBookBySlug(slug: string) {
   if (useMockData()) {
     const b = mockBookBySlug(slug);
     if (!b) return null;
+    const [withPdf] = await withPdfFlags([b]);
     return bookDetailSchema.parse({
-      id: b.id,
-      slug: b.slug,
-      title: b.title,
-      titleBn: b.titleBn,
-      author: b.author,
-      coverUrl: b.coverUrl,
-      minPrice: b.minPrice,
-      hasStock: b.hasStock,
-      language: b.language,
-      genreSlug: b.genreSlug,
-      description: b.description,
-      descriptionBn: b.descriptionBn,
-      authorBn: b.authorBn,
-      isbn: b.isbn,
-      pageCount: b.pageCount,
-      publishedYear: b.publishedYear,
-      moodTags: b.moodTags,
-      genreName: b.genreName,
-      genreNameBn: b.genreNameBn,
-      publisherSlug: b.publisherSlug,
-      publisherName: b.publisherName,
-      writerPenName: b.writerPenName,
-      listings: b.listings,
-      lookInsidePages: b.lookInsidePages,
-      outOfStock: b.outOfStock,
+      id: withPdf.id,
+      slug: withPdf.slug,
+      title: withPdf.title,
+      titleBn: withPdf.titleBn,
+      author: withPdf.author,
+      coverUrl: withPdf.coverUrl,
+      minPrice: withPdf.minPrice,
+      hasStock: withPdf.hasStock,
+      language: withPdf.language,
+      genreSlug: withPdf.genreSlug,
+      description: withPdf.description,
+      descriptionBn: withPdf.descriptionBn,
+      authorBn: withPdf.authorBn,
+      isbn: withPdf.isbn,
+      pageCount: withPdf.pageCount,
+      publishedYear: withPdf.publishedYear,
+      moodTags: withPdf.moodTags,
+      genreName: withPdf.genreName,
+      genreNameBn: withPdf.genreNameBn,
+      publisherSlug: withPdf.publisherSlug,
+      publisherName: withPdf.publisherName,
+      writerPenName: withPdf.writerPenName,
+      listings: withPdf.listings,
+      lookInsidePages: withPdf.lookInsidePages,
+      hasReadablePdf: withPdf.hasReadablePdf,
+      outOfStock: withPdf.outOfStock,
     });
   }
   const res = await fetch(`${apiBase()}/books/${encodeURIComponent(slug)}`, {
@@ -77,7 +92,10 @@ export async function fetchBookBySlug(slug: string) {
 }
 
 export async function searchBooks(q: string) {
-  if (useMockData()) return mockSearch(q);
+  if (useMockData()) {
+    const data = mockSearch(q);
+    return { ...data, items: await withPdfFlags(data.items) };
+  }
   const res = await fetch(`${apiBase()}/search?${new URLSearchParams({ q })}`, {
     headers: { Accept: 'application/json' },
   });
