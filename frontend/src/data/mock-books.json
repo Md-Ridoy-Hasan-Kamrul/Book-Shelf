@@ -350,5 +350,45 @@
     ],
     "lookInsidePages": [],
     "outOfStock": false
+  },
+  {
+    "id": "mock-book-10",
+    "slug": "psychology-of-money",
+    "title": "The Psychology of Money",
+    "titleBn": "দ্য সাইকোলজি অফ মানি",
+    "author": "Morgan Housel",
+    "coverUrl": null,
+    "minPrice": "219.00",
+    "hasStock": true,
+    "hasReadablePdf": true,
+    "language": "bn",
+    "genreSlug": "self-help",
+    "moodTags": ["motivated", "focused", "curious"],
+    "pageCount": null,
+    "description": "Timeless lessons on wealth, greed, and happiness (Bangla edition).",
+    "descriptionBn": "সম্পদ, লোভ ও সুখ নিয়ে কালজয়ী শিক্ষা।",
+    "authorBn": "মর্গান হাউসেল",
+    "isbn": null,
+    "publishedYear": 2021,
+    "genreName": "Self-help",
+    "genreNameBn": "আত্মউন্নয়ন",
+    "publisherSlug": "pathak-samabesh",
+    "publisherName": "Pathak Samabesh",
+    "publisherUserId": "mock-pub-user-1",
+    "writerPenName": null,
+    "writerSlug": null,
+    "writerUserId": null,
+    "listings": [
+      {
+        "id": "mock-listing-10",
+        "price": "219.00",
+        "stock": 15,
+        "condition": "NEW",
+        "sellerType": "PUBLISHER",
+        "sellerName": "Pathak Samabesh"
+      }
+    ],
+    "lookInsidePages": [],
+    "outOfStock": false
   }
 ]

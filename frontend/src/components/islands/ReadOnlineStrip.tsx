@@ -11,6 +11,12 @@ const FALLBACK: Item[] = [
     author: 'Various',
   },
   {
+    slug: 'psychology-of-money',
+    titleBn: 'দ্য সাইকোলজি অফ মানি',
+    title: 'The Psychology of Money',
+    author: 'Morgan Housel',
+  },
+  {
     slug: 'padma-nodir-majhi',
     titleBn: 'পদ্মা নদীর মাঝি',
     title: 'Padma Nadir Majhi',

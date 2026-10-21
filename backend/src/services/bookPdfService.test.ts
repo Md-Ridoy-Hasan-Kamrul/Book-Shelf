@@ -20,8 +20,12 @@ describe('remote Cloudinary PDF URLs', () => {
     expect(isAllowedRemotePdfUrl('https://evil.example/a.pdf')).toBe(false);
   });
 
-  it('maps golpe-golpe-vocabulary to the default Cloudinary URL', () => {
-    const url = remoteBookPdfUrl('golpe-golpe-vocabulary');
-    expect(url).toMatch(/^https:\/\/res\.cloudinary\.com\/djiedtnex\//);
+  it('maps built-in Cloudinary books', () => {
+    expect(remoteBookPdfUrl('golpe-golpe-vocabulary')).toMatch(
+      /^https:\/\/res\.cloudinary\.com\/djiedtnex\//,
+    );
+    expect(remoteBookPdfUrl('psychology-of-money')).toMatch(
+      /^https:\/\/res\.cloudinary\.com\/djiedtnex\//,
+    );
   });
 });
