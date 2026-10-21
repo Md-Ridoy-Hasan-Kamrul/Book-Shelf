@@ -18,18 +18,20 @@ const canReadOnline = Boolean(book.hasReadablePdf) || (await bookPdfExists(book.
 if (!canReadOnline) {
   return Astro.redirect(`/books/${slug}`);
 }
+
+const heading = book.titleBn || book.title;
 ---
 
-<Base
-  title={`Read: ${book.titleBn || book.title}`}
-  description={`Read online: ${book.titleBn || book.title} (download disabled).`}
->
-  <main id="main" class="bv-container py-6 tab:py-8">
-    <p class="type-meta m-0 font-semibold text-brand-700">Read online</p>
-    <h1 class="type-page m-0 mt-1 text-ink-900">{book.titleBn || book.title}</h1>
-    <p class="type-lead m-0 mt-1 text-ink-500">{book.author}</p>
-    <div class="mt-6">
-      <PdfBookReader client:load slug={book.slug} title={book.titleBn || book.title} />
-    </div>
+<Base title={`Read: ${heading}`} description={`Read online: ${heading} (download disabled).`}>
+  <main id="main" class="bv-container py-4 tab:py-6">
+    <header class="mb-4 flex flex-wrap items-end justify-between gap-3">
+      <div class="min-w-0">
+        <p class="type-meta m-0 font-semibold text-brand-700">Read online</p>
+        <h1 class="type-section m-0 mt-1 truncate text-ink-900">{heading}</h1>
+        <p class="m-0 mt-0.5 text-sm text-ink-500">{book.author}</p>
+      </div>
+      <p class="m-0 text-xs text-ink-500">Fullscreen · zoom · pages · no download</p>
+    </header>
+    <PdfBookReader client:load slug={book.slug} title={heading} />
   </main>
 </Base>
