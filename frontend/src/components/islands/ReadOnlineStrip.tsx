@@ -71,7 +71,7 @@ function ReadOnlineStripInner() {
         <h2 id="read-online-heading" className="m-0 font-display text-2xl font-bold text-ink-900">
           অনলাইনে পড়ুন
         </h2>
-        <p className="mt-1 text-sm text-ink-500">PDF বই ওয়েবসাইটে পড়ুন। ডাউনলোড নেই।</p>
+        <p className="mt-1 text-sm text-ink-500">PDF বই ওয়েবসাইটে পড়ুন। ডাউনলোড করা যাবে না।</p>
         <ul className="mt-5 m-0 grid list-none gap-3 p-0 tab:grid-cols-2">
           {items.map((b) => (
             <li
