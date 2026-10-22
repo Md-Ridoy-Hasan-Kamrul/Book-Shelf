@@ -510,5 +510,45 @@
     ],
     "lookInsidePages": [],
     "outOfStock": false
+  },
+  {
+    "id": "mock-book-14",
+    "slug": "mans-search-for-meaning",
+    "title": "Man's Search for Meaning",
+    "titleBn": "Man's Search for Meaning",
+    "author": "Viktor E. Frankl",
+    "coverUrl": null,
+    "minPrice": "420.00",
+    "hasStock": true,
+    "hasReadablePdf": true,
+    "language": "en",
+    "genreSlug": "self-help",
+    "moodTags": ["motivated", "calm", "focused"],
+    "pageCount": null,
+    "description": "Viktor Frankl's account of finding purpose through suffering and logotherapy.",
+    "descriptionBn": "ভিক্টর ফ্রাঙ্কল: দুঃখের মধ্যে অর্থ খোঁজা ও লোগোথেরাপি।",
+    "authorBn": "ভিক্টর ই. ফ্রাঙ্কল",
+    "isbn": null,
+    "publishedYear": 1959,
+    "genreName": "Self-help",
+    "genreNameBn": "আত্মউন্নয়ন",
+    "publisherSlug": "pathak-samabesh",
+    "publisherName": "Pathak Samabesh",
+    "publisherUserId": "mock-pub-user-1",
+    "writerPenName": null,
+    "writerSlug": null,
+    "writerUserId": null,
+    "listings": [
+      {
+        "id": "mock-listing-14",
+        "price": "420.00",
+        "stock": 16,
+        "condition": "NEW",
+        "sellerType": "PUBLISHER",
+        "sellerName": "Pathak Samabesh"
+      }
+    ],
+    "lookInsidePages": [],
+    "outOfStock": false
   }
 ]

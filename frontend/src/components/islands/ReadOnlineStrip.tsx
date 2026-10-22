@@ -34,6 +34,12 @@ const FALLBACK: Item[] = [
     title: 'Influence: The Psychology of Persuasion',
     author: 'Robert B. Cialdini',
   },
+  {
+    slug: 'mans-search-for-meaning',
+    titleBn: "Man's Search for Meaning",
+    title: "Man's Search for Meaning",
+    author: 'Viktor E. Frankl',
+  },
 ];
 
 function ReadOnlineStripInner() {
