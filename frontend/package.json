@@ -4,9 +4,9 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "astro dev --open --port 4321",
+    "dev": "node api.js && astro dev --open --port 4321",
     "dev:ci": "astro dev --host 127.0.0.1 --port 4321",
-    "build": "astro build",
+    "build": "node api.js && astro build",
     "preview": "astro preview",
     "test": "vitest run",
     "test:watch": "vitest",
