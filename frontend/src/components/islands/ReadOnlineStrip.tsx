@@ -40,6 +40,12 @@ const FALLBACK: Item[] = [
     title: "Man's Search for Meaning",
     author: 'Viktor E. Frankl',
   },
+  {
+    slug: 'the-body-keeps-the-score',
+    titleBn: 'The Body Keeps the Score',
+    title: 'The Body Keeps the Score',
+    author: 'Bessel van der Kolk',
+  },
 ];
 
 function ReadOnlineStripInner() {

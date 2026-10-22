@@ -4,6 +4,9 @@ import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 /**
  * HTML page navigations must hit Astro SSR.

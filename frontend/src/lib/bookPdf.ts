@@ -43,6 +43,8 @@ const DEFAULT_REMOTE_PDF_URLS: Record<string, string> = {
     'https://res.cloudinary.com/djiedtnex/image/upload/v1792648731/The_Psychology_of_Persuasion.pdf',
   'mans-search-for-meaning':
     'https://res.cloudinary.com/djiedtnex/image/upload/v1792649569/Man_s_Search_for_Meaning.pdf',
+  'the-body-keeps-the-score':
+    'https://res.cloudinary.com/djiedtnex/image/upload/v1792651634/The_Body_Keeps_the_Score.pdf',
 };
 
 const REMOTE_HOST_ALLOWLIST = new Set(['res.cloudinary.com']);
