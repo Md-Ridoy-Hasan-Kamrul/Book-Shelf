@@ -550,5 +550,45 @@
     ],
     "lookInsidePages": [],
     "outOfStock": false
+  },
+  {
+    "id": "mock-book-15",
+    "slug": "the-body-keeps-the-score",
+    "title": "The Body Keeps the Score",
+    "titleBn": "The Body Keeps the Score",
+    "author": "Bessel van der Kolk",
+    "coverUrl": null,
+    "minPrice": "520.00",
+    "hasStock": true,
+    "hasReadablePdf": true,
+    "language": "en",
+    "genreSlug": "self-help",
+    "moodTags": ["calm", "curious", "focused"],
+    "pageCount": null,
+    "description": "How trauma reshapes the body and brain, and paths toward recovery.",
+    "descriptionBn": "ট্রমা কীভাবে শরীর ও মস্তিষ্ক বদলায়, এবং সুস্থ হওয়ার পথ।",
+    "authorBn": "বেসেল ভ্যান ডার কোল্ক",
+    "isbn": null,
+    "publishedYear": 2014,
+    "genreName": "Self-help",
+    "genreNameBn": "আত্মউন্নয়ন",
+    "publisherSlug": "pathak-samabesh",
+    "publisherName": "Pathak Samabesh",
+    "publisherUserId": "mock-pub-user-1",
+    "writerPenName": null,
+    "writerSlug": null,
+    "writerUserId": null,
+    "listings": [
+      {
+        "id": "mock-listing-15",
+        "price": "520.00",
+        "stock": 11,
+        "condition": "NEW",
+        "sellerType": "PUBLISHER",
+        "sellerName": "Pathak Samabesh"
+      }
+    ],
+    "lookInsidePages": [],
+    "outOfStock": false
   }
 ]
