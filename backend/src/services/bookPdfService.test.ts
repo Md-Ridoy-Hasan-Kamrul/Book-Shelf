@@ -35,5 +35,6 @@ describe('remote Cloudinary PDF URLs', () => {
       /The_Psychology_of_Persuasion\.pdf$/,
     );
     expect(remoteBookPdfUrl('mans-search-for-meaning')).toMatch(/Man_s_Search_for_Meaning\.pdf$/);
+    expect(remoteBookPdfUrl('the-body-keeps-the-score')).toMatch(/The_Body_Keeps_the_Score\.pdf$/);
   });
 });
