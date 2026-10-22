@@ -28,5 +28,8 @@ describe('remote Cloudinary PDF URLs', () => {
       /^https:\/\/res\.cloudinary\.com\/djiedtnex\//,
     );
     expect(remoteBookPdfUrl('ai-prompt-engineering')).toMatch(/AI_Prompt_Engineering\.pdf$/);
+    expect(remoteBookPdfUrl('thinking-fast-and-slow')).toMatch(
+      /Daniel_Kahneman-Thinking_Fast_and_Slow\.pdf$/,
+    );
   });
 });

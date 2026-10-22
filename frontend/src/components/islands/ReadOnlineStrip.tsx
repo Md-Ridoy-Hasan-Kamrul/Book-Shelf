@@ -22,6 +22,12 @@ const FALLBACK: Item[] = [
     title: 'AI Prompt Engineering',
     author: 'Kamrul Hossain',
   },
+  {
+    slug: 'thinking-fast-and-slow',
+    titleBn: 'Thinking, Fast and Slow',
+    title: 'Thinking, Fast and Slow',
+    author: 'Daniel Kahneman',
+  },
 ];
 
 function ReadOnlineStripInner() {

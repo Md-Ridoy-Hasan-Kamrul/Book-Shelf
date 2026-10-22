@@ -34,6 +34,8 @@ const DEFAULT_REMOTE_PDF_URLS: Record<string, string> = {
     'https://res.cloudinary.com/djiedtnex/image/upload/v1792577081/%E0%A6%A6%E0%A7%8D%E0%A6%AF_%E0%A6%B8%E0%A6%BE%E0%A6%87%E0%A6%95%E0%A7%8B%E0%A6%B2%E0%A6%9C%E0%A6%BF_%E0%A6%85%E0%A6%AC_%E0%A6%AE%E0%A6%BE%E0%A6%A8%E0%A6%BF.pdf',
   'ai-prompt-engineering':
     'https://res.cloudinary.com/djiedtnex/image/upload/v1792578945/AI_Prompt_Engineering.pdf',
+  'thinking-fast-and-slow':
+    'https://res.cloudinary.com/djiedtnex/image/upload/v1792644671/Daniel_Kahneman-Thinking_Fast_and_Slow.pdf',
 };
 
 const REMOTE_HOST_ALLOWLIST = new Set(['res.cloudinary.com']);

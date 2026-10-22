@@ -430,5 +430,45 @@
     ],
     "lookInsidePages": [],
     "outOfStock": false
+  },
+  {
+    "id": "mock-book-12",
+    "slug": "thinking-fast-and-slow",
+    "title": "Thinking, Fast and Slow",
+    "titleBn": "Thinking, Fast and Slow",
+    "author": "Daniel Kahneman",
+    "coverUrl": null,
+    "minPrice": "550.00",
+    "hasStock": true,
+    "hasReadablePdf": true,
+    "language": "en",
+    "genreSlug": "self-help",
+    "moodTags": ["curious", "focused", "motivated"],
+    "pageCount": null,
+    "description": "Nobel Prize winner Daniel Kahneman on two systems of thinking: fast and slow.",
+    "descriptionBn": "নোবেল বিজয়ী ড্যানিয়েল কাহনেম্যান: দ্রুত ও ধীর দুই ধরনের চিন্তাভাবনা।",
+    "authorBn": "ড্যানিয়েল কাহনেম্যান",
+    "isbn": null,
+    "publishedYear": 2011,
+    "genreName": "Self-help",
+    "genreNameBn": "আত্মউন্নয়ন",
+    "publisherSlug": "pathak-samabesh",
+    "publisherName": "Pathak Samabesh",
+    "publisherUserId": "mock-pub-user-1",
+    "writerPenName": null,
+    "writerSlug": null,
+    "writerUserId": null,
+    "listings": [
+      {
+        "id": "mock-listing-12",
+        "price": "550.00",
+        "stock": 12,
+        "condition": "NEW",
+        "sellerType": "PUBLISHER",
+        "sellerName": "Pathak Samabesh"
+      }
+    ],
+    "lookInsidePages": [],
+    "outOfStock": false
   }
 ]
