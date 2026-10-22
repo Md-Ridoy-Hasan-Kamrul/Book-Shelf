@@ -28,6 +28,12 @@ const FALLBACK: Item[] = [
     title: 'Thinking, Fast and Slow',
     author: 'Daniel Kahneman',
   },
+  {
+    slug: 'psychology-of-persuasion',
+    titleBn: 'Influence: The Psychology of Persuasion',
+    title: 'Influence: The Psychology of Persuasion',
+    author: 'Robert B. Cialdini',
+  },
 ];
 
 function ReadOnlineStripInner() {

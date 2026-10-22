@@ -470,5 +470,45 @@
     ],
     "lookInsidePages": [],
     "outOfStock": false
+  },
+  {
+    "id": "mock-book-13",
+    "slug": "psychology-of-persuasion",
+    "title": "Influence: The Psychology of Persuasion",
+    "titleBn": "Influence: The Psychology of Persuasion",
+    "author": "Robert B. Cialdini",
+    "coverUrl": null,
+    "minPrice": "480.00",
+    "hasStock": true,
+    "hasReadablePdf": true,
+    "language": "en",
+    "genreSlug": "self-help",
+    "moodTags": ["curious", "motivated", "focused"],
+    "pageCount": null,
+    "description": "Classic guide to the psychology of why people say yes, and how to apply those principles.",
+    "descriptionBn": "মানুষ কেন হ্যাঁ বলে: প্রভাব ও পারসুয়েশনের ক্লাসিক গাইড।",
+    "authorBn": "রবার্ট বি. সিয়ালডিনি",
+    "isbn": null,
+    "publishedYear": 2006,
+    "genreName": "Self-help",
+    "genreNameBn": "আত্মউন্নয়ন",
+    "publisherSlug": "pathak-samabesh",
+    "publisherName": "Pathak Samabesh",
+    "publisherUserId": "mock-pub-user-1",
+    "writerPenName": null,
+    "writerSlug": null,
+    "writerUserId": null,
+    "listings": [
+      {
+        "id": "mock-listing-13",
+        "price": "480.00",
+        "stock": 14,
+        "condition": "NEW",
+        "sellerType": "PUBLISHER",
+        "sellerName": "Pathak Samabesh"
+      }
+    ],
+    "lookInsidePages": [],
+    "outOfStock": false
   }
 ]

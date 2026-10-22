@@ -31,5 +31,8 @@ describe('remote Cloudinary PDF URLs', () => {
     expect(remoteBookPdfUrl('thinking-fast-and-slow')).toMatch(
       /Daniel_Kahneman-Thinking_Fast_and_Slow\.pdf$/,
     );
+    expect(remoteBookPdfUrl('psychology-of-persuasion')).toMatch(
+      /The_Psychology_of_Persuasion\.pdf$/,
+    );
   });
 });

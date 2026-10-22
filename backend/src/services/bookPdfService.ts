@@ -36,6 +36,8 @@ const DEFAULT_REMOTE_PDF_URLS: Record<string, string> = {
     'https://res.cloudinary.com/djiedtnex/image/upload/v1792578945/AI_Prompt_Engineering.pdf',
   'thinking-fast-and-slow':
     'https://res.cloudinary.com/djiedtnex/image/upload/v1792644671/Daniel_Kahneman-Thinking_Fast_and_Slow.pdf',
+  'psychology-of-persuasion':
+    'https://res.cloudinary.com/djiedtnex/image/upload/v1792648731/The_Psychology_of_Persuasion.pdf',
 };
 
 const REMOTE_HOST_ALLOWLIST = new Set(['res.cloudinary.com']);
